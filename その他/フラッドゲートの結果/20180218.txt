@@ -1,0 +1,86 @@
+// 後手なのに　先手の駒を指した？
+// 名前の表示が Kifuwarabe 2018 ではなく floodgate-600-10F になってしまった。
+// 「ログイン名」には表示名を書くのか。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+>1:usi
+<1:id name Kifuwarabe 2018
+<1:id author Satoshi Takahashi
+<1:usiok
+>T:LOGIN floodgate-600-10F kifuwarabe x1
+<T:LOGIN:floodgate-600-10F OK
+<T:##[LOGIN] +OK x1
+>T:%%GAME floodgate-300-10F *
+>1:quit
+>T:LOGOUT
+<T:LOGOUT:completed
+>1:usi
+<1:id name Kifuwarabe 2018
+<1:id author Satoshi Takahashi
+<1:usiok
+>T:LOGIN floodgate-600-10F kifuwarabe x1
+<T:LOGIN:floodgate-600-10F OK
+<T:##[LOGIN] +OK x1
+>T:%%GAME floodgate-300-10F *
+>1:quit
+>T:LOGOUT
+<T:LOGOUT:completed
+>1:usi
+<1:id name Kifuwarabe 2018
+<1:id author Satoshi Takahashi
+<1:usiok
+>T:LOGIN floodgate-600-10F kifuwarabe1 x1
+<T:LOGIN:floodgate-600-10F OK
+<T:##[LOGIN] +OK x1
+>T:%%GAME floodgate-300-10F *
+>T: 
+>T: 
+<T:BEGIN Game_Summary
+<T:Protocol_Version:1.2
+<T:Protocol_Mode:Server
+<T:Format:Shogi 1.0
+<T:Declaration:Jishogi 1.1
+<T:Game_ID:wdoor+floodgate-300-10F+coduck_pi2_600MHz_1c+floodgate-600-10F+20180218220003
+<T:Name+:coduck_pi2_600MHz_1c
+<T:Name-:floodgate-600-10F
+<T:Your_Turn:-
+<T:Rematch_On_Draw:NO
+<T:To_Move:+
+<T:Max_Moves:256
+<T:BEGIN Time
+<T:Time_Unit:1sec
+<T:Total_Time:300
+<T:Byoyomi:0
+<T:Increment:10
+<T:Least_Time_Per_Move:0
+<T:END Time
+<T:BEGIN Position
+<T:P1-KY-KE-GI-KI-OU-KI-GI-KE-KY
+<T:P2 * -HI *  *  *  *  * -KA * 
+<T:P3-FU-FU-FU-FU-FU-FU-FU-FU-FU
+<T:P4 *  *  *  *  *  *  *  *  * 
+<T:P5 *  *  *  *  *  *  *  *  * 
+<T:P6 *  *  *  *  *  *  *  *  * 
+<T:P7+FU+FU+FU+FU+FU+FU+FU+FU+FU
+<T:P8 * +KA *  *  *  *  * +HI * 
+<T:P9+KY+KE+GI+KI+OU+KI+GI+KE+KY
+<T:+
+<T:END Position
+<T:END Game_Summary
+>1:setoption name USI_Ponder value true
+>1:setoption name USI_Hash value 256
+>1:isready
+<1:readyok
+>T:AGREE
+<T:START:wdoor+floodgate-300-10F+coduck_pi2_600MHz_1c+floodgate-600-10F+20180218220003
+>1:usinewgame
+<T:+7776FU,T20
+>1:position startpos moves 7g7f
+>1:go btime 290000 wtime 300000 binc 10000 winc 10000
+<1:bestmove 3g3h
+>T:+3738FU
+<T:#ILLEGAL_MOVE
+<T:#LOSE
+>1:gameover lose
+>T:%%GAME floodgate-300-10F *
+>T: 
