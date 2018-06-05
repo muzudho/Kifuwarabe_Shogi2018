@@ -1,6 +1,11 @@
 #![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_assignments)]
+#![allow(unreachable_code)]
 use std::io::prelude::*;
 use std::net::TcpStream;
+use std;
 ///
 /// CSA通信
 ///
@@ -8,6 +13,8 @@ use std::net::TcpStream;
 /// 「ＣＳＡプロトコルによる通信」Ike's page
 /// http://usapyon.game.coocan.jp/ComShogi/0c.html
 ///
+/// 「Struct std::net::TcpStream」
+/// https://doc.rust-lang.org/std/net/struct.TcpStream.html
 use jotai::uchu::*;
 
 /// 使い方説明の表示
@@ -66,41 +73,43 @@ pub fn csa_send(buf:&String)
   g_writeln(&format!("send:{}", buf));
 }
 
-/*
-void CsaRecv(char *buf)
+///
+/// 2017-01-23「[Multi-Threading & TCP] Writing/Reading on TcpStream」
+/// https://users.rust-lang.org/t/multi-threading-tcp-writing-reading-on-tcpstream/10558/1
+pub fn csa_recv()//buf:&mut String
 {
-  int sum = 0,nRecv;
-  char c[1];
+  /*
+  let mut stream = TcpStream::connect("127.0.0.1:34254").expect("CSASend:SOCKET ERROR:SOCK NOT OPEN?");
+  let sum = 0;
+  let nRecv;
 
-  for (;;) {
+  loop {
     // 1byteずつ読み取る。'\n'が来るまで
-    nRecv = recv( s, c, 1, 0);
-    if ( nRecv < 0 ) {
-      fprintf(stderr,"CSARecv:SOCKET ERROR:SOCK NOT OPEN?\n");
-      exit(1);
-    }
-    buf[sum++] = c[0];
-    if (c[0]=='\n') {
+    let mut buf2 = String::new(); 
+    println!("Received {} bytes", stream.read_to_end(&mut buf2).unwrap());
+    buf.push_str(buf2.to_string());
+    if buf2[0]=='\n' {
       break;
     }
   }
-  buf[sum++]='\0';
-  printf("recv:%s",buf);
+
+  g_writeln(&format!("recv:{}", buf));
+  */
 }
 
-// 見本のメインです。
-int main(int argc,char *argv[])
-{
-  long start=clock();
-  Kyokumen::HashInit();
-  int SikouJikanTotal[2]={0,0};
 
-  int i;
-  int j;
-  if (argc<3) {
-    show_usage();
-    exit(1);
-  }
+// 見本のメインです。
+pub fn csa_main()//int argc,char *argv[]
+{
+/*
+  long start=clock();
+  // 局面ハッシュの初期化をここに書く
+*/
+  let mut sikou_jikan_total : [i64;2] = [0, 0];
+
+  let mut i = 0;
+  let mut j = 0;
+  /*
   for(i=1;i<=2;i++) {
     for(j=CPU;j<=LAN;j++) {
       if (strcmp(argv[i],tebanStr[j])==0) {
@@ -110,112 +119,104 @@ int main(int argc,char *argv[])
     teban[i-1]=(Teban)j;
     if (j==3) {
       show_usage();
-      exit(1);
+      std::process::exit(1);
     }
   }
-  char User[256];
-  char Password[256];
-  if (argc>=5) {
-    strcpy(User,argv[3]);
-    strcpy(Password,argv[4]);
-  } else {
-    strcpy(User,"");
-    strcpy(Password,"");
-  }
-  char Server[256];
-  if (argc>=6) {
-    strcpy(Server,argv[5]);
-  } else {
-    strcpy(Server,"usapyon.dip.jp");
-  }
-  int Port;
-  if (argc>=7) {
-    Port=atoi(argv[6]);
-  } else {
-    Port=4081;
-  }
+*/
+let mut user_name = "Kifuwarabe";
+let mut password = "KifuwarabePass";
+let mut server_domain = "usapyon.dip.jp";
+let mut port = 4081;
+/*
   if (teban[0]==LAN && teban[1]==LAN) {
-    fprintf(stderr,"Can't match LAN against LAN.\n");
+ */
+    g_writeln("Can't match LAN against LAN.");
     show_usage();
-    exit(1);
+    std::process::exit(1);
+/*
   }
+
   if (teban[0]==LAN || teban[1]==LAN) {
-    if (User[0]=='\0') {
+    // LAN同士
+    if (user_name[0]=='\0') {
       show_usage();
-      exit(1);
+      std::process::exit(1);
     }
+
     // Socketを開く
-#ifdef _WINDOWS
-    WORD version=0x0101;
-    WSADATA WSAData;
-    WSAStartup(version,&WSAData);
-#endif
     // ソケット構築
     s=socket(PF_INET,SOCK_STREAM,0);
     if (s<0) {
-      fprintf(stderr,"Can't Create Socket.\n");
-      exit(1);
+      */
+      g_writeln("Can't Create Socket.");
+      std::process::exit(1);
+      /*
     }
+
     // 接続先サーバ名解決
-    struct hostent *host=gethostbyname(Server);
+    struct hostent *host=gethostbyname(server_domain);
     if (host==NULL) {
-      fprintf(stderr,"Can't Find Server '%s'.\n",Server);
-      exit(1);
+      */
+      g_writeln( &format!("Can't Find Server '{}'.", server_domain) );
+      std::process::exit(1);
+      /*
     }
+
     // 接続（connect)
-#ifdef _WINDOWS
-    SOCKADDR_IN Addr;
-#else
     struct sockaddr_in Addr;
-#endif
     memset(&Addr, 0,sizeof(Addr));
     Addr.sin_family = AF_INET;
-    Addr.sin_port = htons(Port);
+    Addr.sin_port = htons(port);
     memcpy((char *)&Addr.sin_addr, (char *)host->h_addr,host->h_length);
     int rtn = connect(s, (sockaddr *)&Addr, sizeof(Addr));
     if (rtn<0) {
-      fprintf(stderr,"Can't Connect to Server '%s' Port %d.\n",Server,Port);
-      exit(1);
+      fprintf(stderr,"Can't Connect to Server '%s' Port %d.\n",server_domain,port);
+      */
+      std::process::exit(1);
+      /*
     }
-    // User,PasswordでLoginする
-    char buf[256];
-    sprintf(buf,"LOGIN %s %s\n",User,Password);
-    CsaSend(buf);
-    for(;;) {
-      CsaRecv(buf); // LOGIN OKがいつか来るはず。
-      char tmp[256];
-      sprintf(tmp,"LOGIN:%s OK\n",User);
-      if (strcmp(buf,tmp)==0) {
-        printf("ログイン成功");
+    // user_name,PasswordでLoginする
+    */
+    let mut buf_login = String::new();
+    /*
+    sprintf(buf_login,"LOGIN %s %s\n",user_name,password);
+    CsaSend(buf_login);
+
+    loop {
+      CsaRecv(buf_login); // LOGIN OKがいつか来るはず。
+      */
+      let mut tmp_login = String::new();
+      /*
+      g_writeln(&format!("LOGIN:{} OK", user_name));
+      if (strcmp(buf_login,tmp_login)==0) {
+        */
+        g_writeln("ログイン成功");
+        /*
         break;
       } else {
-        printf("ログインに失敗しました。\r\n原因: %s\n", buf);
-#ifdef _WINDOWS
-        closesocket(s);
-#else
+        g_writeln(&format!("ログインに失敗しました。\r\n原因: {}", buf_login));
         close(s);
-#endif
-        exit(1);
+        std::process::exit(1);
       }
     }
     for(;;) {
-      CsaRecv(buf);
-      if (strcmp(buf,"Your_Turn:+\n")==0) {
+      CsaRecv(buf_login);
+      if (strcmp(buf_login,"Your_Turn:+\n")==0) {
         if (teban[0]==LAN) {
           swap(teban[0],teban[1]);
         }
       }
-      if (strcmp(buf,"Your_Turn:-\n")==0) {
+      if (strcmp(buf_login,"Your_Turn:-\n")==0) {
         if (teban[1]==LAN) {
           swap(teban[0],teban[1]);
         }
       }
-      if (strcmp(buf,"END Game_Summary\n")==0) {
+      if (strcmp(buf_login,"END Game_Summary\n")==0) {
         break;
       }
     }
     CsaSend("AGREE\n");
-    CsaRecv(buf);  // STARTが来るはず。
+    CsaRecv(buf_login);  // STARTが来るはず。
   }
   
   // 平手の初期配置です。見やすいでしょ？変換はその分複雑ですけど。
@@ -248,30 +249,29 @@ int main(int argc,char *argv[])
 
   // 将棋の局面で、最大の手数は５７９手だそうです。
   Te teBuf[600];
-  int teNum;
-
+  */
+  let mut te_num : i64;
+  /*
   // 手前のプレイヤーから開始します。
   int SorE=SELF;
-
-#ifdef _GCC_
-  time_t temp;
-  srand(time(&temp));
-#else
-  long temp;
-  srand(time(&temp));
-#endif
-
-  int bSennitite=false;
-
+*/
+  let mut temp_time : i64 = 0;
+/*
+  srand(time(&temp_time));
+*/
+  let mut b_sennitite : bool = false;
+/*
   // もしも合法手がなくなったら、詰み＝負けです。
   // 合法手がある間はゲームを継続します。
   // ↓
   // 「投了」により、合法手がある場合でも負けになることがあります。
   // また、「投了」しない限り終わりません
   Te te;
-  bool bLose=false;
-  for(;;) {
-    teNum=k.MakeLegalMoves(SorE,teBuf);
+  */
+  let mut b_lose : bool = false;
+  /*
+  loop {
+    te_num = k.MakeLegalMoves(SorE,teBuf);
     long byouStart=clock();
     k.SenkeiInit();
     k.Print();
@@ -283,18 +283,23 @@ int main(int argc,char *argv[])
       NowTeban=teban[1];
       NextTeban=teban[0];
     }
-    bool bFirst=true;
+  */
+    let mut b_first : bool = true;
+  /*
     switch (NowTeban) {
       case HUMAN:
-        if (teNum==0) {
+        if (te_num == 0) {
           te=Te(0);
         } else do {
-          if (!bFirst) {
-            printf("入力された手が異常です。\n");
+            */
+          if !b_first {
+            g_writeln("入力された手が異常です。");
           }
+
           // 手を入力します。
-          char buf[80];
-          gets(buf);
+          let mut buf_human = String::new();
+          /*
+          gets(buf_human);
           // 入力の方法:from,to,promote
           // ただし、歩を打つときはfromを01、香を打つときはfromを02…とする。
           // promoteは、成るときに*を付ける。
@@ -302,10 +307,10 @@ int main(int argc,char *argv[])
           int koma,capture;
           char promote[2];
           promote[0]='\0';
-          if (strcmp(buf,"%TORYO")==0) {
+          if (strcmp(buf_human,"%TORYO")==0) {
             te=Te(0);
           } else {
-            int ss=sscanf(buf,"%02x%02x%1s",&from,&to,&promote);
+            int ss=sscanf(buf_human,"%02x%02x%1s",&from,&to,&promote);
             if (ss<2) continue;
             if (from<OU) {
               koma=SorE|from;
@@ -319,31 +324,35 @@ int main(int argc,char *argv[])
             } else {
               te=Te(from,to,koma,capture,0);
             }
-            bFirst=false;
+            b_first = false;
           }
-        } while (IsIllegal(te,teNum,teBuf) && !te.IsNull());
+        } while (IsIllegal(te, te_num, teBuf) && !te.IsNull());
         break;
       case CPU:
         te=sikou.Think(SorE,k);
         break;
       case LAN:
         {
-          char buf[256];
+          */
+          let mut buf_lan = String::new();
+          /*
           char komaStr[3];
           char c;
-          CsaRecv(buf);  // 相手の指し手が帰ってくる。（正しい指し手であることはサーバでチェック済み）
-          if (strcmp(buf,"%TORYO\n")==0) {
+          CsaRecv(buf_lan);  // 相手の指し手が帰ってくる。（正しい指し手であることはサーバでチェック済み）
+          if (buf_lan=="%TORYO\n") {
             te=Te(0);
-          } else if (strcmp(buf,"#WIN\n")==0) {
+          } else if (buf_lan=="#WIN\n") {
             te=Te(0);
-          } else if (strcmp(buf,"#TIME_UP\n")==0) {
+          } else if (buf_lan=="#TIME_UP\n") {
             te=Te(0);
-          } else if (strcmp(buf,"#LOSE\n")==0) {
+          } else if (buf_lan=="#LOSE\n") {
+            */
             // 持将棋宣言負け。
-            bLose=true;
+            b_lose = true;
+            /*
             break;
           } else {
-            sscanf(buf,"%c%02x%02x%2s,T%d\n",&c,&te.from,&te.to,komaStr,&ByouHistory[k.Tesu]);
+            sscanf(buf_lan,"%c%02x%02x%2s,T%d\n",&c,&te.from,&te.to,komaStr,&ByouHistory[k.Tesu]);
             int i;
             for(i=0;i<=RY;i++) {
               if (strcmp(komaStr,CSAKomaStr[i|SELF])==0) {
@@ -366,28 +375,34 @@ int main(int argc,char *argv[])
       // 今の手を送る
       if (te.IsNull()) {
         CsaSend("%TORYO\n");
-        char buf[256];
-        CsaRecv(buf);
-        CsaRecv(buf);
+        */
+        let mut buf_a = String::new();
+        /*
+        CsaRecv(buf_a);
+        CsaRecv(buf_a);
       } else {
-        char buf[256];
+        */
+        let mut buf_b = String::new();
+        /*
         char komaStr[3];
         char c;
         int from,to;
-        sprintf(buf,"%c%02x%02x%s\n",SorE==SELF?'+':'-',te.from,te.to,CSAKomaStr[te.koma|(te.promote?PROMOTED:0)]);
+        sprintf(buf_b,"%c%02x%02x%s\n",SorE==SELF?'+':'-',te.from,te.to,CSAKomaStr[te.koma|(te.promote?PROMOTED:0)]);
 
-        CsaSend(buf);
-        CsaRecv(buf);  // 指し手が帰ってくる。
-        if (strcmp(buf,"#TIME_UP\n")==0) {
+        CsaSend(buf_b);
+        CsaRecv(buf_b);  // 指し手が帰ってくる。
+        if (buf_b=="#TIME_UP\n") {
           // 時間切れ
-          CsaRecv(buf);
+          CsaRecv(buf_b);
         }
-        if (strcmp(buf,"#LOSE\n")==0) {
+        if (buf_b=="#LOSE\n") {
+          */
           // 時間切れ負け。
-          bLose=true;
+          b_lose = true;
+          /*
           break;
         }
-        sscanf(buf,"%c%02x%02x%2s,T%d\n",&c,&from,&to,komaStr,&ByouHistory[k.Tesu]);
+        sscanf(buf_b,"%c%02x%02x%2s,T%d\n",&c,&from,&to,komaStr,&ByouHistory[k.Tesu]);
       }
     }
     TeHistory[k.Tesu]=te;
@@ -409,37 +424,47 @@ int main(int argc,char *argv[])
       }
     }
     if (sennitite>=4) {
-      bSennitite=true;
+      b_sennitite = true;
       break;
     }
     if (SorE==SELF) {
-      SikouJikanTotal[0]+=ByouHistory[k.Tesu-1];
+      sikou_jikan_total[0] += ByouHistory[k.Tesu-1];
       SorE=ENEMY;
     } else {
-      SikouJikanTotal[1]+=ByouHistory[k.Tesu-1];
+      sikou_jikan_total[1] += ByouHistory[k.Tesu-1];
       SorE=SELF;
     }
     printf("\n総思考時間:先手 %2d:%02d 後手%2d:%02d\n",
-      SikouJikanTotal[0]/60,SikouJikanTotal[0]%60,
-      SikouJikanTotal[1]/60,SikouJikanTotal[1]%60
+      sikou_jikan_total[0]/60, sikou_jikan_total[0]%60,
+      sikou_jikan_total[1]/60, sikou_jikan_total[1]%60
     );
-    if (te.IsNull() || bLose) {
+    if (te.IsNull() || b_lose) {
       break;
     }
   }
   k.Print();
   if (SorE==SELF && te.IsNull()) {
-    printf("先手の勝ち。\n");
+    */
+    g_writeln("先手の勝ち。");
+    /*
   } else if (SorE==ENEMY && te.IsNull()) {
-    printf("後手の勝ち。\n");
-  } else if (SorE==SELF && (teNum==0 || bLose)) {
-    printf("後手の勝ち。\n");
-  } else if (SorE==ENEMY && (teNum==0 || bLose)) {
-    printf("先手の勝ち。\n");
-  } else if (bSennitite) {
+    */
+    g_writeln("後手の勝ち。");
+    /*
+  } else if (SorE==SELF && (te_num == 0 || b_lose)) {
+    */
+    g_writeln("後手の勝ち。");
+    /*
+  } else if (SorE==ENEMY && (te_num == 0 || b_lose)) {
+    */
+    g_writeln("先手の勝ち。");
+    /*
+  } else if (b_sennitite) {
     // 千日手による終局
     // 王手の千日手の判定
-    printf("千日手です。\n");
+    */
+    g_writeln("千日手です。");
+    /*
     int sennitite=0;
     if (Kyokumen::OuteHistory[k.Tesu]) {
       for(int i=k.Tesu;sennitite<=3&&i>0;i-=2) {
@@ -452,11 +477,17 @@ int main(int argc,char *argv[])
       }
       if (sennitite==4) {
         // 連続王手の千日手
-        printf("連続王手の千日手です。\n");
+        */
+        g_writeln("連続王手の千日手です。");
+        /*
         if (SorE==SELF) { 
-          printf("後手の勝ち。\n");
+          */
+          g_writeln("後手の勝ち。");
+          /*
         } else {
-          printf("先手の勝ち。\n");
+          */
+          g_writeln("先手の勝ち。");
+          /*
         }
       }
     } else if (Kyokumen::OuteHistory[k.Tesu-1]) {
@@ -471,11 +502,17 @@ int main(int argc,char *argv[])
       }
       if (sennitite==4) {
         // 連続王手の千日手
-        printf("連続王手の千日手です。\n");
+        */
+        g_writeln("連続王手の千日手です。");
+        /*
         if (SorE==SELF) {
-          printf("先手の勝ち。\n");
+          */
+          g_writeln("先手の勝ち。");
+          /*
         } else {
-          printf("後手の勝ち。\n");
+          */
+          g_writeln("後手の勝ち。");
+          /*
         }
       }
     }
@@ -484,29 +521,38 @@ int main(int argc,char *argv[])
   if (fp==NULL) {
     fprintf(stderr,"log.csaに書き込みできません。");
   } else {
-    fprintf(fp,"N+\n");
-    fprintf(fp,"N-\n");
-    fprintf(fp,"P1-KY-KE-GI-KI-OU-KI-GI-KE-KY\n");
-    fprintf(fp,"P2 * -HI *  *  *  *  * -KA * \n");
-    fprintf(fp,"P3-FU-FU-FU-FU-FU-FU-FU-FU-FU\n");
-    fprintf(fp,"P4 *  *  *  *  *  *  *  *  * \n");
-    fprintf(fp,"P5 *  *  *  *  *  *  *  *  * \n");
-    fprintf(fp,"P6 *  *  *  *  *  *  *  *  * \n");
-    fprintf(fp,"P7+FU+FU+FU+FU+FU+FU+FU+FU+FU\n");
-    fprintf(fp,"P8 * +KA *  *  *  *  * +HI * \n");
-    fprintf(fp,"P9+KY+KE+GI+KI+OU+KI+GI+KE+KY\n");
-    fprintf(fp,"+\n");
+    */
+    g_writeln("N+");
+    g_writeln("N-");
+    g_writeln("P1-KY-KE-GI-KI-OU-KI-GI-KE-KY");
+    g_writeln("P2 * -HI *  *  *  *  * -KA * ");
+    g_writeln("P3-FU-FU-FU-FU-FU-FU-FU-FU-FU");
+    g_writeln("P4 *  *  *  *  *  *  *  *  * ");
+    g_writeln("P5 *  *  *  *  *  *  *  *  * ");
+    g_writeln("P6 *  *  *  *  *  *  *  *  * ");
+    g_writeln("P7+FU+FU+FU+FU+FU+FU+FU+FU+FU");
+    g_writeln("P8 * +KA *  *  *  *  * +HI * ");
+    g_writeln("P9+KY+KE+GI+KI+OU+KI+GI+KE+KY");
+    g_writeln("+");
+
+  /*
     for(i=0;i<k.Tesu;i++) {
       if (!TeHistory[i].IsNull()) {
         if (i%2==0) {
-          fprintf(fp,"+");
+  */
+    g_writeln("+");
+  /*
         } else {
-          fprintf(fp,"-");
+  */
+    g_writeln("-");
+  /*
         }
         fprintf(fp,"%02x%02x%s\n",TeHistory[i].from,TeHistory[i].to,CSAKomaStr[TeHistory[i].koma|(TeHistory[i].promote?PROMOTED:0)]);
         fprintf(fp,"T%d\n",ByouHistory[i]);
       } else {
-        fprintf(fp,"%%TORYO\n");
+  */
+    g_writeln("%%TORYO");
+  /*
       }
     }
     fclose(fp);
@@ -521,5 +567,5 @@ int main(int argc,char *argv[])
   }
   printf("%.3lfs",(double(clock()-start))/CLOCKS_PER_SEC);
   return 0;
-}
 */
+}
