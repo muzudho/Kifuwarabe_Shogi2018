@@ -60,6 +60,10 @@ impl Processor {
     }
     */
 
+    fn is_matched(&self, len:usize, line: &String, starts:&usize) -> bool {
+        return self.keyword.len()<=len && &line[*starts..self.keyword.len()] == self.keyword
+    }
+
     fn process_events(&self, uchu:&mut Uchu, len:usize, line: &String, starts:&mut usize) {
         *starts += self.keyword.len();
         // 続きにスペース「 」が１つあれば読み飛ばす
@@ -284,51 +288,51 @@ fn main() {
         if len==0 {
             p_len_zero.process_events(&mut uchu, len, &line, &mut starts);
         // 文字数の長いものからチェック
-        }else if line.starts_with(&p_kmugokidir.keyword) {
+        }else if p_kmugokidir.is_matched(len, &line, &starts) { //line.starts_with(&p_kmugokidir.keyword)
             p_kmugokidir.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_usinewgame.keyword.len()<=len && &line[starts..p_usinewgame.keyword.len()] == p_usinewgame.keyword {
+        }else if p_usinewgame.is_matched(len, &line, &starts) {
             p_usinewgame.process_events(&mut uchu, len, &line, &mut starts);
-        }else if line.starts_with(&p_position.keyword) {
+        }else if p_position.is_matched(len, &line, &starts) { //line.starts_with(&p_position.keyword)
             p_position.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_isready.keyword.len()<=len && &line[starts..p_isready.keyword.len()] == p_isready.keyword {
+        }else if p_isready.is_matched(len, &line, &starts) {
             p_isready.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_kmugoki.keyword.len()<=len && &line[starts..p_kmugoki.keyword.len()] == p_kmugoki.keyword {
+        }else if p_kmugoki.is_matched(len, &line, &starts) {
             p_kmugoki.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_hirate.keyword.len()<=len && &line[starts..p_hirate.keyword.len()] == p_hirate.keyword {
+        }else if p_hirate.is_matched(len, &line, &starts) {
             p_hirate.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_kikisu.keyword.len()<=len && &line[starts..p_kikisu.keyword.len()] == p_kikisu.keyword {
+        }else if p_kikisu.is_matched(len, &line, &starts) {
             p_kikisu.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_rndkms.keyword.len()<=len && &line[starts..p_rndkms.keyword.len()] == p_rndkms.keyword {
+        }else if p_rndkms.is_matched(len, &line, &starts) {
             p_rndkms.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_sasite.keyword.len()<=len && &line[starts..p_sasite.keyword.len()] == p_sasite.keyword {
+        }else if p_sasite.is_matched(len, &line, &starts) {
             p_sasite.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_rndms.keyword.len()<=len && &line[starts..p_rndms.keyword.len()] == p_rndms.keyword {
+        }else if p_rndms.is_matched(len, &line, &starts) {
             p_rndms.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_teigi_conv.keyword.len()<=len && &line[starts..p_teigi_conv.keyword.len()] == p_teigi_conv.keyword {
+        }else if p_teigi_conv.is_matched(len, &line, &starts) {
             p_teigi_conv.process_events(&mut uchu, len, &line, &mut starts);            
-        }else if p_hash.keyword.len()<=len && &line[starts..p_hash.keyword.len()] == p_hash.keyword {
+        }else if p_hash.is_matched(len, &line, &starts) {
             p_hash.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_kifu.keyword.len()<=len && &line[starts..p_kifu.keyword.len()] == p_kifu.keyword {
+        }else if p_kifu.is_matched(len, &line, &starts) {
             p_kifu.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_quit.keyword.len()<=len && &line[starts..p_quit.keyword.len()] == p_quit.keyword {
+        }else if p_quit.is_matched(len, &line, &starts) {
             p_quit.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_rand.keyword.len()<=len && &line[starts..p_rand.keyword.len()] == p_rand.keyword {
+        }else if p_rand.is_matched(len, &line, &starts) {
             p_rand.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_same.keyword.len()<=len && &line[starts..p_same.keyword.len()] == p_same.keyword {
+        }else if p_same.is_matched(len, &line, &starts) {
             p_same.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_test.keyword.len()<=len && &line[starts..p_test.keyword.len()] == p_test.keyword {
+        }else if p_test.is_matched(len, &line, &starts) {
             p_test.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_undo.keyword.len()<=len && &line[starts..p_undo.keyword.len()] == p_undo.keyword {
+        }else if p_undo.is_matched(len, &line, &starts) {
             p_undo.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_do.keyword.len()<=len && &line[starts..p_do.keyword.len()] == p_do.keyword {
+        }else if p_do.is_matched(len, &line, &starts) {
             p_do.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_ky0.keyword.len()<=len && &line[starts..p_ky0.keyword.len()] == p_ky0.keyword {
+        }else if p_ky0.is_matched(len, &line, &starts) {
             p_ky0.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_usi.keyword.len()<=len && &line[starts..p_usi.keyword.len()] == p_usi.keyword {
+        }else if p_usi.is_matched(len, &line, &starts) {
             p_usi.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_go.keyword.len()<=len && &line[starts..p_go.keyword.len()] == p_go.keyword {
+        }else if p_go.is_matched(len, &line, &starts) {
             p_go.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_ky.keyword.len()<=len && &line[starts..p_ky.keyword.len()] == p_ky.keyword {
+        }else if p_ky.is_matched(len, &line, &starts) {
             p_ky.process_events(&mut uchu, len, &line, &mut starts);
         }
 
