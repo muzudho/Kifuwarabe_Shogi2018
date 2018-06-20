@@ -54,11 +54,6 @@ struct Processor {
     callback: Callback,
 }
 impl Processor {
-    /*
-    fn set_callback(&mut self, c: Callback) {
-        self.callback = c;
-    }
-    */
 
     fn is_matched(&self, len:usize, line: &String, starts:&usize) -> bool {
         return self.keyword.len()<=len && &line[*starts..self.keyword.len()] == self.keyword
@@ -235,29 +230,31 @@ fn main() {
     uchu.big_bang();
     
     let p_len_zero = Processor { keyword: "".to_string(), callback: do_len_zero };
-    let p_kmugokidir = Processor { keyword: "kmugokidir".to_string(), callback: do_kmugokidir };
-    let p_usinewgame = Processor { keyword: "usinewgame".to_string(), callback: do_usinewgame };
-    let p_position = Processor { keyword: "position".to_string(), callback: do_position };
-    let p_isready = Processor { keyword: "isready".to_string(), callback: do_isready };
-    let p_kmugoki = Processor { keyword: "kmugoki".to_string(), callback: do_kmugoki };
-    let p_hirate = Processor { keyword: "hirate".to_string(), callback: do_hirate };
-    let p_kikisu = Processor { keyword: "kikisu".to_string(), callback: do_kikisu };
-    let p_rndkms = Processor { keyword: "rndkms".to_string(), callback: do_rndkms };
-    let p_sasite = Processor { keyword: "sasite".to_string(), callback: do_sasite };
-    let p_rndms = Processor { keyword: "rndms".to_string(), callback: do_rndms };
-    let p_teigi_conv = Processor { keyword: "teigi::conv".to_string(), callback: do_teigi_conv };
-    let p_hash = Processor { keyword: "hash".to_string(), callback: do_hash };
-    let p_kifu = Processor { keyword: "kifu".to_string(), callback: do_kifu };
-    let p_quit = Processor { keyword: "quit".to_string(), callback: do_quit };
-    let p_rand = Processor { keyword: "rand".to_string(), callback: do_rand };
-    let p_same = Processor { keyword: "same".to_string(), callback: do_same };
-    let p_test = Processor { keyword: "test".to_string(), callback: do_test };
-    let p_undo = Processor { keyword: "undo".to_string(), callback: do_undo };
-    let p_do = Processor { keyword: "do ".to_string(), callback: do_do };
-    let p_ky0 = Processor { keyword: "ky0".to_string(), callback: do_ky0 };
-    let p_usi = Processor { keyword: "usi".to_string(), callback: do_usi };
-    let p_go = Processor { keyword: "go".to_string(), callback: do_go };
-    let p_ky = Processor { keyword: "ky".to_string(), callback: do_ky };
+    let array = [
+        Processor { keyword: "kmugokidir".to_string(), callback: do_kmugokidir },
+        Processor { keyword: "usinewgame".to_string(), callback: do_usinewgame },
+        Processor { keyword: "position".to_string(), callback: do_position },
+        Processor { keyword: "isready".to_string(), callback: do_isready },
+        Processor { keyword: "kmugoki".to_string(), callback: do_kmugoki },
+        Processor { keyword: "hirate".to_string(), callback: do_hirate },
+        Processor { keyword: "kikisu".to_string(), callback: do_kikisu },
+        Processor { keyword: "rndkms".to_string(), callback: do_rndkms },
+        Processor { keyword: "sasite".to_string(), callback: do_sasite },
+        Processor { keyword: "rndms".to_string(), callback: do_rndms },
+        Processor { keyword: "teigi::conv".to_string(), callback: do_teigi_conv },
+        Processor { keyword: "hash".to_string(), callback: do_hash },
+        Processor { keyword: "kifu".to_string(), callback: do_kifu },
+        Processor { keyword: "quit".to_string(), callback: do_quit },
+        Processor { keyword: "rand".to_string(), callback: do_rand },
+        Processor { keyword: "same".to_string(), callback: do_same },
+        Processor { keyword: "test".to_string(), callback: do_test },
+        Processor { keyword: "undo".to_string(), callback: do_undo },
+        Processor { keyword: "do ".to_string(), callback: do_do },
+        Processor { keyword: "ky0".to_string(), callback: do_ky0 },
+        Processor { keyword: "usi".to_string(), callback: do_usi },
+        Processor { keyword: "go".to_string(), callback: do_go },
+        Processor { keyword: "ky".to_string(), callback: do_ky },
+    ];
 
 
     // [Ctrl]+[C] で強制終了
@@ -285,55 +282,18 @@ fn main() {
         let len = line.chars().count();
         let mut starts = 0;
 
-        if len==0 {
+        let mut is_done = false;
+
+        for element in array.iter() {
+            if element.is_matched(len, &line, &starts) {
+                element.process_events(&mut uchu, len, &line, &mut starts);
+                is_done = true;
+                break;
+            }
+        }
+
+        if !is_done {
             p_len_zero.process_events(&mut uchu, len, &line, &mut starts);
-        // 文字数の長いものからチェック
-        }else if p_kmugokidir.is_matched(len, &line, &starts) { //line.starts_with(&p_kmugokidir.keyword)
-            p_kmugokidir.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_usinewgame.is_matched(len, &line, &starts) {
-            p_usinewgame.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_position.is_matched(len, &line, &starts) { //line.starts_with(&p_position.keyword)
-            p_position.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_isready.is_matched(len, &line, &starts) {
-            p_isready.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_kmugoki.is_matched(len, &line, &starts) {
-            p_kmugoki.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_hirate.is_matched(len, &line, &starts) {
-            p_hirate.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_kikisu.is_matched(len, &line, &starts) {
-            p_kikisu.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_rndkms.is_matched(len, &line, &starts) {
-            p_rndkms.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_sasite.is_matched(len, &line, &starts) {
-            p_sasite.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_rndms.is_matched(len, &line, &starts) {
-            p_rndms.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_teigi_conv.is_matched(len, &line, &starts) {
-            p_teigi_conv.process_events(&mut uchu, len, &line, &mut starts);            
-        }else if p_hash.is_matched(len, &line, &starts) {
-            p_hash.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_kifu.is_matched(len, &line, &starts) {
-            p_kifu.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_quit.is_matched(len, &line, &starts) {
-            p_quit.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_rand.is_matched(len, &line, &starts) {
-            p_rand.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_same.is_matched(len, &line, &starts) {
-            p_same.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_test.is_matched(len, &line, &starts) {
-            p_test.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_undo.is_matched(len, &line, &starts) {
-            p_undo.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_do.is_matched(len, &line, &starts) {
-            p_do.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_ky0.is_matched(len, &line, &starts) {
-            p_ky0.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_usi.is_matched(len, &line, &starts) {
-            p_usi.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_go.is_matched(len, &line, &starts) {
-            p_go.process_events(&mut uchu, len, &line, &mut starts);
-        }else if p_ky.is_matched(len, &line, &starts) {
-            p_ky.process_events(&mut uchu, len, &line, &mut starts);
         }
 
         if uchu.is_quit {
