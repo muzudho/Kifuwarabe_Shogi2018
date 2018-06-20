@@ -61,6 +61,12 @@ impl Processor {
     */
 
     fn process_events(&self, uchu:&mut Uchu, len:usize, line: &String, starts:&mut usize) {
+        *starts += self.keyword.len();
+        // 続きにスペース「 」が１つあれば読み飛ばす
+        if 0<(len-*starts) && &line[*starts..(*starts+1)]==" " {
+            *starts+=1;
+        }            
+
         (self.callback)(uchu, len, line, starts);
     }
 }
@@ -160,8 +166,8 @@ fn do_kifu(uchu:&mut Uchu, _len:usize, _line: &String, _starts:&mut usize) {
     let s = uchu.kaku_kifu();
     g_writeln( &s );
 }
-fn do_quit(_uchu:&mut Uchu, _len:usize, _line: &String, _starts:&mut usize){
-
+fn do_quit(uchu:&mut Uchu, _len:usize, _line: &String, _starts:&mut usize){
+    uchu.is_quit = true;
 }
 fn do_rand(_uchu:&mut Uchu, _len:usize, _line: &String, _starts:&mut usize) {
     g_writeln("3<len rand");
@@ -174,11 +180,6 @@ fn do_same(uchu:&mut Uchu, _len:usize, _line: &String, _starts:&mut usize) {
     g_writeln( &format!("同一局面調べ count={}", count));
 }
 fn do_test(uchu:&mut Uchu, len:usize, line: &String, starts:&mut usize) {
-    *starts += 4;
-    // 続きにスペース「 」が１つあれば読み飛ばす
-    if 0<(len-*starts) && &line[*starts..(*starts+1)]==" " {
-        *starts+=1;
-    }            
     // いろいろな動作テスト
     g_writeln( &format!("test starts={} len={}", starts, len));
     test( &line, starts, len, uchu);
@@ -190,7 +191,6 @@ fn do_undo(uchu:&mut Uchu, _len:usize, _line: &String, _starts:&mut usize) {
     }
 }
 fn do_do(uchu:&mut Uchu, len:usize, line: &String, starts:&mut usize) {
-    *starts += 3;
     // コマンド読取。棋譜に追加され、手目も増える
     if read_sasite( &line, starts, len, uchu) {
         // 手目を戻す
@@ -312,8 +312,6 @@ fn main() {
             p_kifu.process_events(&mut uchu, len, &line, &mut starts);
         }else if p_quit.keyword.len()<=len && &line[starts..p_quit.keyword.len()] == p_quit.keyword {
             p_quit.process_events(&mut uchu, len, &line, &mut starts);
-            // ループを抜けて終了
-            break;
         }else if p_rand.keyword.len()<=len && &line[starts..p_rand.keyword.len()] == p_rand.keyword {
             p_rand.process_events(&mut uchu, len, &line, &mut starts);
         }else if p_same.keyword.len()<=len && &line[starts..p_same.keyword.len()] == p_same.keyword {
@@ -332,6 +330,11 @@ fn main() {
             p_go.process_events(&mut uchu, len, &line, &mut starts);
         }else if p_ky.keyword.len()<=len && &line[starts..p_ky.keyword.len()] == p_ky.keyword {
             p_ky.process_events(&mut uchu, len, &line, &mut starts);
+        }
+
+        if uchu.is_quit {
+            // ループを抜けて終了
+            break;
         }
     }//loop
 }

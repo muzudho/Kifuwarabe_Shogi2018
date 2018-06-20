@@ -91,6 +91,8 @@ pub struct KyHashSeed {
  * ここに全部入れてあるぜ☆（＾～＾）
  */
 pub struct Uchu{
+    // アプリケーション終了
+    pub is_quit : bool,
     // 対話モード
     pub dialogue_mode : bool,
     // コマンドを溜めておくバッファー
@@ -123,6 +125,7 @@ pub struct Uchu{
 impl Uchu{
     pub fn new()->Uchu{
         Uchu{
+            is_quit: false,
             dialogue_mode : false,
             vec_command : Vec::new(),
             // 初期局面
