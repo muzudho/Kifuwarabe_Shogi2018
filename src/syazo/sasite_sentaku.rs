@@ -7,8 +7,8 @@ use rand::Rng;
 use std::collections::HashSet;
 
 use consoles::asserts::*;
-use jotai::uchu::*;
-use siko::results::komatori_result::*;
+use memory::uchu::*;
+use thinks::results::komatori_result::*;
 use syazo::sasite_element::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;

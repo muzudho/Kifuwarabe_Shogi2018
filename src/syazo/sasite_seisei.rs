@@ -8,7 +8,7 @@ use teigi::conv::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
 use tusin::usi::*;
-use jotai::uchu::*;
+use memory::uchu::*;
 
 /**
  * 現局面の、任意の移動先升の、

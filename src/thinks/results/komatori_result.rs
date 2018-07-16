@@ -5,7 +5,7 @@ use std::fmt;
 use std::collections::HashSet;
 
 use consoles::asserts::*;
-use jotai::uchu::*;
+use memory::uchu::*;
 use meidai::math_meidai::*;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;

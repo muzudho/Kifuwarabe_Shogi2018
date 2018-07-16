@@ -6,7 +6,7 @@ use consoles::asserts::*;
 use teigi::shogi_syugo::*;
 use teigi::conv::*;
 use std::collections::HashSet;
-use jotai::uchu::*;
+use memory::uchu::*;
 
 
 /**

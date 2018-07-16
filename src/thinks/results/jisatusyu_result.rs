@@ -5,7 +5,7 @@
 
 use teigi::conv::*;
 use tusin::usi::*;
-use jotai::uchu::*;
+use memory::uchu::*;
 
 /// 動かした先が、敵の利きに飛び込んでいれば、自殺手
 /// TODO 利きを再計算したい

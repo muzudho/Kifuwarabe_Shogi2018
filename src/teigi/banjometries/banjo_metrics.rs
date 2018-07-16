@@ -2,7 +2,7 @@
  * 盤上いろいろ☆（＾～＾）
  */
 
-use jotai::uchu::*;
+use memory::uchu::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
 

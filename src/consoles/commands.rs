@@ -3,7 +3,7 @@
  */
 
 use teigi::shogi_syugo::*;
-use jotai::uchu::*;
+use memory::uchu::*;
 
 /**
  * 利き数表示

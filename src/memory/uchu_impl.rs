@@ -1,6 +1,6 @@
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
-use jotai::uchu::*;
+use memory::uchu::*;
 
 impl Uchu {
 

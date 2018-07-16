@@ -4,7 +4,7 @@
  */
 use std::collections::HashSet;
 
-use jotai::uchu::*;
+use memory::uchu::*;
 use teigi::conv::*;
 use std::fmt;
 

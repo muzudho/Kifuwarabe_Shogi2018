@@ -6,10 +6,10 @@ extern crate rand;
 use rand::Rng;
 use std::collections::HashSet;
 
-use jotai::mediators::med_kikisu::*;
-use jotai::uchu::*;
+use memory::uchu::*;
 use kasetu;
-use siko::visions::vision_tree::*;
+use mediators::med_kikisu::*;
+use thinks::visions::vision_tree::*;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
 use tusin::usi::*;
@@ -26,12 +26,14 @@ pub fn think(mut uchu:&mut Uchu)->Sasite{
     // +----------------------+
 
     // 相手の利き升調べ（自殺手防止のため）
-    read_kikisu( &mut uchu );
+    refresh_kikisu( &mut uchu );
 
 
     g_writeln( &format!("info test is_s={}", kasetu::atamakin::is_s(&uchu) ) );
 
     // let を 先に記述した変数の方が、後に記述した変数より　寿命が長いので注意☆（＾～＾）
+
+    // 現局面の合法手を取得する。
     let mut ss_hashset : HashSet<u64> = HashSet::new();
     insert_potential_move( &uchu, &mut ss_hashset );
     // g_writeln("テスト ポテンシャルムーブ.");

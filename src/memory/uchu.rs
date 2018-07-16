@@ -8,9 +8,9 @@ extern crate rand;
 use rand::Rng;
 
 use config::*;
-use jotai::ky::*;
-use jotai::number_board::*;
-use siko::visions::vision_tree::*;
+use memory::ky::*;
+use memory::number_board::*;
+use thinks::visions::vision_tree::*;
 use teigi;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;

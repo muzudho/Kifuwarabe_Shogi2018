@@ -6,7 +6,7 @@ use teigi::conv::*;
 use teigi::constants::*;
 use std::fmt;
 use teigi::shogi_syugo::*;
-use jotai::uchu::*;
+use memory::uchu::*;
 
 /**
  * 指し手

@@ -6,7 +6,7 @@ use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use std::collections::HashSet;
 use tusin::usi::*;
-use jotai::uchu::*;
+use memory::uchu::*;
 
 /******
  * 升 *

@@ -10,9 +10,9 @@ use syazo::sasite_sentaku::*;
 use std::collections::HashSet;
 use teigi::shogi_syugo::*;
 use tusin::usi::*;
-use jotai::uchu::*;
-use siko::randommove;
-use siko::results::jisatusyu_result::*;
+use memory::uchu::*;
+use thinks::randommove;
+use thinks::results::jisatusyu_result::*;
 
 /**
  * ランダム移動

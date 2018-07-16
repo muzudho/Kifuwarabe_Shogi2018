@@ -3,7 +3,7 @@
  * 頭金仮説
  */
 
-use jotai::uchu::*;
+use memory::uchu::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use teigi::shogi_syugo_seki::*;

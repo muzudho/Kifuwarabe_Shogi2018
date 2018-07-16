@@ -49,7 +49,7 @@ pub fn csa_recv()//buf:&mut String
 use std::io::prelude::*;
 use std::net::TcpStream;
 use std;
-use jotai::uchu::*;
+use memory::uchu::*;
 
 /// 使い方説明の表示
 pub fn show_usage()

@@ -6,7 +6,7 @@ use syazo::sasite_element::*;
 use std::collections::HashSet;
 use teigi::shogi_syugo::*;
 use tusin::usi::*;
-use jotai::uchu::*;
+use memory::uchu::*;
 
 /**
  * 狙いは、この木にぶら下げていくぜ☆（*＾～＾*）

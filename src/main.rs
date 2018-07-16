@@ -19,10 +19,11 @@ extern crate lazy_static;
 mod actions;
 mod config;
 mod consoles;
-mod jotai;
+mod memory;
 mod kasetu;
 mod meidai;
-mod siko;
+mod mediators;
+mod thinks;
 mod syazo;
 mod teigi;
 //mod teiri;
@@ -31,7 +32,7 @@ mod tusin;
 use std::io;
 
 use actions::command_list::*;
-use jotai::uchu::*;
+use memory::uchu::*;
 
 
 
@@ -56,7 +57,6 @@ fn main() {
         } else {
             // バッファーに溜まっていれば☆（＾～＾）
             line = uchu.pop_command();
-            //g_writeln( &line );
         }
 
         // まず最初に、コマンドライン入力を待機しろだぜ☆（＾～＾）

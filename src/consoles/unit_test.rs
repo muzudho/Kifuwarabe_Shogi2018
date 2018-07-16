@@ -4,11 +4,11 @@
  * test コマンドで実行しろだぜ☆（＾～＾）
  */
 use consoles::visuals::dumps::*;
-use jotai::uchu::*;
+use memory::uchu::*;
 use meidai::math_meidai::*;
 use teigi::conv::*;
 use syazo::sasite_element::*;
-use siko::randommove;
+use thinks::randommove;
 use std::collections::HashSet;
 use teigi::geometries::geo_teigi::*;
 use teigi::shogi_syugo::*;

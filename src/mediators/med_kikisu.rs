@@ -7,20 +7,24 @@ use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
-use jotai::uchu::*;
+use memory::uchu::*;
 
 /**
  * 盤上の利き升調べ
  *
  * 用途：自殺手防止他
+ *
+ * TODO: 差分更新にしたい。
  */
-pub fn read_kikisu(uchu:&mut Uchu){
+pub fn refresh_kikisu(uchu:&mut Uchu){
 
     // ゼロ・リセット
+    // 駒別に用意した盤を使った、利き数。
     for km in KM_ARRAY.iter() {
         &uchu.kiki_su_by_km[km_to_num(km)].clear();
     }
 
+    // 先後別に用意した盤を使った、利き数。
     for sn in SN_ARRAY.iter() {
         &uchu.kiki_su_by_sn[sn_to_num(sn)].clear();
     }
