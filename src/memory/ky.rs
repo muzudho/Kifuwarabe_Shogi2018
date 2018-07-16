@@ -183,8 +183,6 @@ impl Kyokumen{
         if ss.src==SS_SRC_DA {
             km = sn_kms_to_km( sn, &ss.drop );
             // 自分の持ち駒を増やす
-            //let mg = km_to_mg(km);
-            //self.add_mg(mg,1);
             self.add_mg(km,1);
         } else {
             // 打で無ければ

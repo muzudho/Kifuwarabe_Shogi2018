@@ -7,11 +7,10 @@ use rand::Rng;
 use std::collections::HashSet;
 
 use memory::uchu::*;
-use kasetu;
-use mediators::med_kikisu::*;
-use thinks::visions::vision_tree::*;
+use searchs::searcher::*;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
+use thinks::visions::vision_tree::*;
 use tusin::usi::*;
 
 /**
@@ -19,17 +18,9 @@ use tusin::usi::*;
  */
 pub fn think(mut uchu:&mut Uchu)->Sasite{
 
-    // TODO 王手放置漏れ回避　を最優先させたいぜ☆（＾～＾）
-
-    // +----------------------+
-    // | 王手放置漏れ回避対策 |
-    // +----------------------+
-
-    // 相手の利き升調べ（自殺手防止のため）
-    refresh_kikisu( &mut uchu );
-
-
-    g_writeln( &format!("info test is_s={}", kasetu::atamakin::is_s(&uchu) ) );
+    // 探索を開始する。
+    let mut searcher = Searcher::new();
+    searcher.search(&mut uchu);
 
     // let を 先に記述した変数の方が、後に記述した変数より　寿命が長いので注意☆（＾～＾）
 
