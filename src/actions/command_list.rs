@@ -17,6 +17,8 @@ use teigi::shogi_syugo::*;
 use tusin;
 use tusin::usi::*;
 
+use UCHU_WRAP;
+
 
 pub struct CommandList {
     pub action_len_zero: Command,
@@ -25,7 +27,7 @@ pub struct CommandList {
 impl CommandList{
     pub fn new()->CommandList{
         CommandList{
-            action_len_zero: Command { keyword: "".to_string(), callback: do_len_zero },
+            action_len_zero: Command { keyword: "".to_string(), callback: do_len_zero1 },
             command_array: [
                 Command { keyword: "kmugokidir".to_string(), callback: do_kmugokidir },
                 Command { keyword: "usinewgame".to_string(), callback: do_usinewgame },
@@ -82,7 +84,7 @@ impl Command {
 /**
  * 何とも一致しなかったとき。
  */
-pub fn do_len_zero(uchu:&mut Uchu, _len:usize, _line: &String, _starts:&mut usize) {
+pub fn do_len_zero1(uchu:&mut Uchu, _len:usize, _line: &String, _starts:&mut usize) {
     g_writeln("len==0");
     if !&uchu.dialogue_mode {
         // 空打ち１回目なら、対話モードへ☆（＾～＾）
@@ -94,6 +96,21 @@ pub fn do_len_zero(uchu:&mut Uchu, _len:usize, _line: &String, _starts:&mut usiz
     }else{
         // 局面表示
         let s = &uchu.kaku_ky( &KyNums::Current );
+        g_writeln( &s );
+    }
+}
+pub fn do_len_zero2(_len:usize, _line: &String, _starts:&mut usize){
+    g_writeln("len==0");
+    if !&UCHU_WRAP.read().unwrap().dialogue_mode {
+        // 空打ち１回目なら、対話モードへ☆（＾～＾）
+        UCHU_WRAP.write().unwrap().dialogue_mode = true;
+        // タイトル表示
+        // １画面は２５行だが、最後の２行は開けておかないと、
+        // カーソルが２行分場所を取るんだぜ☆（＾～＾）
+        hyoji_title();
+    }else{
+        // 局面表示
+        let s = &UCHU_WRAP.read().unwrap().kaku_ky( &KyNums::Current );
         g_writeln( &s );
     }
 }

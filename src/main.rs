@@ -8,6 +8,9 @@ extern crate rand;
 #[macro_use]
 extern crate lazy_static;
 
+extern crate kifuwarabe_commander;
+use kifuwarabe_commander::Command;
+use kifuwarabe_commander::Commander;
 
 ///
 /// Rust言語の mod や ソース置き場の説明
@@ -36,7 +39,11 @@ use actions::command_list::*;
 use memory::uchu::*;
 
 
-
+// グローバル変数
+use std::sync::RwLock;
+lazy_static! {
+    static ref UCHU_WRAP: RwLock<Uchu> = RwLock::new(Uchu::new());
+}
 
 fn main() {
 
@@ -47,7 +54,13 @@ fn main() {
     // コマンド リスト。
     let command_list : CommandList = CommandList::new();
 
-
+    // 新コマンド リスト。
+    let mut commander = Commander::new();
+    commander.action_len_zero = Command
+    {
+        keyword: "".to_string(),
+        callback: do_len_zero2
+    };
 
     // [Ctrl]+[C] で強制終了
     loop{

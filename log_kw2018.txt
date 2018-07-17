@@ -4,75 +4,75 @@ usiok
 readyok
 info string My raion 59.
 info string My raion is not outed.
-info 7i6h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=7i6h.
-info 7i7h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=7i7h.
-info 4i5h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=4i5h.
-info 1i1h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=1i1h.
+info 2h5h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=2h5h.
+info 6i7h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=6i7h.
+info 9g9f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=9g9f.
 info 4i4h evaluated => 0 attackers. offence=△->59
 info SOLUTED ss=4i4h.
 info 4i3h evaluated => 0 attackers. offence=△->59
 info SOLUTED ss=4i3h.
-info 6g6f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=6g6f.
-info 8g8f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=8g8f.
+info 2h1h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=2h1h.
+info 5i5h evaluated => 0 attackers. offence=△->58
+info SOLUTED ss=5i5h.
+info 6i5h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=6i5h.
+info 7i6h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=7i6h.
+info 2g2f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=2g2f.
+info 5i6h evaluated => 0 attackers. offence=△->68
+info SOLUTED ss=5i6h.
+info 3g3f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=3g3f.
+info 4g4f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=4g4f.
+info 9i9h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=9i9h.
+info 7i7h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=7i7h.
+info 4i5h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=4i5h.
+info 2h6h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=2h6h.
+info 3i4h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=3i4h.
 info 5i4h evaluated => 0 attackers. offence=△->48
 info SOLUTED ss=5i4h.
-info 2h4h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=2h4h.
+info 8g8f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=8g8f.
 info 2h7h evaluated => 0 attackers. offence=△->59
 info SOLUTED ss=2h7h.
 info 2h3h evaluated => 0 attackers. offence=△->59
 info SOLUTED ss=2h3h.
-info 2h6h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=2h6h.
-info 5i6h evaluated => 0 attackers. offence=△->68
-info SOLUTED ss=5i6h.
-info 3i4h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=3i4h.
-info 9g9f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=9g9f.
-info 2h1h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=2h1h.
-info 4g4f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=4g4f.
-info 7g7f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=7g7f.
-info 3g3f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=3g3f.
-info 5i5h evaluated => 0 attackers. offence=△->58
-info SOLUTED ss=5i5h.
-info 6i7h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=6i7h.
-info 1g1f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=1g1f.
-info 6i5h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=6i5h.
-info 5g5f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=5g5f.
+info 1i1h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=1i1h.
 info 3i3h evaluated => 0 attackers. offence=△->59
 info SOLUTED ss=3i3h.
+info 7g7f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=7g7f.
+info 5g5f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=5g5f.
+info 2h4h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=2h4h.
 info 6i6h evaluated => 0 attackers. offence=△->59
 info SOLUTED ss=6i6h.
-info 2h5h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=2h5h.
-info 2g2f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=2g2f.
-info 9i9h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=9i9h.
+info 1g1f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=1g1f.
+info 6g6f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=6g6f.
 info 30 solutions.
-info solution:2h4h.
-bestmove 2h4h
+info solution:6i7h.
+bestmove 6i7h
 表示 1手目 △ 同一局面1回目
 
            +----+----+----+----+----+----+----+----+----+
-        i9 |▼し|▼う|▼ね|▼い|▼ら|▼い|▼ね|▼う|▼し|
+        i9 |▼し|▼う|▼ね|▼い|▼ら|　　|▼ね|▼う|▼し|
            +----+----+----+----+----+----+----+----+----+
-ひx 0   h8 |　　|　　|　　|▼き|　　|　　|　　|▼ぞ|　　|   ヒx 0
+ひx 0   h8 |　　|▼き|　　|　　|　　|　　|▼い|▼ぞ|　　|   ヒx 0
            +----+----+----+----+----+----+----+----+----+
 しx 0   g7 |▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|   シx 0
            +----+----+----+----+----+----+----+----+----+

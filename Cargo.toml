@@ -4,6 +4,9 @@ version = "0.1.0"
 authors = ["muzudho <muzudho1@gmail.com>"]
 
 [dependencies]
-
 rand="0.3.0"
 lazy_static = "1.0"
+
+[dependencies.kifuwarabe_commander]
+git = "https://github.com/muzudho/rust_kifuwarabe_commander.git"
+rev = "a5f6c55d5c035764ebbba95cd9af143f4c7865d5"
