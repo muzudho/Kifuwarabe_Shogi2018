@@ -4,9 +4,10 @@
  */
 use std::collections::HashSet;
 
-use memory::uchu::*;
 use teigi::conv::*;
 use std::fmt;
+
+use UCHU_WRAP;
 
 /********
  * 手目 *
@@ -441,8 +442,8 @@ impl KmSyugo {
     /**
      * 自分相手
      */
-    pub fn new_jiai( &self, jiai:&Jiai, uchu:&Uchu ) -> KmSyugo {
-        let sn0 = uchu.get_teban(&jiai);
+    pub fn new_jiai(&self, jiai:&Jiai) -> KmSyugo {
+        let sn0 = UCHU_WRAP.read().unwrap().get_teban(&jiai);
         let mut num_syugo1 : HashSet<usize> = HashSet::new();
         for km in KM_ARRAY.iter() {
             let (sn1,_kms) = km_to_sn_kms( km );

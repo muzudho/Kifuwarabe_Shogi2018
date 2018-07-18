@@ -2,17 +2,18 @@
  * 盤上いろいろ☆（＾～＾）
  */
 
-use memory::uchu::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
 
-pub fn is_ji_km_by_ms( ms:umasu, uchu:&Uchu ) -> bool {
-    let km = uchu.ky.get_km_by_ms( ms );
+use UCHU_WRAP;
+
+pub fn is_ji_km_by_ms(ms:umasu) -> bool {
+    let km = UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms );
     let (sn,_kms) = km_to_sn_kms( &km );
-    match_sn( &sn, &uchu.get_teban(&Jiai::Ji) )
+    match_sn( &sn, &UCHU_WRAP.read().unwrap().get_teban(&Jiai::Ji) )
 }
 
 // TODO
-pub fn is_ai_kiki_by_ms( _ms:umasu, _uchu:&Uchu ) -> bool {
+pub fn is_ai_kiki_by_ms(_ms:umasu) -> bool {
     false
 }

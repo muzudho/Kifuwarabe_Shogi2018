@@ -158,7 +158,7 @@ impl KomatoriResult{
  *
  * return u64 : KomatoriResult のハッシュ
  */
-pub fn lookup_banjo_catch(uchu:&Uchu, sn:&Sengo, ms_target:umasu)->HashSet<u64> {
+pub fn lookup_banjo_catch(sn:&Sengo, ms_target:umasu)->HashSet<u64> {
     assert_banjo_ms(
         ms_target,
         &format!("(119)Ｌookup_banjo_catch sn={} ms_target={}"
@@ -179,7 +179,7 @@ pub fn lookup_banjo_catch(uchu:&Uchu, sn:&Sengo, ms_target:umasu)->HashSet<u64> 
         // 打は除く
 
         ss_hashset.clear();
-        insert_ss_by_ms_km_on_banjo( &uchu, ms_target, &km_dst, &mut ss_hashset );
+        insert_ss_by_ms_km_on_banjo(ms_target, &km_dst, &mut ss_hashset );
 
         // g_writeln( &format!("テスト lookup_banjo_catch insert_ss_by_ms_km_on_banjo kms_dst={}.",kms_dst) );
         // use consoles::visuals::dumps::*;

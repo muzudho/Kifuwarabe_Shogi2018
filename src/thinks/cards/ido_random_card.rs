@@ -10,16 +10,17 @@ use syazo::sasite_sentaku::*;
 use std::collections::HashSet;
 use teigi::shogi_syugo::*;
 use tusin::usi::*;
-use memory::uchu::*;
 use thinks::randommove;
 use thinks::results::jisatusyu_result::*;
+
+use UCHU_WRAP;
 
 /**
  * ランダム移動
  *
  * km_dst : 移動した先の駒
  */
-pub fn get_ido_ss_by_km_random(uchu :&Uchu, km_dst:&Koma)->Sasite{
+pub fn get_ido_ss_by_km_random(km_dst:&Koma)->Sasite{
     
     let mut ss_hashset = HashSet::new();
 
@@ -30,8 +31,8 @@ pub fn get_ido_ss_by_km_random(uchu :&Uchu, km_dst:&Koma)->Sasite{
         assert_banjo_ms(ms_dst, "get_ido_ss_by_km_random");
 
         ss_hashset.clear();
-        insert_ss_by_ms_km_on_banjo ( &uchu, ms_dst, &km_dst, &mut ss_hashset );
-        insert_ss_by_ms_km_on_da    ( &uchu, ms_dst, &km_dst, &mut ss_hashset );
+        insert_ss_by_ms_km_on_banjo (ms_dst, &km_dst, &mut ss_hashset );
+        insert_ss_by_ms_km_on_da    (ms_dst, &km_dst, &mut ss_hashset );
         let ss = choice_1ss_by_hashset( &ss_hashset );
 
         if ss.exists(){ return ss;}
@@ -43,7 +44,7 @@ pub fn get_ido_ss_by_km_random(uchu :&Uchu, km_dst:&Koma)->Sasite{
 /**
  * 指し手１つをランダム選出
  */
-pub fn get_ss_by_random(uchu :&Uchu)->Sasite{
+pub fn get_ss_by_random()->Sasite{
     
     let mut ss_hashset = HashSet::new();
 
@@ -54,15 +55,15 @@ pub fn get_ss_by_random(uchu :&Uchu)->Sasite{
         assert_banjo_ms(ms_dst, "Ｇet_ss_by_random");
 
         // 手番の、移動した先の駒
-        let km_dst = sn_kms_to_km( &uchu.get_teban(&Jiai::Ji), randommove::rnd_kms() );
+        let km_dst = sn_kms_to_km( &UCHU_WRAP.read().unwrap().get_teban(&Jiai::Ji), randommove::rnd_kms() );
 
         ss_hashset.clear();
-        insert_ss_by_ms_km_on_banjo ( &uchu, ms_dst, &km_dst, &mut ss_hashset );
-        insert_ss_by_ms_km_on_da    ( &uchu, ms_dst, &km_dst, &mut ss_hashset );
+        insert_ss_by_ms_km_on_banjo (ms_dst, &km_dst, &mut ss_hashset );
+        insert_ss_by_ms_km_on_da    (ms_dst, &km_dst, &mut ss_hashset );
         let ss = choice_1ss_by_hashset( &ss_hashset );
 
         // 移動後は、玉が利きに飛び込まないか？
-        if is_jisatusyu( &uchu, &ss ) {
+        if is_jisatusyu(&ss) {
             continue 'random;
         }
 

@@ -8,7 +8,8 @@ use teigi::conv::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
 use tusin::usi::*;
-use memory::uchu::*;
+
+use UCHU_WRAP;
 
 /**
  * 現局面の、任意の移動先升の、
@@ -18,23 +19,23 @@ use memory::uchu::*;
  *
  * 王手回避漏れや、千日手などのチェックは行っていない
  */
-pub fn insert_potential_move( uchu:&Uchu, ss_hashset:&mut HashSet<u64> ) {
+pub fn insert_potential_move(ss_hashset:&mut HashSet<u64> ) {
     // +----------------+
     // | 盤上の駒の移動 |
     // +----------------+
     for dan_src in 1..10 {
         for suji_src in 1..10 {
             let ms_src = suji_dan_to_ms( suji_src, dan_src );
-            let km_src = uchu.ky.get_km_by_ms( ms_src );
+            let km_src = UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src );
             let sn = km_to_sn(&km_src);
 
-            if match_sn( &sn, &uchu.get_teban(&Jiai::Ji) ) {
+            if match_sn( &sn, &UCHU_WRAP.read().unwrap().get_teban(&Jiai::Ji) ) {
                 // 手番の駒
 
                 let mut dst_hashset : HashSet<umasu> = HashSet::new();
                 insert_dst_by_ms_km( ms_src, &km_src,
                     false, // 成らず
-                    &uchu, &mut dst_hashset );
+                    &mut dst_hashset );
 
                 // g_writeln("テスト ポテンシャルムーブ insert_dst_by_ms_km(成らず).");
                 // use consoles::visuals::dumps::*;
@@ -52,7 +53,7 @@ pub fn insert_potential_move( uchu:&Uchu, ss_hashset:&mut HashSet<u64> ) {
                 dst_hashset.clear();
                 insert_dst_by_ms_km( ms_src, &km_src,
                     true, // 成り
-                    &uchu, &mut dst_hashset );
+                    &mut dst_hashset );
                 for ms_dst in &dst_hashset {
                     ss_hashset.insert( Sasite{
                         src : ms_src,
@@ -71,17 +72,17 @@ pub fn insert_potential_move( uchu:&Uchu, ss_hashset:&mut HashSet<u64> ) {
     for dan_dst in 1..10 {
         for suji_dst in 1..10 {
             let ms_dst = suji_dan_to_ms( suji_dst, dan_dst );
-            let km_dst = uchu.ky.get_km_by_ms( ms_dst );
+            let km_dst = UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_dst );
             match km_dst {
                 Koma::Kara => {
                     // 駒が無いところに打つ
 
                     let mut da_kms_hashset = HashSet::new();
                     for kms_motigoma in MGS_ARRAY.iter() {
-                        let km_motigoma = sn_kms_to_km( &uchu.get_teban(&Jiai::Ji), kms_motigoma );
-                        if 0<uchu.ky.get_mg( &km_motigoma ) {
+                        let km_motigoma = sn_kms_to_km( &UCHU_WRAP.read().unwrap().get_teban(&Jiai::Ji), kms_motigoma );
+                        if 0<UCHU_WRAP.read().unwrap().ky.get_mg( &km_motigoma ) {
                             // 駒を持っていれば
-                            insert_da_kms_by_ms_km     ( ms_dst, &km_motigoma, &uchu, &mut da_kms_hashset );
+                            insert_da_kms_by_ms_km     ( ms_dst, &km_motigoma, &mut da_kms_hashset );
                         }
                     }
                     for num_kms_da in da_kms_hashset {
@@ -106,14 +107,14 @@ pub fn insert_potential_move( uchu:&Uchu, ss_hashset:&mut HashSet<u64> ) {
  *
  * 盤上の駒の移動の最初の１つ。打を除く
  */
-pub fn insert_ss_by_ms_km_on_banjo(uchu :&Uchu, ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut HashSet<u64> ) {
+pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut HashSet<u64> ) {
     assert_banjo_ms(ms_dst,"Ｉnsert_ss_by_ms_km_on_banjo");
 
     // 手番の先後、駒種類
     let (sn,_kms_dst) = km_to_sn_kms( &km_dst );
 
     // 移動先に自駒があれば、指し手は何もない。終わり。
-    if match_sn( &uchu.ky.get_sn_by_ms(ms_dst), &sn ) {
+    if match_sn( &UCHU_WRAP.read().unwrap().ky.get_sn_by_ms(ms_dst), &sn ) {
         return;
     }
 
@@ -128,7 +129,7 @@ pub fn insert_ss_by_ms_km_on_banjo(uchu :&Uchu, ms_dst:umasu, km_dst:&Koma, ss_h
     // +----------------+
     // | 盤上（成らず） |
     // +----------------+
-    insert_narazu_src_by_ms_km  ( ms_dst, &km_dst, &uchu, &mut mv_src_hashset );
+    insert_narazu_src_by_ms_km  ( ms_dst, &km_dst, &mut mv_src_hashset );
     for ms_src in &mv_src_hashset{
         assert_banjo_ms(
             *ms_src,
@@ -146,7 +147,7 @@ pub fn insert_ss_by_ms_km_on_banjo(uchu :&Uchu, ms_dst:umasu, km_dst:&Koma, ss_h
     // | 盤上（成り） |
     // +--------------+
     mv_src_hashset.clear();
-    insert_narumae_src_by_ms_km ( ms_dst, &km_dst, &uchu, &mut mv_src_hashset );
+    insert_narumae_src_by_ms_km ( ms_dst, &km_dst, &mut mv_src_hashset );
     for ms_src in &mv_src_hashset{
         assert_banjo_ms(
             *ms_src,
@@ -166,14 +167,14 @@ pub fn insert_ss_by_ms_km_on_banjo(uchu :&Uchu, ms_dst:umasu, km_dst:&Koma, ss_h
  * 1. 移動先升指定  ms_dst
  * 2. 移動先駒指定  km_dst
  */
-pub fn insert_ss_by_ms_km_on_da(uchu :&Uchu, ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut HashSet<u64> ) {
+pub fn insert_ss_by_ms_km_on_da(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut HashSet<u64> ) {
     assert_banjo_ms(ms_dst,"Ｉnsert_ss_by_ms_km_on_da");
 
     // 手番の先後、駒種類
     let (sn,_kms_dst) = km_to_sn_kms( &km_dst );
 
     // 移動先に自駒があれば、指し手は何もない。終わり。
-    if match_sn( &uchu.ky.get_sn_by_ms(ms_dst), &sn ) {
+    if match_sn( &UCHU_WRAP.write().unwrap().ky.get_sn_by_ms(ms_dst), &sn ) {
         return;
     }
 
@@ -190,7 +191,7 @@ pub fn insert_ss_by_ms_km_on_da(uchu :&Uchu, ms_dst:umasu, km_dst:&Koma, ss_hash
     // +----+
 
     let mut da_kms_hashset : HashSet<usize> = HashSet::new();
-    insert_da_kms_by_ms_km      ( ms_dst, &km_dst, &uchu, &mut da_kms_hashset );
+    insert_da_kms_by_ms_km      ( ms_dst, &km_dst, &mut da_kms_hashset );
     // 打
     for num_kms_da in da_kms_hashset.iter() {
         let kms_da = num_to_kms( *num_kms_da );

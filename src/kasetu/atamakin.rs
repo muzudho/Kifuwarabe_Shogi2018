@@ -9,23 +9,22 @@ use teigi::shogi_syugo::*;
 use teigi::shogi_syugo_seki::*;
 use teigi::banjometries::*;
 
+use UCHU_WRAP;
 
 /**
  * 後手視点で、相手らいおんの南側１升に、頭が丸い自駒がない？
  */
-pub fn is_s(
-    uchu:&Uchu
-)->bool{
+pub fn is_s()->bool{
     // 相手玉の位置
-    let ms_r = uchu.get_ms_r(&Jiai::Ai);
+    let ms_r = UCHU_WRAP.read().unwrap().get_ms_r(&Jiai::Ai);
 
     let p_r = ms_to_p( ms_r );
     let p_south_r = p_r.to_south();
     if !p_in_ban(&p_south_r){ return true; }
 
     let ms_south_r = p_to_ms( &p_south_r );
-    let km = uchu.ky.get_km_by_ms( ms_south_r );
-    let jiai_km = uchu.get_jiai_by_km( &km );
+    let km = UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_south_r );
+    let jiai_km = UCHU_WRAP.read().unwrap().get_jiai_by_km( &km );
     if !match_jiai( &jiai_km, &Jiai::Ji ) { return true; }
 
     g_writeln(&format!("info string south of My raion {} = {}. jiai_km={}.", ms_r, km, jiai_km ));
@@ -80,12 +79,11 @@ pub fn is_atamakin(
     _mskms_l : &MsKms,
     _mskms_s : &MsKms,
     _mskms_a : &MsKms,
-    _mskms_b : &MsKms,
-    uchu : &Uchu
+    _mskms_b : &MsKms
 ) -> bool {
 
     // 相手らいおんのマス
-    let ms_ai_r = uchu.get_ms_r( &Jiai::Ai );
+    let ms_ai_r = UCHU_WRAP.read().unwrap().get_ms_r( &Jiai::Ai );
 
     // らいおん以外の相手の駒種類
     let mut kms_set_ai_c_r = KmsSyugo::new_all();
@@ -96,11 +94,11 @@ pub fn is_atamakin(
     // 単に下３つに移動できるか調べられたらいい。８１升別　利きを作るか？
     // 駒、相手の利き
     let p_k = ms_to_p( ms_ai_r );
-    if banjo_metrics::is_ji_km_by_ms( p_to_ms( &p_k.to_south_west() ), &uchu ) {
+    if banjo_metrics::is_ji_km_by_ms( p_to_ms( &p_k.to_south_west() ) ) {
 
     }
     
-    if banjo_metrics::is_ai_kiki_by_ms( p_to_ms( &p_k.to_south_west() ), &uchu ) {
+    if banjo_metrics::is_ai_kiki_by_ms( p_to_ms( &p_k.to_south_west() ) ) {
 
     }
 

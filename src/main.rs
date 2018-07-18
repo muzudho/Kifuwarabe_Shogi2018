@@ -47,9 +47,8 @@ lazy_static! {
 
 fn main() {
 
-    // 宇宙。
-    let mut uchu : Uchu = Uchu::new();
-    uchu.big_bang();
+    // 宇宙爆誕。
+    UCHU_WRAP.write().unwrap().big_bang();
     
     // コマンド リスト。
     let command_list : CommandList = CommandList::new();
@@ -59,18 +58,18 @@ fn main() {
     commander.action_len_zero = Command
     {
         keyword: "".to_string(),
-        callback: do_len_zero2
+        callback: do_len_zero
     };
 
     // [Ctrl]+[C] で強制終了
     loop{
 
         let mut line : String;
-        if uchu.is_empty_command() {
+        if UCHU_WRAP.read().unwrap().is_empty_command() {
             line = String::new();
         } else {
             // バッファーに溜まっていれば☆（＾～＾）
-            line = uchu.pop_command();
+            line = UCHU_WRAP.write().unwrap().pop_command();
         }
 
         // まず最初に、コマンドライン入力を待機しろだぜ☆（＾～＾）
@@ -90,7 +89,7 @@ fn main() {
 
         for element in command_list.command_array.iter() {
             if element.is_matched(len, &line, &starts) {
-                element.move_caret_and_go(&mut uchu, len, &line, &mut starts);
+                element.move_caret_and_go(len, &line, &mut starts);
                 is_done = true;
                 break;
             }
@@ -98,10 +97,10 @@ fn main() {
 
         // 何とも一致しなかったら実行する。
         if !is_done {
-            command_list.action_len_zero.move_caret_and_go(&mut uchu, len, &line, &mut starts);
+            command_list.action_len_zero.move_caret_and_go(len, &line, &mut starts);
         }
 
-        if uchu.is_quit {
+        if UCHU_WRAP.read().unwrap().is_quit {
             // ループを抜けて終了
             break;
         }

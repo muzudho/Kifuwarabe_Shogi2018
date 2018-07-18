@@ -6,7 +6,8 @@ use syazo::sasite_element::*;
 use std::collections::HashSet;
 use teigi::shogi_syugo::*;
 use tusin::usi::*;
-use memory::uchu::*;
+
+use UCHU_WRAP;
 
 /**
  * 狙いは、この木にぶら下げていくぜ☆（*＾～＾*）
@@ -36,12 +37,12 @@ impl VisionTree{
 /**
  * 楽観筋
  */
-pub fn insert_rakkansuji( uchu:&mut Uchu ){
+pub fn insert_rakkansuji(){
     for sn in SN_ARRAY.iter() {
         let ai_sn = hanten_sn( sn );
 
         // 相手の　らいおん　の位置を覚える
-        &uchu.vision_tree_by_sn[sn_to_num(sn)].set_ai_r( uchu.ky.ms_r[sn_to_num(&ai_sn)] );
+        &UCHU_WRAP.write().unwrap().vision_tree_by_sn[sn_to_num(sn)].set_ai_r( UCHU_WRAP.read().unwrap().ky.ms_r[sn_to_num(&ai_sn)] );
         // 盤上に相手の　らいおん１枚　しかないと想定して、アタックする手
         let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
         //let mut da_kms_hashset : HashSet<usize> = HashSet::new();
@@ -54,15 +55,15 @@ pub fn insert_rakkansuji( uchu:&mut Uchu ){
 
                     mv_src_hashset.clear();
                     //da_kms_hashset.clear();
-                    insert_narazu_src_by_ms_km  ( ms_dst, &km_dst, &uchu, &mut mv_src_hashset );
-                    insert_narumae_src_by_ms_km ( ms_dst, &km_dst, &uchu, &mut mv_src_hashset );
+                    insert_narazu_src_by_ms_km  ( ms_dst, &km_dst, &mut mv_src_hashset );
+                    insert_narumae_src_by_ms_km ( ms_dst, &km_dst, &mut mv_src_hashset );
                     // TODO 王手になるところに打ちたい
-                    //insert_da_kms_by_ms_km      ( &ms_dst, &km_dst, &uchu, &mut da_kms_hashset );
+                    //insert_da_kms_by_ms_km      ( &ms_dst, &km_dst, &mut da_kms_hashset );
 
                     // 盤上
                     for ms_src in mv_src_hashset.iter() {
                         // 成り
-                        let pro = &uchu.ky.is_natta( *ms_src, ms_dst );
+                        let pro = &UCHU_WRAP.read().unwrap().ky.is_natta( *ms_src, ms_dst );
                         
                         let hash_ss = Sasite{
                             src:*ms_src,
@@ -70,7 +71,7 @@ pub fn insert_rakkansuji( uchu:&mut Uchu ){
                             pro:*pro,
                             drop:KmSyurui::Kara,
                         }.to_hash();
-                        &uchu.vision_tree_by_sn[sn_to_num(sn)].ss_tume_hashset.insert( hash_ss );
+                        &UCHU_WRAP.write().unwrap().vision_tree_by_sn[sn_to_num(sn)].ss_tume_hashset.insert( hash_ss );
                     }
 
                     /*
@@ -84,7 +85,7 @@ pub fn insert_rakkansuji( uchu:&mut Uchu ){
                             pro:false,
                             drop:km_da,
                         }.to_hash();
-                        &uchu.vision_tree_by_sn[sn].ss_tume_hashset.insert( hash_ss );
+                        &UCHU_WRAP.write().unwrap().vision_tree_by_sn[sn].ss_tume_hashset.insert( hash_ss );
                     }
                     */
                 }

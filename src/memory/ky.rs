@@ -12,7 +12,8 @@ use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use teigi::shogi_syugo::Koma::*;
 use tusin::usi::*;
-use memory::uchu::*;
+
+use UCHU_WRAP;
 
 // 局面
 pub struct Kyokumen{
@@ -249,14 +250,14 @@ impl Kyokumen{
     /**
      * 局面ハッシュを作り直す
      */
-    pub fn create_hash( &self, uchu:&Uchu ) -> u64 {
+    pub fn create_hash(&self) -> u64 {
         let mut hash : u64 = 0;
 
         // 盤上の駒
         for i_ms in MASU_0..BAN_SIZE {
             let km = self.get_km_by_ms(i_ms as umasu);
             let num_km = km_to_num(&km);
-            hash ^= uchu.ky_hash_seed.km[i_ms][num_km];
+            hash ^= UCHU_WRAP.read().unwrap().ky_hash_seed.km[i_ms][num_km];
         }
 
         // 持ち駒ハッシュ
@@ -269,7 +270,7 @@ impl Kyokumen{
                 "持ち駒 {} の枚数 {} <= {}", km, maisu, MG_MAX
             );
 
-            hash ^= uchu.ky_hash_seed.mg[num_km][maisu as usize];
+            hash ^= UCHU_WRAP.read().unwrap().ky_hash_seed.mg[num_km][maisu as usize];
         }
 
         // 手番ハッシュ はここでは算出しないぜ☆（＾～＾）

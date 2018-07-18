@@ -6,8 +6,8 @@ use consoles::asserts::*;
 use teigi::shogi_syugo::*;
 use teigi::conv::*;
 use std::collections::HashSet;
-use memory::uchu::*;
 
+use UCHU_WRAP;
 
 /**
  * 成る前を含めない、移動元升生成
@@ -25,7 +25,6 @@ use memory::uchu::*;
 pub fn insert_narazu_src_by_ms_km(
     ms_dst:umasu,
     km_dst:&Koma,
-    uchu:&Uchu,
     result:&mut HashSet<umasu>
 ) {
     assert_banjo_ms(ms_dst,"ｉnsert_narazu_src_by_ms_km");
@@ -87,9 +86,9 @@ pub fn insert_narazu_src_by_ms_km(
                         for i_east in 1..9{
                             if dx+i_east<SUJI_10 {
                                 let ms_src = suji_dan_to_ms(dx+i_east, dy);
-                                if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) {
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) {
                                     break;
                                 }
                             }
@@ -98,7 +97,7 @@ pub fn insert_narazu_src_by_ms_km(
                         // 西東
                         if dx+1<SUJI_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy);
-                            if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -109,9 +108,9 @@ pub fn insert_narazu_src_by_ms_km(
                         for i_ne in 1..9{
                             if dx+i_ne<SUJI_10 && dy+i_ne<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx+i_ne, dy+i_ne);
-                                if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) {
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) {
                                     break;
                                 }
                             }
@@ -120,7 +119,7 @@ pub fn insert_narazu_src_by_ms_km(
                         // 北東
                         if dx+1<SUJI_10 && dy+1<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy+1);
-                            if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -129,7 +128,7 @@ pub fn insert_narazu_src_by_ms_km(
             NNE   =>{
                         if dx+1<SUJI_10 && dy+2<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy+2);
-                            if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -140,9 +139,9 @@ pub fn insert_narazu_src_by_ms_km(
                         for i_south in 1..9{
                             if dy+i_south<DAN_10{
                                 let ms_src = suji_dan_to_ms(dx, dy+i_south);
-                                if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) {
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) {
                                     break;
                                 }
                             }
@@ -151,7 +150,7 @@ pub fn insert_narazu_src_by_ms_km(
                         // 北
                         if dy+1<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx, dy+1);
-                            if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -160,7 +159,7 @@ pub fn insert_narazu_src_by_ms_km(
             NNW   =>{
                         if SUJI_0<dx-1 && dy+2<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx-1, dy+2);
-                            if uchu.ky.has_ms_km( ms_src, km_dst )
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst )
                             {
                                 result.insert( ms_src);
                             }
@@ -172,9 +171,9 @@ pub fn insert_narazu_src_by_ms_km(
                         for i_se in 1..9{
                             if SUJI_0<dx-i_se && dy+i_se<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx-i_se, dy+i_se);
-                                if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) {
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) {
                                     break;
                                 }
                             }
@@ -183,7 +182,7 @@ pub fn insert_narazu_src_by_ms_km(
                         // 北西
                         if dx-1>SUJI_0 && DAN_10>dy+1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy+1);
-                            if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -195,9 +194,9 @@ pub fn insert_narazu_src_by_ms_km(
                             if SUJI_0<dx-i_east{
                                 // 進みたいマスから戻ったマス
                                 let ms_src = suji_dan_to_ms(dx-i_east, dy);
-                                if uchu.ky.has_ms_km( ms_src, km_dst ) { // 指定の駒があれば、その升は移動元。続行
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) { // 指定の駒があれば、その升は移動元。続行
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) { // なんか他の駒があれば終わり
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) { // なんか他の駒があれば終わり
                                     break;
                                 }                                
                             }
@@ -206,7 +205,7 @@ pub fn insert_narazu_src_by_ms_km(
                         // 西
                         if SUJI_0<dx-1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy);
-                            if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -217,9 +216,9 @@ pub fn insert_narazu_src_by_ms_km(
                         for i_ne in 1..9{
                             if SUJI_0<dx-i_ne && DAN_0<dy-i_ne {
                                 let ms_src = suji_dan_to_ms(dx-i_ne, dy-i_ne);
-                                if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) {
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) {
                                     break;
                                 }
                             }
@@ -228,7 +227,7 @@ pub fn insert_narazu_src_by_ms_km(
                         // 南西
                         if SUJI_0<dx-1 && DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy-1);
-                            if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -237,7 +236,7 @@ pub fn insert_narazu_src_by_ms_km(
             SSW   =>{
                         if SUJI_0<dx-1 && DAN_0<dy-2 {
                             let ms_src = suji_dan_to_ms(dx-1, dy-2);
-                            if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -248,9 +247,9 @@ pub fn insert_narazu_src_by_ms_km(
                         for i_north in 1..9{
                             if DAN_0<dy-i_north {
                                 let ms_src = suji_dan_to_ms(dx, dy-i_north);
-                                if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) {
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) {
                                     break;
                                 }
                             }
@@ -259,7 +258,7 @@ pub fn insert_narazu_src_by_ms_km(
                         // 南
                         if DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx, dy-1);
-                            if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -268,7 +267,7 @@ pub fn insert_narazu_src_by_ms_km(
             SSE   =>{
                         if dx+1<SUJI_10 && DAN_0<dy-2 {
                             let ms_src = suji_dan_to_ms(dx+1, dy-2);
-                            if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -279,9 +278,9 @@ pub fn insert_narazu_src_by_ms_km(
                         for i_nw in 1..9{
                             if dx+i_nw<SUJI_10 && DAN_0<dy-i_nw {
                                 let ms_src = suji_dan_to_ms(dx+i_nw, dy-i_nw);
-                                if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) {
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) {
                                     break;
                                 }
                             }
@@ -290,7 +289,7 @@ pub fn insert_narazu_src_by_ms_km(
                         // 南東
                         if dx+1<SUJI_10 && DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx+1, dy-1);
-                            if uchu.ky.has_ms_km( ms_src, km_dst ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, km_dst ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -310,7 +309,6 @@ pub fn insert_narazu_src_by_ms_km(
 pub fn insert_narumae_src_by_ms_km(
     ms_dst:umasu,
     km_dst:&Koma,
-    uchu:&Uchu,
     result:&mut HashSet<umasu>
 ){
     assert_banjo_ms(ms_dst,"Ｉnsert_narumae_src_by_ms_km");
@@ -375,9 +373,9 @@ pub fn insert_narumae_src_by_ms_km(
                         for i_east in 1..9{
                             if dx+i_east<SUJI_10 {
                                 let ms_src = suji_dan_to_ms(dx+i_east, dy);
-                                if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) {
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) {
                                     break;
                                 }
                             }
@@ -386,7 +384,7 @@ pub fn insert_narumae_src_by_ms_km(
                         // 西東
                         if dx+1<SUJI_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy);
-                            if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -397,9 +395,9 @@ pub fn insert_narumae_src_by_ms_km(
                         for i_ne in 1..9{
                             if dx+i_ne<SUJI_10 && dy+i_ne<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx+i_ne, dy+i_ne);
-                                if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) {
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) {
                                     break;
                                 }
                             }
@@ -408,7 +406,7 @@ pub fn insert_narumae_src_by_ms_km(
                         // 北東
                         if dx+1<SUJI_10 && dy+1<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy+1);
-                            if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -417,7 +415,7 @@ pub fn insert_narumae_src_by_ms_km(
             NNE   =>{
                         if dx+1<SUJI_10 && dy+2<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy+2);
-                            if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -428,9 +426,9 @@ pub fn insert_narumae_src_by_ms_km(
                         for i_south in 1..9{
                             if dy+i_south<DAN_10{
                                 let ms_src = suji_dan_to_ms(dx, dy+i_south);
-                                if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) {
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) {
                                     break;
                                 }
                             }
@@ -439,7 +437,7 @@ pub fn insert_narumae_src_by_ms_km(
                         // 北
                         if dy+1<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx, dy+1);
-                            if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -448,7 +446,7 @@ pub fn insert_narumae_src_by_ms_km(
             NNW   =>{
                         if SUJI_0<dx-1 && dy+2<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx-1, dy+2);
-                            if uchu.ky.has_ms_km( ms_src, &km_src )
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src )
                             {
                                 result.insert( ms_src);
                             }
@@ -460,9 +458,9 @@ pub fn insert_narumae_src_by_ms_km(
                         for i_se in 1..9{
                             if SUJI_0<dx-i_se && dy+i_se<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx-i_se, dy+i_se);
-                                if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) {
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) {
                                     break;
                                 }
                             }
@@ -471,7 +469,7 @@ pub fn insert_narumae_src_by_ms_km(
                         // 北西
                         if dx-1>SUJI_0 && DAN_10>dy+1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy+1);
-                            if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -483,9 +481,9 @@ pub fn insert_narumae_src_by_ms_km(
                             if SUJI_0<dx-i_east{
                                 // 進みたいマスから戻ったマス
                                 let ms_src = suji_dan_to_ms(dx-i_east, dy);
-                                if uchu.ky.has_ms_km( ms_src, &km_src ) { // 指定の駒があれば、その升は移動元。続行
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) { // 指定の駒があれば、その升は移動元。続行
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) { // なんか他の駒があれば終わり
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) { // なんか他の駒があれば終わり
                                     break;
                                 }                                
                             }
@@ -494,7 +492,7 @@ pub fn insert_narumae_src_by_ms_km(
                         // 西
                         if SUJI_0<dx-1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy);
-                            if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -505,9 +503,9 @@ pub fn insert_narumae_src_by_ms_km(
                         for i_ne in 1..9{
                             if SUJI_0<dx-i_ne && DAN_0<dy-i_ne {
                                 let ms_src = suji_dan_to_ms(dx-i_ne, dy-i_ne);
-                                if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) {
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) {
                                     break;
                                 }
                             }
@@ -516,7 +514,7 @@ pub fn insert_narumae_src_by_ms_km(
                         // 南西
                         if SUJI_0<dx-1 && DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy-1);
-                            if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -525,7 +523,7 @@ pub fn insert_narumae_src_by_ms_km(
             SSW   =>{
                         if SUJI_0<dx-1 && DAN_0<dy-2 {
                             let ms_src = suji_dan_to_ms(dx-1, dy-2);
-                            if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -536,9 +534,9 @@ pub fn insert_narumae_src_by_ms_km(
                         for i_north in 1..9{
                             if DAN_0<dy-i_north {
                                 let ms_src = suji_dan_to_ms(dx, dy-i_north);
-                                if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) {
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) {
                                     break;
                                 }
                             }
@@ -547,7 +545,7 @@ pub fn insert_narumae_src_by_ms_km(
                         // 南
                         if DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx, dy-1);
-                            if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -556,7 +554,7 @@ pub fn insert_narumae_src_by_ms_km(
             SSE   =>{
                         if dx+1<SUJI_10 && DAN_0<dy-2 {
                             let ms_src = suji_dan_to_ms(dx+1, dy-2);
-                            if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -567,9 +565,9 @@ pub fn insert_narumae_src_by_ms_km(
                         for i_nw in 1..9{
                             if dx+i_nw<SUJI_10 && DAN_0<dy-i_nw {
                                 let ms_src = suji_dan_to_ms(dx+i_nw, dy-i_nw);
-                                if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                                if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                     result.insert( ms_src);
-                                } else if uchu.ky.exists_km(ms_src) {
+                                } else if UCHU_WRAP.read().unwrap().ky.exists_km(ms_src) {
                                     break;
                                 }
                             }
@@ -578,7 +576,7 @@ pub fn insert_narumae_src_by_ms_km(
                         // 南東
                         if dx+1<SUJI_10 && DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx+1, dy-1);
-                            if uchu.ky.has_ms_km( ms_src, &km_src ) {
+                            if UCHU_WRAP.read().unwrap().ky.has_ms_km( ms_src, &km_src ) {
                                 result.insert( ms_src);
                             }
                         }
@@ -595,7 +593,7 @@ pub fn insert_narumae_src_by_ms_km(
  *
  * そこに打てる駒種類を返す。
  */
-pub fn insert_da_kms_by_ms_km( ms_dst:umasu, km_dst:&Koma, uchu:&Uchu, result_kms:&mut HashSet<usize>){
+pub fn insert_da_kms_by_ms_km( ms_dst:umasu, km_dst:&Koma, result_kms:&mut HashSet<usize>){
     assert_banjo_ms(ms_dst,"Ｉnsert_da_kms_by_ms_km");
 
     let kms_dst = km_to_kms(&km_dst);
@@ -606,7 +604,7 @@ pub fn insert_da_kms_by_ms_km( ms_dst:umasu, km_dst:&Koma, uchu:&Uchu, result_km
     // +------------------------+
     // | 打ちたいところは空升か |
     // +------------------------+
-    let km_banjo = uchu.ky.get_km_by_ms( ms_dst );
+    let km_banjo = UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_dst );
     match km_banjo {
         Koma::Kara => {},
         _ => { return; },// 駒があるところに打つ手は終了
@@ -616,7 +614,7 @@ pub fn insert_da_kms_by_ms_km( ms_dst:umasu, km_dst:&Koma, uchu:&Uchu, result_km
     // +------------------+
     // | 持っている駒か？ |
     // +------------------+
-    if uchu.ky.get_mg( &km_dst ) < 1 {
+    if UCHU_WRAP.read().unwrap().ky.get_mg( &km_dst ) < 1 {
         return; // 持っていない駒は打てない
     }
 
@@ -651,7 +649,7 @@ pub fn insert_da_kms_by_ms_km( ms_dst:umasu, km_dst:&Koma, uchu:&Uchu, result_km
         },
         H0 => {
             // ▼ひよこ　は２歩できない
-            if dy < DAN_2 || uchu.ky.exists_fu_by_sn_suji( &sn, suji ) {return;}
+            if dy < DAN_2 || UCHU_WRAP.read().unwrap().ky.exists_fu_by_sn_suji( &sn, suji ) {return;}
         },
         U1 => {
             // △うさぎ　は８、９段目には進めない
@@ -661,7 +659,7 @@ pub fn insert_da_kms_by_ms_km( ms_dst:umasu, km_dst:&Koma, uchu:&Uchu, result_km
         S1 => { if DAN_8 < dy {return;} },
         H1 => {
             // △ひよこ　は２歩できない
-            if DAN_8 < dy || uchu.ky.exists_fu_by_sn_suji( &sn, suji ) {return;}
+            if DAN_8 < dy || UCHU_WRAP.read().unwrap().ky.exists_fu_by_sn_suji( &sn, suji ) {return;}
         },
         _ => {}
     }
@@ -684,7 +682,6 @@ pub fn insert_dst_by_ms_km(
     ms_src:umasu,
     km_src:&Koma,
     to_nari:bool,
-    uchu:&Uchu,
     result:&mut HashSet<umasu>
 ) {
     assert_banjo_ms(ms_src,"Ｉnsert_dst_by_ms_km");
@@ -722,7 +719,7 @@ pub fn insert_dst_by_ms_km(
                         for i_east in 1..9{
                             if dx+i_east<SUJI_10 {
                                 let ms_src = suji_dan_to_ms(dx+i_east, dy);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                                 if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
@@ -731,7 +728,7 @@ pub fn insert_dst_by_ms_km(
                         // 西東
                         if dx+1<SUJI_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy);
-                            let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                            let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                             if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                         }
                     },
@@ -741,7 +738,7 @@ pub fn insert_dst_by_ms_km(
                         for i_ne in 1..9{
                             if dx+i_ne<SUJI_10 && dy+i_ne<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx+i_ne, dy+i_ne);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                                 if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
@@ -750,7 +747,7 @@ pub fn insert_dst_by_ms_km(
                         // 北東
                         if dx+1<SUJI_10 && dy+1<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy+1);
-                            let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                            let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                             if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                         }
                     },
@@ -758,7 +755,7 @@ pub fn insert_dst_by_ms_km(
             NNE   =>{
                         if dx+1<SUJI_10 && dy+2<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy+2);
-                            let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                            let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                             if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                         }
                     },
@@ -768,7 +765,7 @@ pub fn insert_dst_by_ms_km(
                         for i_south in 1..9{
                             if dy+i_south<DAN_10{
                                 let ms_src = suji_dan_to_ms(dx, dy+i_south);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                                 if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
@@ -777,7 +774,7 @@ pub fn insert_dst_by_ms_km(
                         // 北
                         if dy+1<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx, dy+1);
-                            let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                            let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                             if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                         }
                     },
@@ -785,7 +782,7 @@ pub fn insert_dst_by_ms_km(
             NNW   =>{
                         if SUJI_0<dx-1 && dy+2<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx-1, dy+2);
-                            let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                            let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                             if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                         }
                     },
@@ -795,7 +792,7 @@ pub fn insert_dst_by_ms_km(
                         for i_se in 1..9{
                             if SUJI_0<dx-i_se && dy+i_se<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx-i_se, dy+i_se);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                                 if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
@@ -804,7 +801,7 @@ pub fn insert_dst_by_ms_km(
                         // 北西
                         if dx-1>SUJI_0 && DAN_10>dy+1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy+1);
-                            let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                            let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                             if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                         }
                     },
@@ -814,7 +811,7 @@ pub fn insert_dst_by_ms_km(
                         for i_east in 1..9{
                             if SUJI_0<dx-i_east{
                                 let ms_src = suji_dan_to_ms(dx-i_east, dy);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                                 if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
@@ -823,7 +820,7 @@ pub fn insert_dst_by_ms_km(
                         // 西
                         if SUJI_0<dx-1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy);
-                            let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                            let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                             if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                         }
                     },
@@ -833,7 +830,7 @@ pub fn insert_dst_by_ms_km(
                         for i_ne in 1..9{
                             if SUJI_0<dx-i_ne && DAN_0<dy-i_ne {
                                 let ms_src = suji_dan_to_ms(dx-i_ne, dy-i_ne);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                                 if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
@@ -842,7 +839,7 @@ pub fn insert_dst_by_ms_km(
                         // 南西
                         if SUJI_0<dx-1 && DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy-1);
-                            let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                            let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                             if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                         }
                     },
@@ -850,7 +847,7 @@ pub fn insert_dst_by_ms_km(
             SSW   =>{
                         if SUJI_0<dx-1 && DAN_0<dy-2 {
                             let ms_src = suji_dan_to_ms(dx-1, dy-2);
-                            let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                            let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                             if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                         }
                     },
@@ -860,7 +857,7 @@ pub fn insert_dst_by_ms_km(
                         for i_north in 1..9{
                             if DAN_0<dy-i_north {
                                 let ms_src = suji_dan_to_ms(dx, dy-i_north);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                                 if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
@@ -869,7 +866,7 @@ pub fn insert_dst_by_ms_km(
                         // 南
                         if DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx, dy-1);
-                            let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                            let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                             if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                         }
                     },
@@ -877,7 +874,7 @@ pub fn insert_dst_by_ms_km(
             SSE   =>{
                         if dx+1<SUJI_10 && DAN_0<dy-2 {
                             let ms_src = suji_dan_to_ms(dx+1, dy-2);
-                            let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                            let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                             if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                         }
                     },
@@ -887,7 +884,7 @@ pub fn insert_dst_by_ms_km(
                         for i_nw in 1..9{
                             if dx+i_nw<SUJI_10 && DAN_0<dy-i_nw {
                                 let ms_src = suji_dan_to_ms(dx+i_nw, dy-i_nw);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                                 if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
@@ -896,7 +893,7 @@ pub fn insert_dst_by_ms_km(
                         // 南東
                         if dx+1<SUJI_10 && DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx+1, dy-1);
-                            let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
+                            let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
                             if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
                         }
                     },
@@ -1041,7 +1038,7 @@ pub fn insert_dst_by_ms_km(
  * その升に到達できる駒が居る升を取得☆（＾～＾）
  * TODO 成りの動きも考えたい。升だけではなく、成りの有無☆（＾～＾）
  */
-pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&mut HashSet<umasu> ) {
+pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, result:&mut HashSet<umasu> ) {
     assert_banjo_ms(ms_dst,"Ｉnsert_narazu_src_by_sn_ms");
 
     // 移動先の筋、段
@@ -1100,8 +1097,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             for i_east in 1..9{
                                 if dx+i_east<SUJI_10 {
                                     let ms_src = suji_dan_to_ms(dx+i_east, dy);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1110,8 +1107,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             // 東
                             if dx+1<SUJI_10 {
                                 let ms_src = suji_dan_to_ms(dx+1, dy);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1121,8 +1118,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             for i_ne in 1..9{
                                 if dx+i_ne<SUJI_10 && dy+i_ne<DAN_10 {
                                     let ms_src = suji_dan_to_ms(dx+i_ne, dy+i_ne);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1131,8 +1128,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             // 北東
                             if dx+1<SUJI_10 && dy+1<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx+1, dy+1);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1140,8 +1137,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                 NNE   =>{
                             if dx+1<SUJI_10 && dy+2<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx+1, dy+2);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1151,8 +1148,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             for i_south in 1..9{
                                 if dy+i_south<DAN_10{
                                     let ms_src = suji_dan_to_ms(dx, dy+i_south);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1161,8 +1158,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             // 北
                             if dy+1<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx, dy+1);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 // g_writeln(&format!("get_src_by_sn_ms 北 ms_src={} sn_ms=>{} kms_ms={} match_sn={} match_kms={}",
                                 //     ms_src, sn_ms, kms_ms, match_sn( &sn_ms, &sn ), match_kms( &kms_ms, &kms )
                                 // ));
@@ -1173,8 +1170,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                 NNW   =>{
                             if SUJI_0<dx-1 && dy+2<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx-1, dy+2);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1184,8 +1181,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             for i_se in 1..9{
                                 if SUJI_0<dx-i_se && dy+i_se<DAN_10 {
                                     let ms_src = suji_dan_to_ms(dx-i_se, dy+i_se);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1194,8 +1191,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             // 北西
                             if dx-1>SUJI_0 && DAN_10>dy+1 {
                                 let ms_src = suji_dan_to_ms(dx-1, dy+1);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1205,8 +1202,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             for i_east in 1..9{
                                 if SUJI_0<dx-i_east{
                                     let ms_src = suji_dan_to_ms(dx-i_east, dy);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1215,8 +1212,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             // 西
                             if SUJI_0<dx-1 {
                                 let ms_src = suji_dan_to_ms(dx-1, dy);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1226,8 +1223,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             for i_ne in 1..9{
                                 if SUJI_0<dx-i_ne && DAN_0<dy-i_ne {
                                     let ms_src = suji_dan_to_ms(dx-i_ne, dy-i_ne);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1236,8 +1233,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             // 南西
                             if SUJI_0<dx-1 && DAN_0<dy-1 {
                                 let ms_src = suji_dan_to_ms(dx-1, dy-1);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1245,8 +1242,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                 SSW   =>{
                             if SUJI_0<dx-1 && DAN_0<dy-2 {
                                 let ms_src = suji_dan_to_ms(dx-1, dy-2);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1256,8 +1253,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             for i_north in 1..9{
                                 if DAN_0<dy-i_north {
                                     let ms_src = suji_dan_to_ms(dx, dy-i_north);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1266,8 +1263,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             // 南
                             if DAN_0<dy-1 {
                                 let ms_src = suji_dan_to_ms(dx, dy-1);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 // g_writeln(&format!("get_src_by_sn_ms 南 kms={} kms_num={} ms_src={} sn_ms=>{} kms_ms={} match_sn={} match_kms={}",
                                 //     kms, kms_num, ms_src, sn_ms, kms_ms, match_sn( &sn_ms, &sn ), match_kms( &kms_ms, &kms )
                                 // ));
@@ -1278,8 +1275,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                 SSE   =>{
                             if dx+1<SUJI_10 && DAN_0<dy-2 {
                                 let ms_src = suji_dan_to_ms(dx+1, dy-2);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1289,8 +1286,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             for i_nw in 1..9{
                                 if dx+i_nw<SUJI_10 && DAN_0<dy-i_nw {
                                     let ms_src = suji_dan_to_ms(dx+i_nw, dy-i_nw);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1299,8 +1296,8 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
                             // 南東
                             if dx+1<SUJI_10 && DAN_0<dy-1 {
                                 let ms_src = suji_dan_to_ms(dx+1, dy-1);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1312,7 +1309,7 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&
 /**
  * 移動元升生成（成る前）
  */
-pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:&mut HashSet<umasu> ) {
+pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, result:&mut HashSet<umasu> ) {
     assert_banjo_ms(ms_dst,"Ｉnsert_narumae_src_by_sn_ms");
 
     // 移動先の筋、段
@@ -1365,8 +1362,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             for i_east in 1..9{
                                 if dx+i_east<SUJI_10 {
                                     let ms_src = suji_dan_to_ms(dx+i_east, dy);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1375,8 +1372,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             // 東
                             if dx+1<SUJI_10 {
                                 let ms_src = suji_dan_to_ms(dx+1, dy);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1386,8 +1383,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             for i_ne in 1..9{
                                 if dx+i_ne<SUJI_10 && dy+i_ne<DAN_10 {
                                     let ms_src = suji_dan_to_ms(dx+i_ne, dy+i_ne);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1396,8 +1393,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             // 北東
                             if dx+1<SUJI_10 && dy+1<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx+1, dy+1);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1405,8 +1402,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                 NNE   =>{
                             if dx+1<SUJI_10 && dy+2<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx+1, dy+2);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1416,8 +1413,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             for i_south in 1..9{
                                 if dy+i_south<DAN_10{
                                     let ms_src = suji_dan_to_ms(dx, dy+i_south);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1426,8 +1423,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             // 北
                             if dy+1<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx, dy+1);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 // g_writeln(&format!("get_src_by_sn_ms 北 ms_src={} sn_ms=>{} kms_ms={} match_sn={} match_kms={}",
                                 //     ms_src, sn_ms, kms_ms, match_sn( &sn_ms, &sn ), match_kms( &kms_ms, &kms )
                                 // ));
@@ -1438,8 +1435,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                 NNW   =>{
                             if SUJI_0<dx-1 && dy+2<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx-1, dy+2);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1449,8 +1446,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             for i_se in 1..9{
                                 if SUJI_0<dx-i_se && dy+i_se<DAN_10 {
                                     let ms_src = suji_dan_to_ms(dx-i_se, dy+i_se);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1459,8 +1456,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             // 北西
                             if dx-1>SUJI_0 && DAN_10>dy+1 {
                                 let ms_src = suji_dan_to_ms(dx-1, dy+1);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1470,8 +1467,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             for i_east in 1..9{
                                 if SUJI_0<dx-i_east{
                                     let ms_src = suji_dan_to_ms(dx-i_east, dy);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1480,8 +1477,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             // 西
                             if SUJI_0<dx-1 {
                                 let ms_src = suji_dan_to_ms(dx-1, dy);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1491,8 +1488,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             for i_ne in 1..9{
                                 if SUJI_0<dx-i_ne && DAN_0<dy-i_ne {
                                     let ms_src = suji_dan_to_ms(dx-i_ne, dy-i_ne);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1501,8 +1498,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             // 南西
                             if SUJI_0<dx-1 && DAN_0<dy-1 {
                                 let ms_src = suji_dan_to_ms(dx-1, dy-1);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1510,8 +1507,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                 SSW   =>{
                             if SUJI_0<dx-1 && DAN_0<dy-2 {
                                 let ms_src = suji_dan_to_ms(dx-1, dy-2);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1521,8 +1518,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             for i_north in 1..9{
                                 if DAN_0<dy-i_north {
                                     let ms_src = suji_dan_to_ms(dx, dy-i_north);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1531,8 +1528,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             // 南
                             if DAN_0<dy-1 {
                                 let ms_src = suji_dan_to_ms(dx, dy-1);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 // g_writeln(&format!("get_src_by_sn_ms 南 kms={} kms_num={} ms_src={} sn_ms=>{} kms_ms={} match_sn={} match_kms={}",
                                 //     kms, kms_num, ms_src, sn_ms, kms_ms, match_sn( &sn_ms, &sn ), match_kms( &kms_ms, &kms )
                                 // ));
@@ -1543,8 +1540,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                 SSE   =>{
                             if dx+1<SUJI_10 && DAN_0<dy-2 {
                                 let ms_src = suji_dan_to_ms(dx+1, dy-2);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },
@@ -1554,8 +1551,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             for i_nw in 1..9{
                                 if dx+i_nw<SUJI_10 && DAN_0<dy-i_nw {
                                     let ms_src = suji_dan_to_ms(dx+i_nw, dy-i_nw);
-                                    let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                    let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                    let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                    let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                     if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                                     if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
                                 }
@@ -1564,8 +1561,8 @@ pub fn insert_narumae_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, uchu:&Uchu, result:
                             // 南東
                             if dx+1<SUJI_10 && DAN_0<dy-1 {
                                 let ms_src = suji_dan_to_ms(dx+1, dy-1);
-                                let sn_ms = uchu.ky.get_sn_by_ms( ms_src );
-                                let kms_ms = km_to_kms( &uchu.ky.get_km_by_ms( ms_src ));
+                                let sn_ms = UCHU_WRAP.read().unwrap().ky.get_sn_by_ms( ms_src );
+                                let kms_ms = km_to_kms( &UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src ));
                                 if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
                             }
                 },

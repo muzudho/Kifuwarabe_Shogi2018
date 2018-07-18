@@ -8,6 +8,8 @@ use std::fmt;
 use teigi::shogi_syugo::*;
 use memory::uchu::*;
 
+use UCHU_WRAP;
+
 /**
  * 指し手
  * 棋譜にも使うので、取った駒の情報を記憶しておくんだぜ☆（＾～＾）
@@ -128,7 +130,7 @@ impl fmt::Debug for Sasite{
  * 読み取った指し手は、棋譜に入れる。
  * 現在の手目のところに入れ、手目のカウントアップも行う。
  */
- pub fn read_sasite( line:&String, starts:&mut usize, len:usize, uchu:&mut Uchu )->bool{
+ pub fn read_sasite(line:&String, starts:&mut usize, len:usize)->bool{
 
     // 4文字か5文字あるはず。
     if (len-*starts)<4{
@@ -140,13 +142,13 @@ impl fmt::Debug for Sasite{
     // 1文字目と2文字目
     match &line[*starts..(*starts+1)]{
         // 1文字目が駒だったら打。2文字目は必ず「*」なはずなので読み飛ばす。
-        "R" => { *starts+=2; uchu.set_sasite_src(0); uchu.set_sasite_drop(KmSyurui::K); },
-        "B" => { *starts+=2; uchu.set_sasite_src(0); uchu.set_sasite_drop(KmSyurui::Z); },
-        "G" => { *starts+=2; uchu.set_sasite_src(0); uchu.set_sasite_drop(KmSyurui::I); },
-        "S" => { *starts+=2; uchu.set_sasite_src(0); uchu.set_sasite_drop(KmSyurui::N); },
-        "N" => { *starts+=2; uchu.set_sasite_src(0); uchu.set_sasite_drop(KmSyurui::U); },
-        "L" => { *starts+=2; uchu.set_sasite_src(0); uchu.set_sasite_drop(KmSyurui::S); },
-        "P" => { *starts+=2; uchu.set_sasite_src(0); uchu.set_sasite_drop(KmSyurui::H); },
+        "R" => { *starts+=2; UCHU_WRAP.write().unwrap().set_sasite_src(0); UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::K); },
+        "B" => { *starts+=2; UCHU_WRAP.write().unwrap().set_sasite_src(0); UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::Z); },
+        "G" => { *starts+=2; UCHU_WRAP.write().unwrap().set_sasite_src(0); UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::I); },
+        "S" => { *starts+=2; UCHU_WRAP.write().unwrap().set_sasite_src(0); UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::N); },
+        "N" => { *starts+=2; UCHU_WRAP.write().unwrap().set_sasite_src(0); UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::U); },
+        "L" => { *starts+=2; UCHU_WRAP.write().unwrap().set_sasite_src(0); UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::S); },
+        "P" => { *starts+=2; UCHU_WRAP.write().unwrap().set_sasite_src(0); UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::H); },
         _ => {
             // 残りは「筋の数字」、「段のアルファベット」のはず。
             let suji;
@@ -177,8 +179,8 @@ impl fmt::Debug for Sasite{
                 _ => {g_writeln(&format!("(2) '{}' だった。", &line[*starts..(*starts+1)])); return false;},
             }
 
-            uchu.set_sasite_src(suji_dan_to_ms(suji, dan));
-            uchu.set_sasite_drop(KmSyurui::Kara);
+            UCHU_WRAP.write().unwrap().set_sasite_src(suji_dan_to_ms(suji, dan));
+            UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::Kara);
         },
     }
 
@@ -214,14 +216,14 @@ impl fmt::Debug for Sasite{
         _ => {g_writeln(&format!("(4) '{}' だった。", &line[*starts..(*starts+1)])); return false;},
     }
 
-    uchu.set_sasite_dst(suji_dan_to_ms(suji, dan));
+    UCHU_WRAP.write().unwrap().set_sasite_dst(suji_dan_to_ms(suji, dan));
     
     // 5文字に「+」があれば成り。
     if 0<(len-*starts) && &line[*starts..(*starts+1)]=="+" {
-        uchu.set_sasite_pro(true);
+        UCHU_WRAP.write().unwrap().set_sasite_pro(true);
         *starts+=1;
     } else {
-        uchu.set_sasite_pro(false);        
+        UCHU_WRAP.write().unwrap().set_sasite_pro(false);        
     }
 
     // 続きにスペース「 」が１つあれば読み飛ばす
@@ -229,14 +231,14 @@ impl fmt::Debug for Sasite{
         *starts+=1;
     }
 
-    uchu.teme+=1;
+    UCHU_WRAP.write().unwrap().teme+=1;
     true
  }
 
 /**
  * position コマンド 盤上部分のみ 読取
  */
- pub fn read_banjo( line:&String, starts:&mut usize, len:usize, uchu:&mut Uchu ){
+ pub fn read_banjo(line:&String, starts:&mut usize, len:usize){
     // 盤部
     let mut suji = SUJI_9;//９筋から右方向へ読取
     let mut dan = DAN_1;
@@ -244,78 +246,78 @@ impl fmt::Debug for Sasite{
         match &line[*starts..(*starts+1)]{
             "/" => { *starts+=1; suji=SUJI_9; dan+=1; },
             "1" => { *starts+=1;
-                uchu.set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
             },
             "2" => { *starts+=1;
-                uchu.set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                uchu.set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
             },
             "3" => { *starts+=1;
-                uchu.set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                uchu.set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                uchu.set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
             },
             "4" => { *starts+=1;
                 for _i_kara in 0..4{
-                    uchu.set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
                 }
             },
             "5" => { *starts+=1;
                 for _i_kara in 0..5{
-                    uchu.set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
                 }
             },
             "6" => { *starts+=1;
                 for _i_kara in 0..6{
-                    uchu.set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
                 }
             },
             "7" => { *starts+=1;
                 for _i_kara in 0..7{
-                    uchu.set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
                 }
             },
             "8" => { *starts+=1;
                 for _i_kara in 0..8{
-                    uchu.set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
                 }
             },
             "9" => { *starts+=1;
                 for _i_kara in 0..9{
-                    uchu.set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
                 }
             },
-            "K" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::R0); suji-=1; },
-            "R" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::K0); suji-=1; },
-            "B" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::Z0); suji-=1; },
-            "G" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::I0); suji-=1; },
-            "S" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::N0); suji-=1; },
-            "N" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::U0); suji-=1; },
-            "L" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::S0); suji-=1; },
-            "P" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::H0); suji-=1; },
-            "k" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::R1); suji-=1; },
-            "r" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::K1); suji-=1; },
-            "b" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::Z1); suji-=1; },
-            "g" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::I1); suji-=1; },
-            "s" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::N1); suji-=1; },
-            "n" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::U1); suji-=1; },
-            "l" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::S1); suji-=1; },
-            "p" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::H1); suji-=1; },
+            "K" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::R0); suji-=1; },
+            "R" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::K0); suji-=1; },
+            "B" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Z0); suji-=1; },
+            "G" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::I0); suji-=1; },
+            "S" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::N0); suji-=1; },
+            "N" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::U0); suji-=1; },
+            "L" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::S0); suji-=1; },
+            "P" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::H0); suji-=1; },
+            "k" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::R1); suji-=1; },
+            "r" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::K1); suji-=1; },
+            "b" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Z1); suji-=1; },
+            "g" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::I1); suji-=1; },
+            "s" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::N1); suji-=1; },
+            "n" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::U1); suji-=1; },
+            "l" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::S1); suji-=1; },
+            "p" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::H1); suji-=1; },
             "+" => {
                 *starts+=1;
                 match &line[*starts..(*starts+1)]{
-                    "R" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::PK0); suji-=1; },
-                    "B" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::PZ0); suji-=1; },
-                    "S" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::PN0); suji-=1; },
-                    "N" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::PU0); suji-=1; },
-                    "L" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::PS0); suji-=1; },
-                    "P" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::PH0); suji-=1; },
-                    "r" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::PK1); suji-=1; },
-                    "b" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::PZ1); suji-=1; },
-                    "s" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::PN1); suji-=1; },
-                    "n" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::PU1); suji-=1; },
-                    "l" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::PS1); suji-=1; },
-                    "p" => { *starts+=1; uchu.set_ky0_ban_km(suji,dan,Koma::PH1); suji-=1; },
+                    "R" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PK0); suji-=1; },
+                    "B" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PZ0); suji-=1; },
+                    "S" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PN0); suji-=1; },
+                    "N" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PU0); suji-=1; },
+                    "L" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PS0); suji-=1; },
+                    "P" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PH0); suji-=1; },
+                    "r" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PK1); suji-=1; },
+                    "b" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PZ1); suji-=1; },
+                    "s" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PN1); suji-=1; },
+                    "n" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PU1); suji-=1; },
+                    "l" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PS1); suji-=1; },
+                    "p" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PH1); suji-=1; },
                     _ => { g_writeln(&format!("盤部(0) '{}' だった。", &line[*starts..(*starts+1)])); break 'ban;},
                 }                    
             },
@@ -324,14 +326,14 @@ impl fmt::Debug for Sasite{
     }
 
     // 初期局面ハッシュを作り直す
-    let ky_hash = uchu.create_ky0_hash();
-    uchu.set_ky0_hash( ky_hash );
+    let ky_hash = UCHU_WRAP.write().unwrap().create_ky0_hash();
+    UCHU_WRAP.write().unwrap().set_ky0_hash( ky_hash );
 }
 
  /**
   * position コマンド読取
   */
- pub fn read_position( line:&String, uchu:&mut Uchu ){
+ pub fn read_position(line:&String){
 
     let mut starts = 0;
 
@@ -339,14 +341,14 @@ impl fmt::Debug for Sasite{
     let len = line.chars().count();
 
     // 局面をクリアー。手目も 0 に戻します。
-    uchu.clear_ky01();
+    UCHU_WRAP.write().unwrap().clear_ky01();
 
     if 16<(len-starts) && &line[starts..(starts+17)]=="position startpos"{
         // 'position startpos' を読み飛ばし
         starts += 17;
         // 別途用意した平手初期局面文字列を読取
         let mut local_starts = 0;
-        read_banjo( &STARTPOS.to_string(), &mut local_starts, STARTPOS_LN, uchu);
+        read_banjo( &STARTPOS.to_string(), &mut local_starts, STARTPOS_LN);
 
         if 0<(len-starts) && &line[starts..(starts+1)]==" "{
             // ' ' を読み飛ばした。
@@ -354,7 +356,7 @@ impl fmt::Debug for Sasite{
         }
     }else if 13<(len-starts) && &line[starts..(starts+14)]=="position sfen "{
         starts += 14; // 'position sfen ' を読み飛ばし
-        read_banjo( line, &mut starts, len, uchu);
+        read_banjo( line, &mut starts, len);
 
         if 0<(len-starts) && &line[starts..(starts+1)]==" "{
             starts += 1;
@@ -424,7 +426,7 @@ impl fmt::Debug for Sasite{
                         _ => { break 'mg; }, // 持駒部 正常終了
                     }
 
-                    uchu.set_ky0_mg(km, maisu);
+                    UCHU_WRAP.write().unwrap().set_ky0_mg(km, maisu);
                 }//if
             }//loop
         }//else
@@ -446,19 +448,19 @@ impl fmt::Debug for Sasite{
     }
 
     // 初期局面を、現局面にコピーします
-    uchu.copy_ky0_to_ky1();
+    UCHU_WRAP.write().unwrap().copy_ky0_to_ky1();
 
     // 指し手を全部読んでいくぜ☆（＾～＾）手目のカウントも増えていくぜ☆（＾～＾）
-    while read_sasite( line, &mut starts, len, uchu) {
+    while read_sasite(line, &mut starts, len) {
         // 手目を戻す
-        uchu.teme -= 1;
+        UCHU_WRAP.write().unwrap().teme -= 1;
         // 入っている指し手の通り指すぜ☆（＾～＾）
-        let teme = uchu.teme;
-        let ss = uchu.kifu[ teme ];
-        uchu.do_ss( &ss );
+        let teme = UCHU_WRAP.read().unwrap().teme;
+        let ss = UCHU_WRAP.read().unwrap().kifu[ teme ];
+        UCHU_WRAP.write().unwrap().do_ss( &ss );
 
         // 現局面表示
-        //let s1 = &uchu.kaku_ky( &KyNums::Current );
+        //let s1 = &UCHU_WRAP.read().unwrap().kaku_ky( &KyNums::Current );
         //g_writeln( &s1 );
     }
 }

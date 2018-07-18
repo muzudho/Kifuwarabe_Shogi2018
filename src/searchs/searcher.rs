@@ -3,7 +3,6 @@
  */
 
 use mediators::med_kikisu::*;
-use memory::uchu::*;
 
 /**
  * 探索オブジェクト。思考開始時に作成して使う。
@@ -21,7 +20,7 @@ impl Searcher{
     /**
      * 探索。
      */
-    pub fn search(&mut self, mut uchu:&mut Uchu){
+    pub fn search(&mut self){
 
         // TODO 王手放置漏れ回避　を最優先させたいぜ☆（＾～＾）
 
@@ -30,8 +29,8 @@ impl Searcher{
         // +----------------------+
 
         // 相手の利き升調べ（自殺手防止のため）
-        refresh_kikisu( &mut uchu );
-        // g_writeln( &format!("info test is_s={}", kasetu::atamakin::is_s(&uchu) ) );
+        refresh_kikisu();
+        // g_writeln( &format!("info test is_s={}", kasetu::atamakin::is_s() ) );
 
     }
 }

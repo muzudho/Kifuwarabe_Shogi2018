@@ -7,7 +7,8 @@ use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
-use memory::uchu::*;
+
+use UCHU_WRAP;
 
 /**
  * 盤上の利き升調べ
@@ -16,17 +17,17 @@ use memory::uchu::*;
  *
  * TODO: 差分更新にしたい。
  */
-pub fn refresh_kikisu(uchu:&mut Uchu){
+pub fn refresh_kikisu(){
 
     // ゼロ・リセット
     // 駒別に用意した盤を使った、利き数。
     for km in KM_ARRAY.iter() {
-        &uchu.kiki_su_by_km[km_to_num(km)].clear();
+        &UCHU_WRAP.write().unwrap().kiki_su_by_km[km_to_num(km)].clear();
     }
 
     // 先後別に用意した盤を使った、利き数。
     for sn in SN_ARRAY.iter() {
-        &uchu.kiki_su_by_sn[sn_to_num(sn)].clear();
+        &UCHU_WRAP.write().unwrap().kiki_su_by_sn[sn_to_num(sn)].clear();
     }
 
     // カウント    
@@ -39,17 +40,17 @@ pub fn refresh_kikisu(uchu:&mut Uchu){
 
                 // 移動元の升
                 let mut mv_src_hashset : HashSet<umasu>     = HashSet::new();
-                insert_narazu_src_by_ms_km  ( ms_dst, &km_dst, &uchu, &mut mv_src_hashset );
-                insert_narumae_src_by_ms_km ( ms_dst, &km_dst, &uchu, &mut mv_src_hashset );
+                insert_narazu_src_by_ms_km  ( ms_dst, &km_dst, &mut mv_src_hashset );
+                insert_narumae_src_by_ms_km ( ms_dst, &km_dst, &mut mv_src_hashset );
                 // 打は考えない。盤上の利き数なので
                 let kikisu = mv_src_hashset.len();
                 let sn = km_to_sn( &km_dst);
 
                 // 駒別
-                uchu.kiki_su_by_km[km_to_num(&km_dst)].add_su_by_ms( ms_dst, kikisu as i8 );
+                UCHU_WRAP.write().unwrap().kiki_su_by_km[km_to_num(&km_dst)].add_su_by_ms( ms_dst, kikisu as i8 );
 
                 // 先後別
-                uchu.kiki_su_by_sn[sn_to_num(&sn)].add_su_by_ms( ms_dst, kikisu as i8 );
+                UCHU_WRAP.write().unwrap().kiki_su_by_sn[sn_to_num(&sn)].add_su_by_ms( ms_dst, kikisu as i8 );
             }
         }
     }
