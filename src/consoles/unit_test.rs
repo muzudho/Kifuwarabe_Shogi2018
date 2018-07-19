@@ -319,8 +319,8 @@ pub fn test( line:&String, starts:&mut usize, len:usize) {
 
     } else {
         //g_writeln( &format!( "未定義のテスト「{}」", &line[*starts..len-1] ) );
-        UCHU_WRAP.write().unwrap().push_command( &"position startpos moves 6i5h 8c8d 9i9h 8d8e 3g3f 8e8f 5h4h 8f8g+ 1i1h 8g9h 2g2f 9h8h 9g9f 8h7i 2i3g 8b8i+ 2f2e 7i7h".to_string() );
-        UCHU_WRAP.write().unwrap().push_command( &"ky".to_string() );
+        //UCHU_WRAP.write().unwrap().push_command( &"position startpos moves 6i5h 8c8d 9i9h 8d8e 3g3f 8e8f 5h4h 8f8g+ 1i1h 8g9h 2g2f 9h8h 9g9f 8h7i 2i3g 8b8i+ 2f2e 7i7h".to_string() );
+        //UCHU_WRAP.write().unwrap().push_command( &"ky".to_string() );
         //g_writeln( &UCHU_WRAP.write().unwrap().pop_command() );
     }
 }

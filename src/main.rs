@@ -33,8 +33,6 @@ mod teigi;
 //mod teiri;
 mod tusin;
 
-use std::io;
-
 use actions::command_list::*;
 use memory::uchu::*;
 
@@ -51,58 +49,32 @@ fn main() {
     UCHU_WRAP.write().unwrap().big_bang();
     
     // コマンド リスト。
-    let command_list : CommandList = CommandList::new();
-
-    // 新コマンド リスト。
     let mut commander = Commander::new();
-    commander.action_len_zero = Command
-    {
-        keyword: "".to_string(),
-        callback: do_len_zero
-    };
+    commander.action_len_zero = Command {keyword: "".to_string(), callback: do_len_zero};
+    commander.command_array.push(Command {keyword: "kmugokidir".to_string(), callback: do_kmugokidir});
+    commander.command_array.push(Command { keyword: "usinewgame".to_string(), callback: do_usinewgame});
+    commander.command_array.push(Command { keyword: "position".to_string(), callback: do_position});
+    commander.command_array.push(Command { keyword: "isready".to_string(), callback: do_isready});
+    commander.command_array.push(Command { keyword: "kmugoki".to_string(), callback: do_kmugoki});
+    commander.command_array.push(Command { keyword: "hirate".to_string(), callback: do_hirate});
+    commander.command_array.push(Command { keyword: "kikisu".to_string(), callback: do_kikisu});
+    commander.command_array.push(Command { keyword: "rndkms".to_string(), callback: do_rndkms});
+    commander.command_array.push(Command { keyword: "sasite".to_string(), callback: do_sasite});
+    commander.command_array.push(Command { keyword: "rndms".to_string(), callback: do_rndms});
+    commander.command_array.push(Command { keyword: "teigi::conv".to_string(), callback: do_teigi_conv});
+    commander.command_array.push(Command { keyword: "hash".to_string(), callback: do_hash});
+    commander.command_array.push(Command { keyword: "kifu".to_string(), callback: do_kifu});
+    commander.command_array.push(Command { keyword: "quit".to_string(), callback: do_quit});
+    commander.command_array.push(Command { keyword: "rand".to_string(), callback: do_rand});
+    commander.command_array.push(Command { keyword: "same".to_string(), callback: do_same});
+    commander.command_array.push(Command { keyword: "test".to_string(), callback: do_test});
+    commander.command_array.push(Command { keyword: "undo".to_string(), callback: do_undo});
+    commander.command_array.push(Command { keyword: "do ".to_string(), callback: do_do});
+    commander.command_array.push(Command { keyword: "ky0".to_string(), callback: do_ky0});
+    commander.command_array.push(Command { keyword: "usi".to_string(), callback: do_usi});
+    commander.command_array.push(Command { keyword: "go".to_string(), callback: do_go});
+    commander.command_array.push(Command { keyword: "ky".to_string(), callback: do_ky});
 
     // [Ctrl]+[C] で強制終了
-    loop{
-
-        let mut line : String;
-        if UCHU_WRAP.read().unwrap().is_empty_command() {
-            line = String::new();
-        } else {
-            // バッファーに溜まっていれば☆（＾～＾）
-            line = UCHU_WRAP.write().unwrap().pop_command();
-        }
-
-        // まず最初に、コマンドライン入力を待機しろだぜ☆（＾～＾）
-        io::stdin().read_line(&mut line)
-            .ok()// read_lineの返り値オブジェクトResult の okメソッド
-            .expect("info Failed to read line");// OKで無かった場合のエラーメッセージ
-
-        // 末尾の改行を除こうぜ☆（＾～＾）
-        // trim すると空白も消えるぜ☆（＾～＾）
-        let line : String = line.trim().parse().ok().expect("info Failed to parse");
-
-        // 文字数を調べようぜ☆（＾～＾）
-        let len = line.chars().count();
-        let mut starts = 0;
-
-        let mut is_done = false;
-
-        for element in command_list.command_array.iter() {
-            if element.is_matched(len, &line, &starts) {
-                element.move_caret_and_go(len, &line, &mut starts);
-                is_done = true;
-                break;
-            }
-        }
-
-        // 何とも一致しなかったら実行する。
-        if !is_done {
-            command_list.action_len_zero.move_caret_and_go(len, &line, &mut starts);
-        }
-
-        if UCHU_WRAP.read().unwrap().is_quit {
-            // ループを抜けて終了
-            break;
-        }
-    }//loop
+    commander.run();
 }
