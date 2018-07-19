@@ -2,3 +2,5 @@ id name Kifuwarabe 2018
 id author TAKAHASHI, Satoshi
 usiok
 readyok
+info string My raion 59.
+info string My raion is not outed.

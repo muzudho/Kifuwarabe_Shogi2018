@@ -551,7 +551,9 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
      * 初期局面ハッシュを作り直す
      */
     pub fn create_ky0_hash( &self ) -> u64 {
-        let mut hash = self.ky0.create_hash();
+
+        let ky_hash_seed = &self.ky_hash_seed;
+        let mut hash = self.ky0.create_hash(&ky_hash_seed);
 
         // 手番ハッシュ（後手固定）
         hash ^= self.ky_hash_seed.sn[SN_GO];
@@ -563,7 +565,8 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
      * 局面ハッシュを作り直す
      */
     pub fn create_ky1_hash( &self ) -> u64 {
-        let mut hash = self.ky.create_hash();
+        let ky_hash_seed = &self.ky_hash_seed;
+        let mut hash = self.ky.create_hash(&ky_hash_seed);
 
         // 手番ハッシュ
         use teigi::shogi_syugo::Sengo::*;

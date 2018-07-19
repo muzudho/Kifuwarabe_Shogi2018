@@ -239,6 +239,7 @@ impl fmt::Debug for Sasite{
  * position コマンド 盤上部分のみ 読取
  */
  pub fn read_banjo(line:&String, starts:&mut usize, len:usize){
+
     // 盤部
     let mut suji = SUJI_9;//９筋から右方向へ読取
     let mut dan = DAN_1;
@@ -348,6 +349,7 @@ impl fmt::Debug for Sasite{
         starts += 17;
         // 別途用意した平手初期局面文字列を読取
         let mut local_starts = 0;
+
         read_banjo( &STARTPOS.to_string(), &mut local_starts, STARTPOS_LN);
 
         if 0<(len-starts) && &line[starts..(starts+1)]==" "{
