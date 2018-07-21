@@ -10,7 +10,7 @@ use memory::uchu::*;
 use searchs::searcher::*;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
-use tusin::usi::*;
+use tusin::us_conv::*;
 
 use UCHU_WRAP;
 

@@ -12,7 +12,7 @@ use thinks::randommove;
 use std::collections::HashSet;
 use teigi::geometries::geo_teigi::*;
 use teigi::shogi_syugo::*;
-use tusin::usi::*;
+use tusin::us_conv::*;
 
 use UCHU_WRAP;
 
@@ -65,7 +65,7 @@ pub fn test( line:&String, starts:&mut usize, len:usize) {
             g_writeln( &format!( "移動可能な駒がある升={}", ms_src) );
             ss.destination = ms_dst;
             ss.promotion = pro_dst;
-            ss.drop = KmSyurui::Kara;
+            ss.drop = kms_to_pt(&KmSyurui::Kara);
             break;
         }
         g_writeln( &format!( "指し手にすると={}", ss) );

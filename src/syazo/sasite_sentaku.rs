@@ -12,7 +12,7 @@ use thinks::results::komatori_result::*;
 use syazo::sasite_element::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
-use tusin::usi::*;
+use tusin::us_conv::*;
 
 use UCHU_WRAP;
 

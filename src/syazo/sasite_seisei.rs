@@ -7,7 +7,7 @@ use teigi::shogi_syugo::*;
 use teigi::conv::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
-use tusin::usi::*;
+use tusin::us_conv::*;
 
 use UCHU_WRAP;
 
@@ -43,10 +43,10 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64> ) {
 
                 for ms_dst in &dst_hashset {
                     ss_hashset.insert( Movement{
-                        source : ms_src,
-                        destination : *ms_dst,
-                        promotion : false, // 成らず
-                        drop : KmSyurui::Kara,
+                        source: ms_src,
+                        destination: *ms_dst,
+                        promotion: false, // 成らず
+                        drop: kms_to_pt(&KmSyurui::Kara),
                     }.to_hash() );
                 }
 
@@ -56,10 +56,10 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64> ) {
                     &mut dst_hashset );
                 for ms_dst in &dst_hashset {
                     ss_hashset.insert( Movement{
-                        source : ms_src,
-                        destination : *ms_dst,
-                        promotion : true, // 成り
-                        drop : KmSyurui::Kara,
+                        source: ms_src,
+                        destination: *ms_dst,
+                        promotion: true, // 成り
+                        drop: kms_to_pt(&KmSyurui::Kara),
                     }.to_hash() );
                 }
             }
@@ -88,10 +88,10 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64> ) {
                     for num_kms_da in da_kms_hashset {
                         let kms = num_to_kms( num_kms_da );
                         ss_hashset.insert( Movement{
-                            source : SS_SRC_DA,    // 駒大
-                            destination : ms_dst,       // どの升へ行きたいか
-                            promotion : false,        // 打に成りは無し
-                            drop : kms,         // 打った駒種類
+                            source: SS_SRC_DA,    // 駒大
+                            destination: ms_dst,       // どの升へ行きたいか
+                            promotion: false,        // 打に成りは無し
+                            drop: kms_to_pt(&kms),         // 打った駒種類
                         }.to_hash() );
                     }
                 },
@@ -141,7 +141,7 @@ pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut H
         ss_hash_builder.source = *ms_src;
         // 成らず
         ss_hash_builder.promotion = false;
-        ss_hash_builder.drop = KmSyurui::Kara;
+        ss_hash_builder.drop = kms_to_pt(&KmSyurui::Kara);
         ss_hashset.insert( ss_hash_builder.to_hash() );
     }
 
@@ -161,7 +161,7 @@ pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut H
         ss_hash_builder.source = *ms_src;
         // 成り
         ss_hash_builder.promotion = true;
-        ss_hash_builder.drop = KmSyurui::Kara;
+        ss_hash_builder.drop = kms_to_pt(&KmSyurui::Kara);
         ss_hashset.insert( ss_hash_builder.to_hash() );
     }
 }
@@ -201,10 +201,10 @@ pub fn insert_ss_by_ms_km_on_da(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut Hash
         let kms_da = num_to_kms( *num_kms_da );
         
         let hash_ss = Movement{
-            source:SS_SRC_DA,
-            destination:ms_dst,
-            promotion:false,
-            drop:kms_da,
+            source: SS_SRC_DA,
+            destination: ms_dst,
+            promotion: false,
+            drop: kms_to_pt(&kms_da),
         }.to_hash();
         ss_hashset.insert( hash_ss );
     }

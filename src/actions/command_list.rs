@@ -17,7 +17,7 @@ use teigi::constants::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use tusin;
-use tusin::usi::*;
+use tusin::us_conv::*;
 
 use UCHU_WRAP;
 
@@ -70,7 +70,7 @@ pub fn do_usinewgame(_row: &String, _starts:&mut usize, _res:&mut Response) {
  */
 pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
     // positionコマンドの読取を丸投げ
-    tusin::usi::read_position(&row);
+    tusin::us_conv::read_position(&row);
 }
 
 /**
@@ -95,7 +95,7 @@ pub fn do_kmugoki(_row: &String, _starts:&mut usize, _res:&mut Response) {
  * 平手初期局面にする。
  */
 pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
-    tusin::usi::read_position(&KY1.to_string());
+    tusin::us_conv::read_position(&KY1.to_string());
 }
 
 /**
@@ -255,9 +255,7 @@ pub fn do_ky0(_row: &String, _starts:&mut usize, _res:&mut Response) {
     g_writeln( &s );
 }
 
-/**
- * USIプロトコル参照。
- */
+/// USIプロトコル参照。
 pub fn do_usi(_row: &String, _starts:&mut usize, _res:&mut Response) {
     g_writeln( &format!("id name {}", ENGINE_NAME) );
     g_writeln( &format!("id author {}", ENGINE_AUTHOR) );

@@ -14,7 +14,7 @@ use thinks::visions::vision_tree::*;
 use teigi;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
-use tusin::usi::*;
+use tusin::us_conv::*;
 
 use std::fs::File;
 use std::io::Write;
@@ -332,7 +332,7 @@ impl Uchu{
         self.kifu[ self.teme ].promotion = pro
     }
     pub fn set_sasite_drop(&mut self, kms:KmSyurui){
-        self.kifu[ self.teme ].drop = kms
+        self.kifu[ self.teme ].drop = kms_to_pt(&kms)
     }
     pub fn set_ky0_hash(&mut self, hash:u64){
         self.ky0_hash = hash

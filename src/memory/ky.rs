@@ -11,7 +11,7 @@
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use teigi::shogi_syugo::Koma::*;
-use tusin::usi::*;
+use tusin::us_conv::*;
 use memory::uchu::*;
 
 // 局面
@@ -140,7 +140,7 @@ impl Kyokumen{
 
         // 打かどうか
         if ss.source==SS_SRC_DA {
-            km = sn_kms_to_km( &sn, &ss.drop );
+            km = sn_kms_to_km( &sn, &pt_to_kms(&ss.drop) );
             // 自分の持ち駒を減らす
             self.add_mg(km,-1);
         } else {
@@ -181,7 +181,7 @@ impl Kyokumen{
 
         // 打かどうか
         if ss.source==SS_SRC_DA {
-            km = sn_kms_to_km( sn, &ss.drop );
+            km = sn_kms_to_km( sn, &pt_to_kms(&ss.drop) );
             // 自分の持ち駒を増やす
             self.add_mg(km,1);
         } else {

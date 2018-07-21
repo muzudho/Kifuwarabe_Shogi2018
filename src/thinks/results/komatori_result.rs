@@ -12,7 +12,7 @@ use syazo::sasite_sentaku::*;
 use teigi::conv::*;
 use teigi::geometries::geo_teigi::*;
 use teigi::shogi_syugo::*;
-use tusin::usi::*;
+use tusin::us_conv::*;
 
 /********************
  * 駒取り結果の結果 *

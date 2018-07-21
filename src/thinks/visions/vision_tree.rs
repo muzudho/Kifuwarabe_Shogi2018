@@ -1,14 +1,14 @@
 /**
  * 思考部だぜ☆（＾～＾）
  */
-use syazo::sasite_element::*;
+//use syazo::sasite_element::*;
 use std::collections::HashSet;
-use teigi::conv::*;
+//use teigi::conv::*;
 use teigi::shogi_syugo::*;
-use tusin::usi::*;
-use memory::ky::*;
+//use tusin::us_conv::*;
+//use memory::ky::*;
 
-use UCHU_WRAP;
+//use UCHU_WRAP;
 
 /**
  * 狙いは、この木にぶら下げていくぜ☆（*＾～＾*）
@@ -36,6 +36,7 @@ impl VisionTree{
     }
 }
 
+/*
 /**
  * 楽観筋
  */
@@ -96,3 +97,4 @@ pub fn insert_rakkansuji(
         }
     }
 }
+*/

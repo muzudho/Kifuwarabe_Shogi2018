@@ -4,7 +4,7 @@
  */
 
 use teigi::conv::*;
-use tusin::usi::*;
+use tusin::us_conv::*;
 
 use UCHU_WRAP;
 
