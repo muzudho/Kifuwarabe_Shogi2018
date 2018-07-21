@@ -233,6 +233,7 @@ impl Kyokumen{
     /**
      * 移動先と移動元を比較し、違う駒があれば、成ったと判定するぜ☆（＾～＾）
      */
+    #[allow(dead_code)]
     pub fn is_natta( &self, ms_src:umasu, ms_dst:umasu )->bool{
         let km_src = &self.get_km_by_ms(ms_src);
         let kms_src = km_to_kms(&km_src);

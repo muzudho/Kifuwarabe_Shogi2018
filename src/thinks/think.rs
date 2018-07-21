@@ -10,9 +10,6 @@ use memory::uchu::*;
 use searchs::searcher::*;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
-use teigi::conv::*;
-use teigi::shogi_syugo::*;
-use thinks::visions::vision_tree::*;
 use tusin::usi::*;
 
 use UCHU_WRAP;
@@ -42,31 +39,16 @@ pub fn think()->Sasite{
     // 現局面を見て、ビジョンを作り直せだぜ☆（＾～＾）
     &UCHU_WRAP.write().unwrap().remake_visions();
 
-    g_writeln( &format!("think(1)") );
-
     /*
     // 楽観筋
     for sn in SN_ARRAY.iter() {
-
-        g_writeln( &format!("think(2)") );
-
         let ai_sn = hanten_sn( sn );
-
-        g_writeln( &format!("think(3)") );
-
         // 相手の　らいおん　の位置を覚える
         let ai_ms_r = UCHU_WRAP.read().unwrap().ky.ms_r[sn_to_num(&ai_sn)];
-
-        g_writeln( &format!("think(4)") );
-
         insert_rakkansuji(&sn, &mut UCHU_WRAP.write().unwrap().vision_tree_by_sn[sn_to_num(sn)], ai_ms_r);
-
-        g_writeln( &format!("think(7)") );
     }
     // TODO 楽観筋はまだ使ってない☆（＾～＾）
     */
-
-    g_writeln( &format!("think(8)") );
 
     // 楽観王手の一覧はできているはず。
 
@@ -75,50 +57,24 @@ pub fn think()->Sasite{
         &mut ss_hashset
     );
 
-    g_writeln( &format!("think(9)") );
-
     // 自殺手は省くぜ☆（＾～＾）
     filtering_ss_except_jisatusyu( &mut ss_hashset);
 
-    g_writeln( &format!("think(10)") );
-
-
     if ss_hashset.len()==0 {
         // 投了
-
-        g_writeln( &format!("think(11)") );
-
         return Sasite::new();
     } else {
-
-        g_writeln( &format!("think(12)") );
-
         let index = rand::thread_rng().gen_range(0,ss_hashset.len());
-
-        g_writeln( &format!("think(13)") );
-
         let mut i = 0;
         for ss_hash in ss_hashset {
-
-            g_writeln( &format!("think(14)") );
-
             if i==index {
-
-                g_writeln( &format!("think(15)") );
-
                 //let result : Sasite = ss.clone();
                 let ss = Sasite::from_hash(ss_hash);
                 g_writeln(&format!("info solution:{}.", ss ));
                 return ss;
             }
-
-            g_writeln( &format!("think(16)") );
-
             i+=1;
         }
-
-        g_writeln( &format!("think(17)") );
-
         // 投了
         return Sasite::new();
     }

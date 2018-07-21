@@ -8,7 +8,6 @@ use teigi::conv::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
 use tusin::usi::*;
-use memory::uchu::*;
 
 use UCHU_WRAP;
 
@@ -130,7 +129,6 @@ pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut H
     // +----------------+
     // | 盤上（成らず） |
     // +----------------+
-    g_writeln( &format!("i nsert_ss_by_ms_km_on_banjo(0.1)") );
     // 現局面を読取専用で取得し、ロック。
     let gen_ky = &UCHU_WRAP.read().unwrap().ky;
     insert_narazu_src_by_ms_km  (&gen_ky, ms_dst, &km_dst, &mut mv_src_hashset);
@@ -152,9 +150,7 @@ pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut H
     // +--------------+
     mv_src_hashset.clear();
 
-    g_writeln( &format!("i nsert_ss_by_ms_km_on_banjo(1)") );
     insert_narumae_src_by_ms_km (&gen_ky, ms_dst, &km_dst, &mut mv_src_hashset );
-    g_writeln( &format!("i nsert_ss_by_ms_km_on_banjo(2)") );
 
     for ms_src in &mv_src_hashset{
         assert_banjo_ms(
