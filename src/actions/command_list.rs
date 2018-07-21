@@ -24,7 +24,7 @@ use UCHU_WRAP;
 
 
 
-pub fn do_len_zero(__line: &String, _starts:&mut usize, _len:usize, _response:&mut Response){
+pub fn do_other(_row: &String, _starts:&mut usize, _res:&mut Response){
     // 書込許可モードで、ロック。
     let mut uchu_w = UCHU_WRAP.write().unwrap();
     if !&uchu_w.dialogue_mode {
@@ -44,7 +44,7 @@ pub fn do_len_zero(__line: &String, _starts:&mut usize, _len:usize, _response:&m
 /**
  * 駒の動きの確認。
  */
-pub fn do_kmugokidir(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_kmugokidir(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.read().unwrap();
 
@@ -58,7 +58,7 @@ pub fn do_kmugokidir(_line: &String, _starts:&mut usize, _len:usize, _response:&
 /**
  * USIプロトコル参照。
  */
-pub fn do_usinewgame(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_usinewgame(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 書込許可モードで、ロック。
     let mut uchu_w = UCHU_WRAP.write().unwrap();
     
@@ -68,22 +68,22 @@ pub fn do_usinewgame(_line: &String, _starts:&mut usize, _len:usize, _response:&
 /**
  * USIプロトコル参照。
  */
-pub fn do_position(line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
     // positionコマンドの読取を丸投げ
-    tusin::usi::read_position(&line);
+    tusin::usi::read_position(&row);
 }
 
 /**
  * USIプロトコル参照。
  */
-pub fn do_isready(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_isready(_row: &String, _starts:&mut usize, _res:&mut Response) {
     g_writeln("readyok");
 }
 
 /**
  * 駒の動き確認用。
  */
-pub fn do_kmugoki(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_kmugoki(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.read().unwrap();
 
@@ -94,21 +94,21 @@ pub fn do_kmugoki(_line: &String, _starts:&mut usize, _len:usize, _response:&mut
 /**
  * 平手初期局面にする。
  */
-pub fn do_hirate(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
     tusin::usi::read_position(&KY1.to_string());
 }
 
 /**
  * 利き数表示。
  */
-pub fn do_kikisu(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_kikisu(_row: &String, _starts:&mut usize, _res:&mut Response) {
     consoles::commands::cmd_kikisu();
 }
 
 /**
  * 駒種類をランダムで出す。
  */
-pub fn do_rndkms(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_rndkms(_row: &String, _starts:&mut usize, _res:&mut Response) {
     let kms = thinks::randommove::rnd_kms();
     g_writeln( &format!("乱駒種類={}", &kms) );
 }
@@ -116,7 +116,7 @@ pub fn do_rndkms(_line: &String, _starts:&mut usize, _len:usize, _response:&mut 
 /**
  * 合法手を確認する。
  */
-pub fn do_sasite(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_sasite(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // FIXME 合法手とは限らない
     let mut ss_potential_hashset = HashSet::new();
     insert_potential_move(&mut ss_potential_hashset );
@@ -128,7 +128,7 @@ pub fn do_sasite(_line: &String, _starts:&mut usize, _len:usize, _response:&mut 
 /**
  * マスをランダムで返す。
  */
-pub fn do_rndms(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_rndms(_row: &String, _starts:&mut usize, _res:&mut Response) {
     let ms = thinks::randommove::rnd_ms();
     g_writeln( &format!( "乱升={}", ms) );
 }
@@ -136,7 +136,7 @@ pub fn do_rndms(_line: &String, _starts:&mut usize, _len:usize, _response:&mut R
 /**
  * convのテスト。
  */
-pub fn do_teigi_conv(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_teigi_conv(_row: &String, _starts:&mut usize, _res:&mut Response) {
     for ms in 11..19 {
         for hash in 0..10 {
             let next = push_ms_to_hash(hash,ms);
@@ -155,7 +155,7 @@ pub fn do_teigi_conv(_line: &String, _starts:&mut usize, _len:usize, _response:&
 /**
  * 局面ハッシュ表示。
  */
-pub fn do_hash(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_hash(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.read().unwrap();
 
@@ -166,7 +166,7 @@ pub fn do_hash(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Re
 /**
  * 棋譜表示。
  */
-pub fn do_kifu(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_kifu(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.read().unwrap();
 
@@ -177,14 +177,14 @@ pub fn do_kifu(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Re
 /**
  * 終了。
  */
-pub fn do_quit(_line: &String, _starts:&mut usize, _len:usize, response:&mut Response){
-    response.quits = true;
+pub fn do_quit(_row: &String, _starts:&mut usize, res:&mut Response){
+    res.quits = true;
 }
 
 /**
  * 乱数の試し確認。
  */
-pub fn do_rand(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_rand(_row: &String, _starts:&mut usize, _res:&mut Response) {
     let secret_number = rand::thread_rng().gen_range(1, 101);//1~100
     g_writeln( &format!( "乱数={}", secret_number ) );
 }
@@ -192,7 +192,7 @@ pub fn do_rand(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Re
 /**
  * 同一局面回数調べ。
  */
-pub fn do_same(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_same(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.read().unwrap();
 
@@ -203,15 +203,18 @@ pub fn do_same(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Re
 /**
  * いろいろな動作テストをしたいときに汎用的に使う。
  */
-pub fn do_test(line: &String, starts:&mut usize, len:usize, _response:&mut Response) {
+pub fn do_test(row: &String, starts:&mut usize, _res:&mut Response) {
+    // 1行の文字数です。
+    let len = row.chars().count();
+
     g_writeln( &format!("test starts={} len={}", starts, len));
-    test( &line, starts, len);
+    test( &row, starts, len);
 }
 
 /**
  * 指した手を１手戻す。
  */
-pub fn do_undo(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_undo(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 書込許可モードで、ロック。
     let mut uchu_w = UCHU_WRAP.write().unwrap();
 
@@ -223,11 +226,15 @@ pub fn do_undo(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Re
 /**
  * 指し手を入れる。
  */
-pub fn do_do(line: &String, starts:&mut usize, len:usize, _response:&mut Response) {
+pub fn do_do(row: &String, starts:&mut usize, _res:&mut Response) {
     // 書込許可モードで、ロック。
     let mut uchu_w = UCHU_WRAP.write().unwrap();
+
+    // 1行の文字数です。
+    let len = row.chars().count();
+
     // コマンド読取。棋譜に追加され、手目も増える
-    if read_sasite(&mut* uchu_w, &line, starts, len) {
+    if read_sasite(&mut* uchu_w, &row, starts, len) {
         // 手目を戻す
         uchu_w.teme -= 1;
         // 入っている指し手の通り指すぜ☆（＾～＾）
@@ -240,7 +247,7 @@ pub fn do_do(line: &String, starts:&mut usize, len:usize, _response:&mut Respons
 /**
  * 初期局面表示。
  */
-pub fn do_ky0(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_ky0(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.read().unwrap();
 
@@ -251,7 +258,7 @@ pub fn do_ky0(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Res
 /**
  * USIプロトコル参照。
  */
-pub fn do_usi(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_usi(_row: &String, _starts:&mut usize, _res:&mut Response) {
     g_writeln( &format!("id name {}", ENGINE_NAME) );
     g_writeln( &format!("id author {}", ENGINE_AUTHOR) );
     g_writeln("usiok");
@@ -260,7 +267,7 @@ pub fn do_usi(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Res
 /**
  * 思考を開始する。bestmoveコマンドを返却する。
  */
-pub fn do_go(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_go(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // go btime 40000 wtime 50000 binc 10000 winc 10000
     let bestmove = think();
     // 例： bestmove 7g7f
@@ -270,7 +277,7 @@ pub fn do_go(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Resp
 /**
  * 現局面表示。
  */
-pub fn do_ky(_line: &String, _starts:&mut usize, _len:usize, _response:&mut Response) {
+pub fn do_ky(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.read().unwrap();
 
