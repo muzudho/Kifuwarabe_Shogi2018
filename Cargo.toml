@@ -7,6 +7,6 @@ authors = ["muzudho <muzudho1@gmail.com>"]
 rand="0.3.0"
 lazy_static = "1.0"
 
-[dependencies.kifuwarabe_commander]
-git = "https://github.com/muzudho/rust_kifuwarabe_commander.git"
-rev = "9394786686622e8a6b5e7d0c3b2a0025c3b2a6f2"
+[dependencies.kifuwarabe_shell]
+git = "https://github.com/muzudho/rust_kifuwarabe_shell.git"
+rev = "3dcf600ee43efb1011de7946a4035641b1f733de"

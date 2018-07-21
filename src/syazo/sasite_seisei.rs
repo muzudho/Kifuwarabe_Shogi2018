@@ -42,10 +42,10 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64> ) {
                 // hyoji_ms_hashset( &dst_hashset );
 
                 for ms_dst in &dst_hashset {
-                    ss_hashset.insert( Sasite{
-                        src : ms_src,
-                        dst : *ms_dst,
-                        pro : false, // 成らず
+                    ss_hashset.insert( Movement{
+                        source : ms_src,
+                        destination : *ms_dst,
+                        promotion : false, // 成らず
                         drop : KmSyurui::Kara,
                     }.to_hash() );
                 }
@@ -55,10 +55,10 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64> ) {
                     true, // 成り
                     &mut dst_hashset );
                 for ms_dst in &dst_hashset {
-                    ss_hashset.insert( Sasite{
-                        src : ms_src,
-                        dst : *ms_dst,
-                        pro : true, // 成り
+                    ss_hashset.insert( Movement{
+                        source : ms_src,
+                        destination : *ms_dst,
+                        promotion : true, // 成り
                         drop : KmSyurui::Kara,
                     }.to_hash() );
                 }
@@ -87,10 +87,10 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64> ) {
                     }
                     for num_kms_da in da_kms_hashset {
                         let kms = num_to_kms( num_kms_da );
-                        ss_hashset.insert( Sasite{
-                            src : SS_SRC_DA,    // 駒大
-                            dst : ms_dst,       // どの升へ行きたいか
-                            pro : false,        // 打に成りは無し
+                        ss_hashset.insert( Movement{
+                            source : SS_SRC_DA,    // 駒大
+                            destination : ms_dst,       // どの升へ行きたいか
+                            promotion : false,        // 打に成りは無し
                             drop : kms,         // 打った駒種類
                         }.to_hash() );
                     }
@@ -119,9 +119,9 @@ pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut H
     }
 
     // ハッシュを作るのに使う
-    let mut ss_hash_builder = Sasite::new();
+    let mut ss_hash_builder = Movement::new();
 
-    ss_hash_builder.dst = ms_dst;
+    ss_hash_builder.destination = ms_dst;
 
     // 移動元の升
     let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
@@ -138,9 +138,9 @@ pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut H
             "Ｉnsert_ss_by_ms_km_on_banjo ms_src(成らず)"
         );
 
-        ss_hash_builder.src = *ms_src;
+        ss_hash_builder.source = *ms_src;
         // 成らず
-        ss_hash_builder.pro = false;
+        ss_hash_builder.promotion = false;
         ss_hash_builder.drop = KmSyurui::Kara;
         ss_hashset.insert( ss_hash_builder.to_hash() );
     }
@@ -158,9 +158,9 @@ pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut H
             "Ｉnsert_ss_by_ms_km_on_banjo ms_src(成り)"
         );
 
-        ss_hash_builder.src = *ms_src;
+        ss_hash_builder.source = *ms_src;
         // 成り
-        ss_hash_builder.pro = true;
+        ss_hash_builder.promotion = true;
         ss_hash_builder.drop = KmSyurui::Kara;
         ss_hashset.insert( ss_hash_builder.to_hash() );
     }
@@ -183,9 +183,9 @@ pub fn insert_ss_by_ms_km_on_da(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut Hash
     }
 
     // ハッシュを作るのに使う
-    let mut ss_hash_builder = Sasite::new();
+    let mut ss_hash_builder = Movement::new();
 
-    ss_hash_builder.dst = ms_dst;
+    ss_hash_builder.destination = ms_dst;
 
     // 移動元の升
     //let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
@@ -200,10 +200,10 @@ pub fn insert_ss_by_ms_km_on_da(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut Hash
     for num_kms_da in da_kms_hashset.iter() {
         let kms_da = num_to_kms( *num_kms_da );
         
-        let hash_ss = Sasite{
-            src:SS_SRC_DA,
-            dst:ms_dst,
-            pro:false,
+        let hash_ss = Movement{
+            source:SS_SRC_DA,
+            destination:ms_dst,
+            promotion:false,
             drop:kms_da,
         }.to_hash();
         ss_hashset.insert( hash_ss );

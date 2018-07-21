@@ -20,7 +20,7 @@ use UCHU_WRAP;
  *
  * km_dst : 移動した先の駒
  */
-pub fn get_ido_ss_by_km_random(km_dst:&Koma)->Sasite{
+pub fn get_ido_ss_by_km_random(km_dst:&Koma)->Movement{
     
     let mut ss_hashset = HashSet::new();
 
@@ -38,13 +38,13 @@ pub fn get_ido_ss_by_km_random(km_dst:&Koma)->Sasite{
         if ss.exists(){ return ss;}
     }
     // 投了
-    Sasite::new()
+    Movement::new()
 }
 
 /**
  * 指し手１つをランダム選出
  */
-pub fn get_ss_by_random()->Sasite{
+pub fn get_ss_by_random()->Movement{
     
     let mut ss_hashset = HashSet::new();
 
@@ -70,5 +70,5 @@ pub fn get_ss_by_random()->Sasite{
         if ss.exists(){ return ss;}
     }
     // 投了
-    Sasite::new()
+    Movement::new()
 }

@@ -86,28 +86,28 @@ impl KomatoriResult{
     ///         (2-2-1) 狙われている駒を、動かせば解決
     ///
     /// ss : 現局面での、駒の動き手の１つ
-    pub fn get_result( &self, ss:&Sasite ) -> KomatoriResultResult{
+    pub fn get_result( &self, ss:&Movement ) -> KomatoriResultResult{
         // (1)
-        if self.ms_attacker == ss.dst {
+        if self.ms_attacker == ss.destination {
             return KomatoriResultResult::NoneAttacker;
         }
 
         // (2-1)
         if km_is_nagaikiki( &self.km_attacker ) {
-            assert_banjo_ms(ss.dst,             "(205b2)Ｇet_result");
+            assert_banjo_ms(ss.destination,             "(205b2)Ｇet_result");
             assert_banjo_ms(self.ms_attacker,   "(205b3)Ｇet_result");
             assert_banjo_ms(self.ms_target,     "(205b4)Ｇet_result");
 
-            let p_dst = ms_to_p( ss.dst );
+            let p_dst = ms_to_p( ss.destination );
             let p_atk = ms_to_p( self.ms_attacker );
             let p_tgt = ms_to_p( self.ms_target );                
 
             // 合い駒判定
             if
                 // これから動かす駒は、狙われている駒ではないとする
-                ss.src != self.ms_target
+                ss.source != self.ms_target
                 // あるいは打か
-                || ss.src == SS_SRC_DA
+                || ss.source == SS_SRC_DA
             { 
                 // 利きの線分上に、駒を置いたか？
                 if intersect_point_on_line_segment( &p_dst, &p_atk, &p_tgt ) {
@@ -117,8 +117,8 @@ impl KomatoriResult{
             } else {
                 // 狙われている駒を動かす場合
 
-                assert_banjo_ms(ss.src,             "(205b1)Ｇet_result");
-                let p_src = ms_to_p( ss.src );
+                assert_banjo_ms(ss.source,             "(205b1)Ｇet_result");
+                let p_src = ms_to_p( ss.source );
 
                 // スライダー駒との角度
                 let argangle4a = get_argangle4_p_p( &p_atk, &p_tgt );
@@ -140,7 +140,7 @@ impl KomatoriResult{
 
         } else {
             // (3-2) 狙われている駒を、とりあえず動かす
-            if self.ms_target == ss.src { return KomatoriResultResult::NoneMoved; }
+            if self.ms_target == ss.source { return KomatoriResultResult::NoneMoved; }
         }
 
         // TODO 逃げた先の自殺手判定
@@ -188,14 +188,14 @@ pub fn lookup_banjo_catch(sn:&Sengo, ms_target:umasu)->HashSet<u64> {
         let ss = choice_1ss_by_hashset( &ss_hashset );
         if ss.exists() {
             assert_banjo_ms(
-                ss.src,
-                &format!("(123)Ｌookup_banjo_catch ss.src /  ms_target={} km_dst={} ss={}"
+                ss.source,
+                &format!("(123)Ｌookup_banjo_catch ss.source /  ms_target={} km_dst={} ss={}"
                     , ms_target, km_dst, ss)
             );
             
             let oute_result = KomatoriResult{
                 km_attacker : km_dst,
-                ms_attacker : ss.src, // FIXME 打だと 0 になるのでは
+                ms_attacker : ss.source, // FIXME 打だと 0 になるのでは
                 ms_target   : ms_target,
             };
 

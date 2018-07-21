@@ -1,5 +1,5 @@
 /**
- * USIプロトコル
+ * USIプロトコル Rustフレームワーク
  */
 use consoles::asserts::*;
 use teigi::conv::*;
@@ -10,56 +10,53 @@ use memory::uchu::*;
 
 use UCHU_WRAP;
 
-/**
- * 指し手
- * 棋譜にも使うので、取った駒の情報を記憶しておくんだぜ☆（＾～＾）
- * しかし、なんで英語が並んでるんだぜ☆（＾～＾）
- */
+/// # Movement (ムーブメント;指し手)
+///
+/// * `source` - 移動元升。打った場合は 0。
+/// * `destination` - 移動先升。これが 0 なら投了とするぜ☆（＾～＾）
+/// * `promotion` - 移動後に成るなら真。
+/// * `drop` - 打の場合、打った駒種類。
 #[derive(Copy,Clone)]
-pub struct Sasite{
-    // 移動元升。打った場合は 0。
-    pub src : umasu,
-    // 移動先升。これが 0 なら投了とするぜ☆（＾～＾）
-    pub dst : umasu,
-    // 移動後に成るなら真
-    pub pro : bool,
-    // 打の場合、打った駒種類
+pub struct Movement{
+    pub source : umasu,
+    pub destination : umasu,
+    pub promotion : bool,
     pub drop : KmSyurui,
 }
-impl Sasite{
-    pub fn new()->Sasite{
-        Sasite{
-            src:0,
-            dst:0,
-            pro:false,
+impl Movement{
+    pub fn new()->Movement{
+        Movement{
+            source:0,
+            destination:0,
+            promotion:false,
             drop:KmSyurui::Kara,
         }
     }
     #[allow(dead_code)]
     pub fn clear(&mut self){
-        self.src = 0;
-        self.dst = 0;
-        self.pro = false;
+        self.source = 0;
+        self.destination = 0;
+        self.promotion = false;
         self.drop= KmSyurui::Kara;
     }
     pub fn to_hash(&self)->u64{
         let mut hash = 0;
         // 正順で取り出すことを考えて、逆順で押し込む☆（＾～＾）
         hash = push_kms_to_hash(hash, &self.drop);
-        hash = push_bool_to_hash(hash, self.pro);
-        hash = push_ms_to_hash(hash, self.dst);
-        push_ms_to_hash(hash, self.src)
+        hash = push_bool_to_hash(hash, self.promotion);
+        hash = push_ms_to_hash(hash, self.destination);
+        push_ms_to_hash(hash, self.source)
     }
-    pub fn from_hash(hash:u64)->Sasite{
+    pub fn from_hash(hash:u64)->Movement{
         // 逆順で押し込んであるんで、正順に引き出す☆（＾～＾）
         let (hash,src) = pop_ms_from_hash(hash);
         let (hash,dst) = pop_ms_from_hash(hash);
         let (hash,pro) = pop_bool_from_hash(hash);
         let (_hash,drop) = pop_kms_from_hash(hash);
-        Sasite{
-            src:src,
-            dst:dst,
-            pro:pro,
+        Movement{
+            source:src,
+            destination:dst,
+            promotion:pro,
             drop:drop,
         }
     }
@@ -68,10 +65,10 @@ impl Sasite{
      * 考えた結果、指し手が考え付いていれば真。
      */
     pub fn exists(&self)->bool{
-        self.dst != MASU_0
+        self.destination != MASU_0
     }
 }
-impl fmt::Display for Sasite{
+impl fmt::Display for Movement{
     fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
 
         // 手が何もない、ぐらいの意味だが、
@@ -79,10 +76,10 @@ impl fmt::Display for Sasite{
         if !self.exists() { return write!(f,"resign"); }
 
         // 投了を弾いたあと、診断☆（＾～＾）
-        assert_banjo_ms(self.dst,"Ｓasite Ｄisplay");
-        let (dx,dy) = ms_to_suji_dan(self.dst);
+        assert_banjo_ms(self.destination,"Ｓasite Ｄisplay");
+        let (dx,dy) = ms_to_suji_dan(self.destination);
 
-        if self.src==SS_SRC_DA {
+        if self.source==SS_SRC_DA {
             use teigi::shogi_syugo::KmSyurui::*;
             write!(f, "{}*{}{}{}",
                 match self.drop {
@@ -97,29 +94,29 @@ impl fmt::Display for Sasite{
                 },
                 dx,
                 num_to_lower_case(dy),
-                if self.pro {"+"}else{""}
+                if self.promotion {"+"}else{""}
             )
         } else {
-            let (sx,sy) = if self.src==MASU_0 {
+            let (sx,sy) = if self.source==MASU_0 {
                 // エラー・データも表示したい
                  (0,0)
             } else {
-                assert_banjo_ms(self.src,"Ｓasite Ｄisplay＜その２＞");
-                ms_to_suji_dan(self.src)
+                assert_banjo_ms(self.source,"Ｓasite Ｄisplay＜その２＞");
+                ms_to_suji_dan(self.source)
             };
             write!(f, "{}{}{}{}{}",
                 sx,
                 num_to_lower_case(sy),
                 dx,
                 num_to_lower_case(dy),
-                if self.pro {"+"}else{""}
+                if self.promotion {"+"}else{""}
             )
         }
     }
 }
-impl fmt::Debug for Sasite{
+impl fmt::Debug for Movement{
     fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Sasite({}{}{}{})", self.src, self.dst, self.pro, self.drop)
+        write!(f, "Movement({}{}{}{})", self.source, self.destination, self.promotion, self.drop)
     }
 }
 

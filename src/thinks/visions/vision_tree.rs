@@ -69,10 +69,10 @@ pub fn insert_rakkansuji(
                 for ms_src in mv_src_hashset.iter() {
                     // 成り
                     let pro = &UCHU_WRAP.read().unwrap().ky.is_natta( *ms_src, ms_dst );
-                    let hash_ss = Sasite{
-                        src:*ms_src,
-                        dst:ms_dst,
-                        pro:*pro,
+                    let hash_ss = Movement{
+                        source:*ms_src,
+                        destination:ms_dst,
+                        promotion:*pro,
                         drop:KmSyurui::Kara,
                     }.to_hash();
                     vtree.ss_tume_hashset.insert( hash_ss );
@@ -83,10 +83,10 @@ pub fn insert_rakkansuji(
                 for kms_da in da_kms_hashset.iter() {
                     let km_da = sn_kms_to_km( &sn, &kms_da );
                     
-                    let hash_ss = Sasite{
-                        src:SS_SRC_DA,
-                        dst:ms_dst,
-                        pro:false,
+                    let hash_ss = Movement{
+                        source:SS_SRC_DA,
+                        destination:ms_dst,
+                        promotion:false,
                         drop:km_da,
                     }.to_hash();
                     &UCHU_WRAP.write().unwrap().vision_tree_by_sn[sn].ss_tume_hashset.insert( hash_ss );

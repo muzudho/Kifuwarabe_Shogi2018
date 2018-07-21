@@ -103,7 +103,7 @@ pub struct Uchu{
     pub teme : usize,
     // 棋譜
     //#[derive(Copy, Clone)]
-    pub kifu : [Sasite; TEME_LN],
+    pub kifu : [Movement; TEME_LN],
     // 初期局面ハッシュ
     pub ky0_hash : u64,
     // 現局面ハッシュ
@@ -142,23 +142,23 @@ impl Uchu{
             teme : 0,
             kifu : [
                 // 1行16要素で並べるぜ☆（＾～＾）
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),  Sasite::new(),
-                Sasite::new()//257要素
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new()//257要素
             ],
             ky0_hash : 0,
             ky_hash : [
@@ -323,13 +323,13 @@ impl Uchu{
      * 棋譜の作成
      */
     pub fn set_sasite_src(&mut self, src:umasu){
-        self.kifu[ self.teme ].src = src
+        self.kifu[ self.teme ].source = src
     }
     pub fn set_sasite_dst(&mut self, dst:umasu){
-        self.kifu[ self.teme ].dst = dst
+        self.kifu[ self.teme ].destination = dst
     }
     pub fn set_sasite_pro(&mut self, pro:bool){
-        self.kifu[ self.teme ].pro = pro
+        self.kifu[ self.teme ].promotion = pro
     }
     pub fn set_sasite_drop(&mut self, kms:KmSyurui){
         self.kifu[ self.teme ].drop = kms
@@ -344,7 +344,7 @@ impl Uchu{
     pub fn set_cap(&mut self, teme:usize, km:Koma){
         self.cap[ teme ] = km
     }
-    pub fn get_sasite(&self) -> Sasite {
+    pub fn get_sasite(&self) -> Movement {
         self.kifu[ self.teme ]
     }
     #[allow(dead_code)]
@@ -515,7 +515,7 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
     }
 
     // 入れた指し手の通り指すぜ☆（＾～＾）
-    pub fn do_ss(&mut self, ss:&Sasite) {
+    pub fn do_ss(&mut self, ss:&Movement) {
         // もう入っているかも知れないが、棋譜に入れる☆
         let sn = self.get_teban(&Jiai::Ji);
         let cap = self.ky.do_sasite( &sn, ss );

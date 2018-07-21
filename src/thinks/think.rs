@@ -17,7 +17,7 @@ use UCHU_WRAP;
 /**
  * 現局面での最善手を返すぜ☆（*＾～＾*）
  */
-pub fn think()->Sasite{
+pub fn think()->Movement{
 
     // 探索を開始する。
     let mut searcher = Searcher::new();
@@ -62,20 +62,20 @@ pub fn think()->Sasite{
 
     if ss_hashset.len()==0 {
         // 投了
-        return Sasite::new();
+        return Movement::new();
     } else {
         let index = rand::thread_rng().gen_range(0,ss_hashset.len());
         let mut i = 0;
         for ss_hash in ss_hashset {
             if i==index {
-                //let result : Sasite = ss.clone();
-                let ss = Sasite::from_hash(ss_hash);
+                //let result : Movement = ss.clone();
+                let ss = Movement::from_hash(ss_hash);
                 g_writeln(&format!("info solution:{}.", ss ));
                 return ss;
             }
             i+=1;
         }
         // 投了
-        return Sasite::new();
+        return Movement::new();
     }
 }

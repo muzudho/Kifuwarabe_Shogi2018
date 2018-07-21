@@ -26,75 +26,75 @@ readyok
               1    2    3    4    5    6    7    8    9
 info string My raion 59.
 info string My raion is not outed.
-info 6i7h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=6i7h.
-info 5i4h evaluated => 0 attackers. offence=△->48
-info SOLUTED ss=5i4h.
+info 9i9h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=9i9h.
+info 3i4h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=3i4h.
+info 4i5h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=4i5h.
+info 9g9f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=9g9f.
+info 6g6f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=6g6f.
+info 5i5h evaluated => 0 attackers. offence=△->58
+info SOLUTED ss=5i5h.
+info 7g7f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=7g7f.
+info 7i7h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=7i7h.
+info 1i1h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=1i1h.
 info 2h5h evaluated => 0 attackers. offence=△->59
 info SOLUTED ss=2h5h.
-info 7i6h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=7i6h.
+info 6i5h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=6i5h.
 info 8g8f evaluated => 0 attackers. offence=△->59
 info SOLUTED ss=8g8f.
+info 7i6h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=7i6h.
+info 3g3f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=3g3f.
+info 2h7h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=2h7h.
+info 6i6h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=6i6h.
+info 2h3h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=2h3h.
 info 2g2f evaluated => 0 attackers. offence=△->59
 info SOLUTED ss=2g2f.
 info 4g4f evaluated => 0 attackers. offence=△->59
 info SOLUTED ss=4g4f.
-info 3i3h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=3i3h.
-info 5i6h evaluated => 0 attackers. offence=△->68
-info SOLUTED ss=5i6h.
-info 6i6h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=6i6h.
-info 9g9f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=9g9f.
-info 2h6h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=2h6h.
-info 5i5h evaluated => 0 attackers. offence=△->58
-info SOLUTED ss=5i5h.
-info 1i1h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=1i1h.
-info 4i4h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=4i4h.
-info 2h7h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=2h7h.
-info 3i4h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=3i4h.
-info 5g5f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=5g5f.
-info 2h3h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=2h3h.
-info 9i9h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=9i9h.
-info 6i5h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=6i5h.
-info 4i5h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=4i5h.
-info 1g1f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=1g1f.
-info 7g7f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=7g7f.
-info 4i3h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=4i3h.
-info 7i7h evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=7i7h.
-info 3g3f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=3g3f.
-info 6g6f evaluated => 0 attackers. offence=△->59
-info SOLUTED ss=6g6f.
 info 2h1h evaluated => 0 attackers. offence=△->59
 info SOLUTED ss=2h1h.
+info 4i3h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=4i3h.
+info 5i6h evaluated => 0 attackers. offence=△->68
+info SOLUTED ss=5i6h.
+info 4i4h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=4i4h.
+info 2h6h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=2h6h.
+info 1g1f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=1g1f.
+info 6i7h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=6i7h.
 info 2h4h evaluated => 0 attackers. offence=△->59
 info SOLUTED ss=2h4h.
+info 5i4h evaluated => 0 attackers. offence=△->48
+info SOLUTED ss=5i4h.
+info 5g5f evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=5g5f.
+info 3i3h evaluated => 0 attackers. offence=△->59
+info SOLUTED ss=3i3h.
 info 30 solutions.
-info solution:2h5h.
-bestmove 2h5h
+info solution:7i6h.
+bestmove 7i6h
 表示 1手目 △ 同一局面1回目
 
            +----+----+----+----+----+----+----+----+----+
-        i9 |▼し|▼う|▼ね|▼い|▼ら|▼い|▼ね|▼う|▼し|
+        i9 |▼し|▼う|▼ね|▼い|▼ら|▼い|　　|▼う|▼し|
            +----+----+----+----+----+----+----+----+----+
-ひx 0   h8 |　　|　　|　　|　　|▼き|　　|　　|▼ぞ|　　|   ヒx 0
+ひx 0   h8 |　　|▼き|　　|　　|　　|▼ね|　　|▼ぞ|　　|   ヒx 0
            +----+----+----+----+----+----+----+----+----+
 しx 0   g7 |▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|   シx 0
            +----+----+----+----+----+----+----+----+----+
@@ -111,114 +111,3 @@ bestmove 2h5h
 ▼      a1 |△シ|△ウ|△ネ|△イ|△ラ|△イ|△ネ|△ウ|△シ|   △
            +----+----+----+----+----+----+----+----+----+
               1    2    3    4    5    6    7    8    9
-info string My raion 51.
-info string My raion is not outed.
-info 4a4b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=4a4b.
-info 4c4d evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=4c4d.
-info 8b5b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=8b5b.
-info 4a5b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=4a5b.
-info 8b7b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=8b7b.
-info 5a5b evaluated => 0 attackers. offence=▼->52
-info SOLUTED ss=5a5b.
-info 7a6b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=7a6b.
-info 7a7b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=7a7b.
-info 8b3b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=8b3b.
-info 2c2d evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=2c2d.
-info 8c8d evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=8c8d.
-info 5c5d evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=5c5d.
-info 8b9b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=8b9b.
-info 7c7d evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=7c7d.
-info 5a6b evaluated => 0 attackers. offence=▼->62
-info SOLUTED ss=5a6b.
-info 9a9b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=9a9b.
-info 3c3d evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=3c3d.
-info 4a3b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=4a3b.
-info 9c9d evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=9c9d.
-info 1a1b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=1a1b.
-info 6a5b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=6a5b.
-info 3a4b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=3a4b.
-info 6a7b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=6a7b.
-info 8b4b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=8b4b.
-info 6a6b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=6a6b.
-info 3a3b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=3a3b.
-info 1c1d evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=1c1d.
-info 6c6d evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=6c6d.
-info 8b6b evaluated => 0 attackers. offence=▼->51
-info SOLUTED ss=8b6b.
-info 5a4b evaluated => 0 attackers. offence=▼->42
-info SOLUTED ss=5a4b.
-info 30 solutions.
-info solution:4a4b.
-bestmove 4a4b
-表示 2手目 ▼ 同一局面1回目
-
-           +----+----+----+----+----+----+----+----+----+
-        i9 |▼し|▼う|▼ね|▼い|▼ら|▼い|▼ね|▼う|▼し|
-           +----+----+----+----+----+----+----+----+----+
-ひx 0   h8 |　　|　　|　　|　　|▼き|　　|　　|▼ぞ|　　|   ヒx 0
-           +----+----+----+----+----+----+----+----+----+
-しx 0   g7 |▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|▼ひ|   シx 0
-           +----+----+----+----+----+----+----+----+----+
-うx 0   f6 |　　|　　|　　|　　|　　|　　|　　|　　|　　|   ウx 0
-           +----+----+----+----+----+----+----+----+----+
-ねx 0   e5 |　　|　　|　　|　　|　　|　　|　　|　　|　　|   ネx 0
-           +----+----+----+----+----+----+----+----+----+
-いx 0   d4 |　　|　　|　　|　　|　　|　　|　　|　　|　　|   イx 0
-           +----+----+----+----+----+----+----+----+----+
-ぞx 0   c3 |△ヒ|△ヒ|△ヒ|△ヒ|△ヒ|△ヒ|△ヒ|△ヒ|△ヒ|   ゾx 0
-           +----+----+----+----+----+----+----+----+----+
-きx 0   b2 |　　|△ゾ|　　|△イ|　　|　　|　　|△キ|　　|   キx 0
-           +----+----+----+----+----+----+----+----+----+
-▼      a1 |△シ|△ウ|△ネ|　　|△ラ|△イ|△ネ|△ウ|△シ|   △
-           +----+----+----+----+----+----+----+----+----+
-              1    2    3    4    5    6    7    8    9
-+--------- --------- --------- --------- --------- --------- --------- -------+
-| KifuWarabe Shogi 2018                                                       |
-+---------+--------- --------- --------- --------- --------- --------- -------+
-          | Created by Muzudho (Doujin Circle Grayscale)                      |
-          +--------- --------- --------- --------- --------- --------- -------+
-05
-          [Enter]
-07
-08
-09
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23

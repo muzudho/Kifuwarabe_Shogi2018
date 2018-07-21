@@ -16,7 +16,7 @@ use tusin::usi::*;
 
 use UCHU_WRAP;
 
-pub fn choice_1ss_by_hashset( ss_hashset:&HashSet<u64> ) -> Sasite {
+pub fn choice_1ss_by_hashset( ss_hashset:&HashSet<u64> ) -> Movement {
 
     let index = if ss_hashset.len()==0 {
         0
@@ -32,7 +32,7 @@ pub fn choice_1ss_by_hashset( ss_hashset:&HashSet<u64> ) -> Sasite {
         }
         i += 1;
     }
-    Sasite::from_hash( ss_choice_hash )
+    Movement::from_hash( ss_choice_hash )
 }
 
 /**
@@ -62,11 +62,11 @@ pub fn filtering_ss_except_oute(
 
         // 指せる手から、王手が消えている手だけ、選び抜くぜ☆（＾～＾）
         'idea: for hash_ss_potential in ss_hashset_input.iter() {
-            let ss_potential = Sasite::from_hash( *hash_ss_potential );
+            let ss_potential = Movement::from_hash( *hash_ss_potential );
             for komatori_result_hash in komatori_result_hashset.iter() {
                 let komatori_result = KomatoriResult::from_hash( *komatori_result_hash);
 
-                assert_banjo_ms( ss_potential.dst, "(206)Ｓearch_gohoshu_hash" );
+                assert_banjo_ms( ss_potential.destination, "(206)Ｓearch_gohoshu_hash" );
                 match komatori_result.get_result(&ss_potential) {
                         KomatoriResultResult::NoneAttacker
                     | KomatoriResultResult::NoneAigoma
@@ -117,7 +117,7 @@ pub fn filtering_ss_except_jisatusyu(
 
     // 指せる手から、王手が消えている手だけ、選び抜くぜ☆（＾～＾）
     'idea: for hash_ss_potential in ss_hashset_input.iter() {
-        let ss_potential = Sasite::from_hash( *hash_ss_potential );
+        let ss_potential = Movement::from_hash( *hash_ss_potential );
 
         // その手を指してみる
         UCHU_WRAP.write().unwrap().do_ss( &ss_potential );
@@ -126,8 +126,8 @@ pub fn filtering_ss_except_jisatusyu(
         // g_writeln( &s1 );            
 
         // 狙われている方の玉の位置
-        let ms_r_new = if ss_potential.src == ms_r {
-                ss_potential.dst // 狙われていた方の玉が動いた先
+        let ms_r_new = if ss_potential.source == ms_r {
+                ss_potential.destination // 狙われていた方の玉が動いた先
             } else {
                 ms_r // 動いていない、狙われていた方の玉の居場所
             };
@@ -192,7 +192,7 @@ pub fn filtering_ss_except_sennitite(
     // 指せる手から、千日手が消えている手だけ選んで、集合を作るぜ☆（＾～＾）
     'idea: for hash_ss_potential in ss_hashset_input.iter() {
 
-        let ss = Sasite::from_hash( *hash_ss_potential );
+        let ss = Movement::from_hash( *hash_ss_potential );
             //ss_hashset.insert( *hash_ss_potential );
 
         // その手を指してみる

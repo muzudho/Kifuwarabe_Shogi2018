@@ -60,7 +60,7 @@ pub fn hyoji_ss_hashset( ss_hashset:&HashSet<u64> ){
     // 辞書順ソート
     let mut vec_ss_str = Vec::new();
     for ss_hash in ss_hashset {
-        let ss = Sasite::from_hash( *ss_hash );
+        let ss = Movement::from_hash( *ss_hash );
         let ss_str = format!( "{}", ss );
         vec_ss_str.push( ss_str );
     }

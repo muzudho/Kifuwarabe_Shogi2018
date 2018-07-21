@@ -8,9 +8,9 @@ extern crate rand;
 #[macro_use]
 extern crate lazy_static;
 
-extern crate kifuwarabe_commander;
-use kifuwarabe_commander::Command;
-use kifuwarabe_commander::Commander;
+extern crate kifuwarabe_shell;
+use kifuwarabe_shell::TokenMapping;
+use kifuwarabe_shell::Shell;
 
 ///
 /// Rust言語の mod や ソース置き場の説明
@@ -49,32 +49,32 @@ fn main() {
     UCHU_WRAP.write().unwrap().big_bang();
     
     // コマンド リスト。
-    let mut commander = Commander::new();
-    commander.action_len_zero = Command {keyword: "".to_string(), callback: do_len_zero};
-    commander.command_array.push(Command {keyword: "kmugokidir".to_string(), callback: do_kmugokidir});
-    commander.command_array.push(Command { keyword: "usinewgame".to_string(), callback: do_usinewgame});
-    commander.command_array.push(Command { keyword: "position".to_string(), callback: do_position});
-    commander.command_array.push(Command { keyword: "isready".to_string(), callback: do_isready});
-    commander.command_array.push(Command { keyword: "kmugoki".to_string(), callback: do_kmugoki});
-    commander.command_array.push(Command { keyword: "hirate".to_string(), callback: do_hirate});
-    commander.command_array.push(Command { keyword: "kikisu".to_string(), callback: do_kikisu});
-    commander.command_array.push(Command { keyword: "rndkms".to_string(), callback: do_rndkms});
-    commander.command_array.push(Command { keyword: "sasite".to_string(), callback: do_sasite});
-    commander.command_array.push(Command { keyword: "rndms".to_string(), callback: do_rndms});
-    commander.command_array.push(Command { keyword: "teigi::conv".to_string(), callback: do_teigi_conv});
-    commander.command_array.push(Command { keyword: "hash".to_string(), callback: do_hash});
-    commander.command_array.push(Command { keyword: "kifu".to_string(), callback: do_kifu});
-    commander.command_array.push(Command { keyword: "quit".to_string(), callback: do_quit});
-    commander.command_array.push(Command { keyword: "rand".to_string(), callback: do_rand});
-    commander.command_array.push(Command { keyword: "same".to_string(), callback: do_same});
-    commander.command_array.push(Command { keyword: "test".to_string(), callback: do_test});
-    commander.command_array.push(Command { keyword: "undo".to_string(), callback: do_undo});
-    commander.command_array.push(Command { keyword: "do ".to_string(), callback: do_do});
-    commander.command_array.push(Command { keyword: "ky0".to_string(), callback: do_ky0});
-    commander.command_array.push(Command { keyword: "usi".to_string(), callback: do_usi});
-    commander.command_array.push(Command { keyword: "go".to_string(), callback: do_go});
-    commander.command_array.push(Command { keyword: "ky".to_string(), callback: do_ky});
+    let mut shell = Shell::new();
+    shell.other_token_mapping = TokenMapping {token: "".to_string(), callback: do_len_zero};
+    shell.token_mapping_array.push(TokenMapping {token: "kmugokidir".to_string(), callback: do_kmugokidir});
+    shell.token_mapping_array.push(TokenMapping { token: "usinewgame".to_string(), callback: do_usinewgame});
+    shell.token_mapping_array.push(TokenMapping { token: "position".to_string(), callback: do_position});
+    shell.token_mapping_array.push(TokenMapping { token: "isready".to_string(), callback: do_isready});
+    shell.token_mapping_array.push(TokenMapping { token: "kmugoki".to_string(), callback: do_kmugoki});
+    shell.token_mapping_array.push(TokenMapping { token: "hirate".to_string(), callback: do_hirate});
+    shell.token_mapping_array.push(TokenMapping { token: "kikisu".to_string(), callback: do_kikisu});
+    shell.token_mapping_array.push(TokenMapping { token: "rndkms".to_string(), callback: do_rndkms});
+    shell.token_mapping_array.push(TokenMapping { token: "sasite".to_string(), callback: do_sasite});
+    shell.token_mapping_array.push(TokenMapping { token: "rndms".to_string(), callback: do_rndms});
+    shell.token_mapping_array.push(TokenMapping { token: "teigi::conv".to_string(), callback: do_teigi_conv});
+    shell.token_mapping_array.push(TokenMapping { token: "hash".to_string(), callback: do_hash});
+    shell.token_mapping_array.push(TokenMapping { token: "kifu".to_string(), callback: do_kifu});
+    shell.token_mapping_array.push(TokenMapping { token: "quit".to_string(), callback: do_quit});
+    shell.token_mapping_array.push(TokenMapping { token: "rand".to_string(), callback: do_rand});
+    shell.token_mapping_array.push(TokenMapping { token: "same".to_string(), callback: do_same});
+    shell.token_mapping_array.push(TokenMapping { token: "test".to_string(), callback: do_test});
+    shell.token_mapping_array.push(TokenMapping { token: "undo".to_string(), callback: do_undo});
+    shell.token_mapping_array.push(TokenMapping { token: "do ".to_string(), callback: do_do});
+    shell.token_mapping_array.push(TokenMapping { token: "ky0".to_string(), callback: do_ky0});
+    shell.token_mapping_array.push(TokenMapping { token: "usi".to_string(), callback: do_usi});
+    shell.token_mapping_array.push(TokenMapping { token: "go".to_string(), callback: do_go});
+    shell.token_mapping_array.push(TokenMapping { token: "ky".to_string(), callback: do_ky});
 
     // [Ctrl]+[C] で強制終了
-    commander.run();
+    shell.run();
 }

@@ -53,7 +53,7 @@ pub fn test( line:&String, starts:&mut usize, len:usize) {
         // 移動先の升、および　不成駒／成駒
         let ms_dst = randommove::rnd_ms();
         let pro_dst = randommove::rnd_bool();
-        let mut ss = Sasite::new();
+        let mut ss = Movement::new();
         // 移動可能な元升
         let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
         //let mut da_kms_hashset : HashSet<usize> = HashSet::new();
@@ -61,10 +61,10 @@ pub fn test( line:&String, starts:&mut usize, len:usize) {
         insert_narumae_src_by_ms_km (&gen_ky, ms_dst, &km, &mut mv_src_hashset );
         //insert_da_kms_by_ms_km      ( ms_dst, &km, &mut da_kms_hashset );
         for ms_src in mv_src_hashset {
-            ss.src = ms_src;
+            ss.source = ms_src;
             g_writeln( &format!( "移動可能な駒がある升={}", ms_src) );
-            ss.dst = ms_dst;
-            ss.pro = pro_dst;
+            ss.destination = ms_dst;
+            ss.promotion = pro_dst;
             ss.drop = KmSyurui::Kara;
             break;
         }
