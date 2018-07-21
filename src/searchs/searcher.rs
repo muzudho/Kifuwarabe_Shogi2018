@@ -3,7 +3,6 @@
  */
 
 use mediators::med_kikisu::*;
-use memory::uchu::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
 
@@ -26,9 +25,6 @@ impl Searcher{
      * 探索。
      */
     pub fn search(&mut self){
-
-        g_writeln( &format!("s earch(1)") );
-
         // TODO 王手放置漏れ回避　を最優先させたいぜ☆（＾～＾）
 
         // +----------------------+
@@ -43,14 +39,10 @@ impl Searcher{
             uchu.kiki_su_by_km[km_to_num(km)].clear();
         }
 
-        g_writeln( &format!("s earch(2)") );
-
         // 先後別に用意した盤を使った、利き数。
         for sn in SN_ARRAY.iter() {
             uchu.kiki_su_by_sn[sn_to_num(sn)].clear();
         }
-
-        g_writeln( &format!("s earch(3)") );
 
         // 相手の利き升調べ（自殺手防止のため）
         let (local_kiki_su_by_sn, local_kiki_su_by_km) = refresh_kikisu(
@@ -59,15 +51,10 @@ impl Searcher{
             );
         // g_writeln( &format!("info test is_s={}", kasetu::atamakin::is_s() ) );
 
-        g_writeln( &format!("s earch(4)") );
-
         // 駒別
         uchu.set_kiki_su_by_km( local_kiki_su_by_km);
-        g_writeln( &format!("s earch(5)") );
 
         // 先後別
         uchu.set_kiki_su_by_sn( local_kiki_su_by_sn);
-        g_writeln( &format!("s earch(6)") );
-
     }
 }

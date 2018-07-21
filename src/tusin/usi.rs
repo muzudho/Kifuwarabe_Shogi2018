@@ -130,7 +130,12 @@ impl fmt::Debug for Sasite{
  * 読み取った指し手は、棋譜に入れる。
  * 現在の手目のところに入れ、手目のカウントアップも行う。
  */
- pub fn read_sasite(line:&String, starts:&mut usize, len:usize)->bool{
+pub fn read_sasite(
+    uchu_w: &mut Uchu,
+    line: &String,
+    starts: &mut usize,
+    len: usize
+)->bool{
 
     // 4文字か5文字あるはず。
     if (len-*starts)<4{
@@ -142,13 +147,13 @@ impl fmt::Debug for Sasite{
     // 1文字目と2文字目
     match &line[*starts..(*starts+1)]{
         // 1文字目が駒だったら打。2文字目は必ず「*」なはずなので読み飛ばす。
-        "R" => { *starts+=2; UCHU_WRAP.write().unwrap().set_sasite_src(0); UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::K); },
-        "B" => { *starts+=2; UCHU_WRAP.write().unwrap().set_sasite_src(0); UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::Z); },
-        "G" => { *starts+=2; UCHU_WRAP.write().unwrap().set_sasite_src(0); UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::I); },
-        "S" => { *starts+=2; UCHU_WRAP.write().unwrap().set_sasite_src(0); UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::N); },
-        "N" => { *starts+=2; UCHU_WRAP.write().unwrap().set_sasite_src(0); UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::U); },
-        "L" => { *starts+=2; UCHU_WRAP.write().unwrap().set_sasite_src(0); UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::S); },
-        "P" => { *starts+=2; UCHU_WRAP.write().unwrap().set_sasite_src(0); UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::H); },
+        "R" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(KmSyurui::K); },
+        "B" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(KmSyurui::Z); },
+        "G" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(KmSyurui::I); },
+        "S" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(KmSyurui::N); },
+        "N" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(KmSyurui::U); },
+        "L" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(KmSyurui::S); },
+        "P" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(KmSyurui::H); },
         _ => {
             // 残りは「筋の数字」、「段のアルファベット」のはず。
             let suji;
@@ -179,8 +184,8 @@ impl fmt::Debug for Sasite{
                 _ => {g_writeln(&format!("(2) '{}' だった。", &line[*starts..(*starts+1)])); return false;},
             }
 
-            UCHU_WRAP.write().unwrap().set_sasite_src(suji_dan_to_ms(suji, dan));
-            UCHU_WRAP.write().unwrap().set_sasite_drop(KmSyurui::Kara);
+            uchu_w.set_sasite_src(suji_dan_to_ms(suji, dan));
+            uchu_w.set_sasite_drop(KmSyurui::Kara);
         },
     }
 
@@ -216,14 +221,14 @@ impl fmt::Debug for Sasite{
         _ => {g_writeln(&format!("(4) '{}' だった。", &line[*starts..(*starts+1)])); return false;},
     }
 
-    UCHU_WRAP.write().unwrap().set_sasite_dst(suji_dan_to_ms(suji, dan));
+    uchu_w.set_sasite_dst(suji_dan_to_ms(suji, dan));
     
     // 5文字に「+」があれば成り。
     if 0<(len-*starts) && &line[*starts..(*starts+1)]=="+" {
-        UCHU_WRAP.write().unwrap().set_sasite_pro(true);
+        uchu_w.set_sasite_pro(true);
         *starts+=1;
     } else {
-        UCHU_WRAP.write().unwrap().set_sasite_pro(false);        
+        uchu_w.set_sasite_pro(false);        
     }
 
     // 続きにスペース「 」が１つあれば読み飛ばす
@@ -231,7 +236,7 @@ impl fmt::Debug for Sasite{
         *starts+=1;
     }
 
-    UCHU_WRAP.write().unwrap().teme+=1;
+    uchu_w.teme+=1;
     true
  }
 
@@ -453,7 +458,7 @@ impl fmt::Debug for Sasite{
     UCHU_WRAP.write().unwrap().copy_ky0_to_ky1();
 
     // 指し手を全部読んでいくぜ☆（＾～＾）手目のカウントも増えていくぜ☆（＾～＾）
-    while read_sasite(line, &mut starts, len) {
+    while read_sasite(&mut* UCHU_WRAP.write().unwrap(), line, &mut starts, len) {
         // 手目を戻す
         UCHU_WRAP.write().unwrap().teme -= 1;
         // 入っている指し手の通り指すぜ☆（＾～＾）
