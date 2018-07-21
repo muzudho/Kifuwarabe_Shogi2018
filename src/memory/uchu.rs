@@ -117,8 +117,13 @@ pub struct Uchu{
     // ビジョン・ツリー
     pub vision_tree_by_sn : [VisionTree; SN_LN],
 }
-
 impl Uchu{
+    pub fn set_kiki_su_by_sn(&mut self, kiki_su_by_sn:[NumberBoard; SN_LN]){
+        self.kiki_su_by_sn = kiki_su_by_sn
+    }
+    pub fn set_kiki_su_by_km(&mut self, kiki_su_by_km:[NumberBoard; KM_LN]){
+        self.kiki_su_by_km = kiki_su_by_km
+    }
     pub fn new()->Uchu{
         Uchu{
             dialogue_mode : false,

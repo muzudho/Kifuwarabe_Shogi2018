@@ -3,10 +3,13 @@
  */
 
 use consoles::asserts::*;
-use teigi::conv::*;
-use teigi::shogi_syugo::*;
+use memory::number_board::*;
+use memory::ky::*;
+use memory::uchu::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
+use teigi::conv::*;
+use teigi::shogi_syugo::*;
 
 use UCHU_WRAP;
 
@@ -17,18 +20,27 @@ use UCHU_WRAP;
  *
  * TODO: 差分更新にしたい。
  */
-pub fn refresh_kikisu(){
+pub fn refresh_kikisu(gen_ky: &Kyokumen) -> (
+    [NumberBoard; SN_LN],
+    [NumberBoard; KM_LN]
+){
+    g_writeln( &format!("r efresh_kikisu(0.1)") );
 
-    // ゼロ・リセット
-    // 駒別に用意した盤を使った、利き数。
-    for km in KM_ARRAY.iter() {
-        &UCHU_WRAP.write().unwrap().kiki_su_by_km[km_to_num(km)].clear();
-    }
+    // 利き数（先後別）
+    let mut local_kiki_su_by_sn : [NumberBoard; SN_LN] = [
+        NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
+    ];
 
-    // 先後別に用意した盤を使った、利き数。
-    for sn in SN_ARRAY.iter() {
-        &UCHU_WRAP.write().unwrap().kiki_su_by_sn[sn_to_num(sn)].clear();
-    }
+    // 利きの数（先後付き駒別）
+    // 利き数（駒別なので３０個ある）
+    let mut local_kiki_su_by_km : [NumberBoard; KM_LN] = [
+        NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
+        NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
+        NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
+        NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
+        NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
+        NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
+    ];
 
     // カウント    
     for km_dst in KM_ARRAY.iter()
@@ -40,19 +52,37 @@ pub fn refresh_kikisu(){
 
                 // 移動元の升
                 let mut mv_src_hashset : HashSet<umasu>     = HashSet::new();
-                insert_narazu_src_by_ms_km  ( ms_dst, &km_dst, &mut mv_src_hashset );
-                insert_narumae_src_by_ms_km ( ms_dst, &km_dst, &mut mv_src_hashset );
+
+                g_writeln( &format!("r efresh_kikisu(1)") );
+                insert_narazu_src_by_ms_km  (&gen_ky, ms_dst, &km_dst, &mut mv_src_hashset);
+
+                g_writeln( &format!("r efresh_kikisu(2)") );
+                insert_narumae_src_by_ms_km (&gen_ky, ms_dst, &km_dst, &mut mv_src_hashset);
+                g_writeln( &format!("r efresh_kikisu(3)") );
+
                 // 打は考えない。盤上の利き数なので
                 let kikisu = mv_src_hashset.len();
+
+                g_writeln( &format!("r efresh_kikisu(4)") );
+
                 let sn = km_to_sn( &km_dst);
 
+                g_writeln( &format!("r efresh_kikisu(5)") );
+
                 // 駒別
-                UCHU_WRAP.write().unwrap().kiki_su_by_km[km_to_num(&km_dst)].add_su_by_ms( ms_dst, kikisu as i8 );
+                local_kiki_su_by_km[km_to_num(&km_dst)].add_su_by_ms( ms_dst, kikisu as i8 );
+
+                g_writeln( &format!("r efresh_kikisu(6)") );
 
                 // 先後別
-                UCHU_WRAP.write().unwrap().kiki_su_by_sn[sn_to_num(&sn)].add_su_by_ms( ms_dst, kikisu as i8 );
+                local_kiki_su_by_sn[sn_to_num(&sn)].add_su_by_ms( ms_dst, kikisu as i8 );
+                g_writeln( &format!("r efresh_kikisu(7)") );
             }
+            g_writeln( &format!("r efresh_kikisu(8)") );
         }
+        g_writeln( &format!("r efresh_kikisu(9)") );
     }
+    g_writeln( &format!("r efresh_kikisu(10)") );
 
+    return (local_kiki_su_by_sn, local_kiki_su_by_km);
 }
