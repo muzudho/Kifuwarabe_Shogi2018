@@ -133,81 +133,35 @@ impl fmt::Debug for Movement{
 pub fn read_sasite(
     uchu_w: &mut Uchu,
     line: &String,
-    starts: &mut usize,
+    mut starts: &mut usize,
     len: usize
 )->bool{
+    // 構文解析。
+    let umov : UsiMovement = parse_movement(&line, &mut starts, len);
 
-    let mut starts2 = *starts;
-    let umov : UsiMovement = read_movement(&line, &mut starts2, len);
-
-    // 4文字か5文字あるはず。
-    if (len-*starts)<4{
-        // 指し手読取終了時にここを通るぜ☆（＾～＾）
-        // 残り４文字もない。
-        return false;
-    }
-
-    // 1文字目と2文字目
-    *starts+= 2;
+    // 読取成否、移動元。
     use tusin::usi::PieceType;
     match umov.drop {
         PieceType::Space=> {
+            if umov.source_file == -1 {
+                // 読取失敗時、または 指し手読取終了時にここを通るぜ☆（＾～＾）
+                return false;
+            }
             uchu_w.set_sasite_src(suji_dan_to_ms(umov.source_file, umov.source_rank));
         },
         _=> {
-            // 打。
+            // 打のとき。
             uchu_w.set_sasite_src(0);
         },
     }
+    // 打。
     uchu_w.set_sasite_drop(pt_to_kms(&umov.drop));
+    // 移動先。
+    uchu_w.set_sasite_dst(suji_dan_to_ms(umov.destination_file, umov.destination_rank));
+    // 成り。
+    uchu_w.set_sasite_pro(umov.promotion);
 
-    // 残りは「筋の数字」、「段のアルファベット」のはず。
-    let suji;
-    let dan;
-
-    // 3文字目
-    match &line[*starts..(*starts+1)]{
-        "1" => { suji=1; *starts+=1; },
-        "2" => { suji=2; *starts+=1; },
-        "3" => { suji=3; *starts+=1; },
-        "4" => { suji=4; *starts+=1; },
-        "5" => { suji=5; *starts+=1; },
-        "6" => { suji=6; *starts+=1; },
-        "7" => { suji=7; *starts+=1; },
-        "8" => { suji=8; *starts+=1; },
-        "9" => { suji=9; *starts+=1; },
-        _ => {g_writeln(&format!("(3) '{}' だった。", &line[*starts..(*starts+1)])); return false;},
-    }
-    
-    // 4文字目
-    match &line[*starts..(*starts+1)]{
-        "a" => { dan=1; *starts+=1; },
-        "b" => { dan=2; *starts+=1; },
-        "c" => { dan=3; *starts+=1; },
-        "d" => { dan=4; *starts+=1; },
-        "e" => { dan=5; *starts+=1; },
-        "f" => { dan=6; *starts+=1; },
-        "g" => { dan=7; *starts+=1; },
-        "h" => { dan=8; *starts+=1; },
-        "i" => { dan=9; *starts+=1; },
-        _ => {g_writeln(&format!("(4) '{}' だった。", &line[*starts..(*starts+1)])); return false;},
-    }
-
-    uchu_w.set_sasite_dst(suji_dan_to_ms(suji, dan));
-    
-    // 5文字に「+」があれば成り。
-    if 0<(len-*starts) && &line[*starts..(*starts+1)]=="+" {
-        uchu_w.set_sasite_pro(true);
-        *starts+=1;
-    } else {
-        uchu_w.set_sasite_pro(false);        
-    }
-
-    // 続きにスペース「 」が１つあれば読み飛ばす
-    if 0<(len-*starts) && &line[*starts..(*starts+1)]==" " {
-        *starts+=1;
-    }
-
+    // 手目。
     uchu_w.teme+=1;
     true
  }
@@ -216,6 +170,9 @@ pub fn read_sasite(
  * position コマンド 盤上部分のみ 読取
  */
  pub fn read_banjo(line:&String, starts:&mut usize, len:usize){
+
+    //let mut starts1 = starts;
+    //parse_banjo(&line, &starts1, len);
 
     // 盤部
     let mut suji = SUJI_9;//９筋から右方向へ読取

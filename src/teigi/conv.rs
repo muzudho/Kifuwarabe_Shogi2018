@@ -240,9 +240,7 @@ pub fn kaiten180_ms_by_ms_sn(ms:umasu, sn:&Sengo) -> umasu {
  * 先後付き駒 *
  **************/
 
-/**
- * 先後付き駒の数値化
- */
+/// 先後付き駒の数値化。
 pub fn km_to_num(km:&Koma) -> usize{
     use teigi::shogi_syugo::Koma::*;
     match *km {
@@ -313,24 +311,18 @@ pub fn num_to_km(km_num:usize) -> Koma{
         _ =>Owari,
     }
 }
-/**
- * ハッシュ値を作る
- */
+/// ハッシュ値を作る
 pub fn push_km_to_hash(hash:u64, km:&Koma) -> u64 {
     // 使ってるのは30駒番号ぐらいなんで、32(=2^5) あれば十分
     (hash<<5) + km_to_num(km) as u64
 }
-/**
- * ハッシュ値から作る
- */
+/// ハッシュ値から作る
 pub fn pop_km_from_hash(hash:u64) -> (u64,Koma) {
     // 使ってるのは30駒番号ぐらいなんで、32(=2^5) あれば十分
     let km_num = num_to_km( (hash & 0b11111) as usize);
     (hash>>5, km_num)
 }
-/**
- * 駒→成駒　（成れない駒は、そのまま）
- */
+/// 駒→成駒　（成れない駒は、そのまま）
 pub fn km_to_prokm(km:&Koma) -> Koma{
     use teigi::shogi_syugo::Koma::*;
     match *km {
@@ -366,9 +358,7 @@ pub fn km_to_prokm(km:&Koma) -> Koma{
         Owari =>Owari,
     }
 }
-/**
- * 成駒→駒
- */
+/// 成駒→駒
 pub fn prokm_to_km(km:&Koma) -> Koma{
     use teigi::shogi_syugo::Koma::*;
     match *km {
@@ -404,15 +394,11 @@ pub fn prokm_to_km(km:&Koma) -> Koma{
         Owari =>Owari,
     }
 }
-/**
- * 駒→長い利きの有無
- */
+/// 駒→長い利きの有無
 pub fn km_is_nagaikiki(km:&Koma) -> bool{
     kms_is_nagaikiki( &km_to_kms( km ) )
 }
-/**
- * 先後付き駒→駒種類
- */
+/// 先後付き駒→駒種類
 pub fn km_to_sn_kms(km:&Koma)->(Sengo,KmSyurui){
     use teigi::shogi_syugo::Koma;
     use teigi::shogi_syugo::Koma::*;
@@ -452,9 +438,7 @@ pub fn km_to_sn_kms(km:&Koma)->(Sengo,KmSyurui){
         Koma::Owari => { (Sengo::Owari,KmSyurui::Owari) },
     }
 }
-/**
- * 先後付き駒　を　先後　へ変換。
- */
+/// 先後付き駒　を　先後　へ変換。
 #[allow(dead_code)]
 pub fn km_to_sn(km:&Koma)->Sengo{
     use teigi::shogi_syugo::Koma::*;
@@ -492,9 +476,7 @@ pub fn km_to_sn(km:&Koma)->Sengo{
         Koma::Owari => { Sengo::Owari},
     }
 }
-/**
- * 先後付き駒→駒種類
- */
+/// 先後付き駒→駒種類
 pub fn km_to_kms(km:&Koma)->KmSyurui{
     use teigi::shogi_syugo::Koma;
     use teigi::shogi_syugo::Koma::*;
@@ -533,10 +515,8 @@ pub fn km_to_kms(km:&Koma)->KmSyurui{
         Koma::Owari => { KmSyurui::Owari},
     }
 }
-/**
- * 先後付き駒　を　持ち駒種類　へ変換。
- * 持ち駒にするので、先後は反転するぜ☆（＾～＾）
- */
+/// 先後付き駒　を　持ち駒種類　へ変換。
+/// 持ち駒にするので、先後は反転するぜ☆（＾～＾）
 pub fn km_to_mg(km_cap:Koma)->Koma{
     use teigi::shogi_syugo::Koma::*;
     match km_cap{
@@ -577,9 +557,7 @@ pub fn km_to_mg(km_cap:Koma)->Koma{
  * 駒種類 *
  **********/
 
-/**
- * 駒種類の数値化
- */
+/// 駒種類の数値化
 pub fn kms_to_num(kms:&KmSyurui) -> usize{
     use teigi::shogi_syugo::KmSyurui::*;
     match *kms {

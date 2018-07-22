@@ -221,14 +221,12 @@ impl GoteJin{
 /******
  * 駒 *
  ******/
-// 先後付き駒
+/// 先後付き駒
 
-// 持ち駒の駒のうち、最大の枚数は歩の 18。
+/// 持ち駒の駒のうち、最大の枚数は歩の 18。
 pub const MG_MAX : usize = 18;
 pub const KM_LN : usize = 30;
-/**
- * 先後付きの駒と空白
- */
+/// 先後付きの駒と空白
 #[derive(Copy, Clone)]
 pub enum Koma{
     // ▼らいおん
