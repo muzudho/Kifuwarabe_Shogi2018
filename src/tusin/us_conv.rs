@@ -24,7 +24,6 @@ pub struct Movement{
     pub promotion : bool,
     pub drop : KmSyurui,
 }
-
 impl Movement{
     pub fn new()->Movement{
         Movement{
@@ -138,6 +137,9 @@ pub fn read_sasite(
     len: usize
 )->bool{
 
+    let mut starts2 = *starts;
+    let umov : UsiMovement = read_movement(&line, &mut starts2, len);
+
     // 4文字か5文字あるはず。
     if (len-*starts)<4{
         // 指し手読取終了時にここを通るぜ☆（＾～＾）
@@ -148,13 +150,13 @@ pub fn read_sasite(
     // 1文字目と2文字目
     match &line[*starts..(*starts+1)]{
         // 1文字目が駒だったら打。2文字目は必ず「*」なはずなので読み飛ばす。
-        "R" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(KmSyurui::K); },
-        "B" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(KmSyurui::Z); },
-        "G" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(KmSyurui::I); },
-        "S" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(KmSyurui::N); },
-        "N" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(KmSyurui::U); },
-        "L" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(KmSyurui::S); },
-        "P" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(KmSyurui::H); },
+        "R" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(pt_to_kms(&umov.drop)); },
+        "B" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(pt_to_kms(&umov.drop)); },
+        "G" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(pt_to_kms(&umov.drop)); },
+        "S" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(pt_to_kms(&umov.drop)); },
+        "N" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(pt_to_kms(&umov.drop)); },
+        "L" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(pt_to_kms(&umov.drop)); },
+        "P" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(pt_to_kms(&umov.drop)); },
         _ => {
             // 残りは「筋の数字」、「段のアルファベット」のはず。
             let suji;
@@ -186,7 +188,7 @@ pub fn read_sasite(
             }
 
             uchu_w.set_sasite_src(suji_dan_to_ms(suji, dan));
-            uchu_w.set_sasite_drop(KmSyurui::Kara);
+            uchu_w.set_sasite_drop(pt_to_kms(&umov.drop));
         },
     }
 
