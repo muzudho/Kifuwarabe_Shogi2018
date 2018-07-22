@@ -148,49 +148,18 @@ pub fn read_sasite(
     }
 
     // 1文字目と2文字目
-    match &line[*starts..(*starts+1)]{
-        // 1文字目が駒だったら打。2文字目は必ず「*」なはずなので読み飛ばす。
-        "R" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(pt_to_kms(&umov.drop)); },
-        "B" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(pt_to_kms(&umov.drop)); },
-        "G" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(pt_to_kms(&umov.drop)); },
-        "S" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(pt_to_kms(&umov.drop)); },
-        "N" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(pt_to_kms(&umov.drop)); },
-        "L" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(pt_to_kms(&umov.drop)); },
-        "P" => { *starts+=2; uchu_w.set_sasite_src(0); uchu_w.set_sasite_drop(pt_to_kms(&umov.drop)); },
-        _ => {
-            // 残りは「筋の数字」、「段のアルファベット」のはず。
-            let suji;
-            let dan;
-            match &line[*starts..(*starts+1)]{
-                "1" => { suji=1; *starts+=1; },
-                "2" => { suji=2; *starts+=1; },
-                "3" => { suji=3; *starts+=1; },
-                "4" => { suji=4; *starts+=1; },
-                "5" => { suji=5; *starts+=1; },
-                "6" => { suji=6; *starts+=1; },
-                "7" => { suji=7; *starts+=1; },
-                "8" => { suji=8; *starts+=1; },
-                "9" => { suji=9; *starts+=1; },
-                _ => {g_writeln(&format!("(1) '{}' だった。", &line[*starts..(*starts+1)])); return false;},
-            }
-
-            match &line[*starts..(*starts+1)]{
-                "a" => { dan=1; *starts+=1; },
-                "b" => { dan=2; *starts+=1; },
-                "c" => { dan=3; *starts+=1; },
-                "d" => { dan=4; *starts+=1; },
-                "e" => { dan=5; *starts+=1; },
-                "f" => { dan=6; *starts+=1; },
-                "g" => { dan=7; *starts+=1; },
-                "h" => { dan=8; *starts+=1; },
-                "i" => { dan=9; *starts+=1; },
-                _ => {g_writeln(&format!("(2) '{}' だった。", &line[*starts..(*starts+1)])); return false;},
-            }
-
-            uchu_w.set_sasite_src(suji_dan_to_ms(suji, dan));
-            uchu_w.set_sasite_drop(pt_to_kms(&umov.drop));
+    *starts+= 2;
+    use tusin::usi::PieceType;
+    match umov.drop {
+        PieceType::Space=> {
+            uchu_w.set_sasite_src(suji_dan_to_ms(umov.source_file, umov.source_rank));
+        },
+        _=> {
+            // 打。
+            uchu_w.set_sasite_src(0);
         },
     }
+    uchu_w.set_sasite_drop(pt_to_kms(&umov.drop));
 
     // 残りは「筋の数字」、「段のアルファベット」のはず。
     let suji;

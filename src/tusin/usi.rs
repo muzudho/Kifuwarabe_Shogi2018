@@ -1,4 +1,5 @@
 use std::fmt;
+use memory::uchu::*;
 
 /// 駒種類の数。
 //pub const PIECE_TYPE_LN : usize = 16;
@@ -121,44 +122,64 @@ pub fn read_movement(
     len: usize
 ) -> UsiMovement {
 
+    let mut result = UsiMovement{
+        source_file : -1,
+        source_rank : -1,
+        drop : PieceType::Space,
+        destination_file : -1,
+        destination_rank : -1,
+        promotion : false,
+    };
+
     // 4文字か5文字あるはず。
     if (len-*starts)<4{
         // 指し手読取終了時にここを通るぜ☆（＾～＾）
         // 残り４文字もない。
-        return UsiMovement{
-            source_file : -1,
-            source_rank : -1,
-            drop : PieceType::Space,
-            destination_file : -1,
-            destination_rank : -1,
-            promotion : false,
-        };
+        return result;
     }
 
-    let drop : PieceType;
     // 1文字目と2文字目
     match &line[*starts..(*starts+1)]{
         // 1文字目が駒だったら打。2文字目は必ず「*」なはずなので読み飛ばす。
-        "R" => { *starts+= 2; drop= PieceType::R },
-        "B" => { *starts+= 2; drop= PieceType::B },
-        "G" => { *starts+= 2; drop= PieceType::G },
-        "S" => { *starts+= 2; drop= PieceType::S },
-        "N" => { *starts+= 2; drop= PieceType::N },
-        "L" => { *starts+= 2; drop= PieceType::L },
-        "P" => { *starts+= 2; drop= PieceType::P },
+        "R" => { *starts+= 2; result.drop= PieceType::R },
+        "B" => { *starts+= 2; result.drop= PieceType::B },
+        "G" => { *starts+= 2; result.drop= PieceType::G },
+        "S" => { *starts+= 2; result.drop= PieceType::S },
+        "N" => { *starts+= 2; result.drop= PieceType::N },
+        "L" => { *starts+= 2; result.drop= PieceType::L },
+        "P" => { *starts+= 2; result.drop= PieceType::P },
         _ => {
             // 残りは「筋の数字」、「段のアルファベット」のはず。
-            drop= PieceType::Space;
+            match &line[*starts..(*starts+1)]{
+                "1" => result.source_file= 1,
+                "2" => result.source_file= 2,
+                "3" => result.source_file= 3,
+                "4" => result.source_file= 4,
+                "5" => result.source_file= 5,
+                "6" => result.source_file= 6,
+                "7" => result.source_file= 7,
+                "8" => result.source_file= 8,
+                "9" => result.source_file= 9,
+                _ => {g_writeln(&format!("(1) '{}' だった。", &line[*starts..(*starts+1)])); return result;},
+            }
+            *starts+=1;
+
+            match &line[*starts..(*starts+1)]{
+                "a" => result.source_rank= 1,
+                "b" => result.source_rank= 2,
+                "c" => result.source_rank= 3,
+                "d" => result.source_rank= 4,
+                "e" => result.source_rank= 5,
+                "f" => result.source_rank= 6,
+                "g" => result.source_rank= 7,
+                "h" => result.source_rank= 8,
+                "i" => result.source_rank= 9,
+                _ => {g_writeln(&format!("(2) '{}' だった。", &line[*starts..(*starts+1)])); return result;},
+            }
+            *starts+=1;
         },
     }
 
-    // 残りは「筋の数字」、「段のアルファベット」のはず。
-    UsiMovement{
-        source_file : -1,
-        source_rank : -1,
-        drop : drop,
-        destination_file : -1,
-        destination_rank : -1,
-        promotion : false,
-    }
+    // 残りは「筋の数字」、「段のアルファベット」のはず。成り
+    return result;
 }
