@@ -62,111 +62,6 @@ impl fmt::Display for PieceType{
     }
 }
 
-/// 先後付きの駒と空白
-#[derive(Copy, Clone)]
-pub enum Piece{
-    // ▼玉(King)。
-    K0,
-    // ▼飛車(Rook)。
-    R0,
-    // ▼角(Bishop)。
-    B0,
-    // ▼金(Gold)。
-    G0,
-    // ▼銀(Silver)。
-    S0,
-    // ▼桂(kNight)。
-    N0,
-    // ▼香(Lance)。
-    L0,
-    // ▼歩(Pawn)。
-    P0,
-    // ▼竜(Promoted Rook)。
-    PR0,
-    // ▼馬(Promoted Bishop)。
-    PB0,
-    // ▼全(Promoted Silver)。
-    PS0,
-    // ▼圭(Promoted kNight)。
-    PN0,
-    // ▼杏(Promoted Lance)。
-    PL0,
-    // ▼と(Promoted Pawn)。
-    PP0,
-    // △玉(King)。
-    K1,
-    // △飛車(Rook)。
-    R1,
-    // △角(Bishop)。
-    B1,
-    // △金(Gold)。
-    G1,
-    // △銀(Silver)。
-    S1,
-    // △桂(kNight)。
-    N1,
-    // △香(Lance)。
-    L1,
-    // △歩(Pawn)。
-    P1,
-    // △竜(Promoted Rook)。
-    PR1,
-    // △馬(Promoted Bishop)。
-    PB1,
-    // △全(Promoted Silver)。
-    PS1,
-    // △圭(Promoted kNight)。
-    PN1,
-    // △杏(Promoted Lance)。
-    PL1,
-    // △と(Promoted Pawn)。
-    PP1,
-    // 空マス
-    Space,
-    // 要素数より1小さい数。該当なしや、エラー値用としても兼用する
-    Num
-}
-impl fmt::Display for Piece{
-    fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
-        // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
-        use tusin::usi::Piece::*;
-        match *self{
-            K0 => { write!(f,"▼玉")},
-            R0 => { write!(f,"▼飛")},
-            B0 => { write!(f,"▼角")},
-            G0 => { write!(f,"▼金")},
-            S0 => { write!(f,"▼銀")},
-            N0 => { write!(f,"▼桂")},
-            L0 => { write!(f,"▼香")},
-            P0 => { write!(f,"▼歩")},
-            PR0 => { write!(f,"▼竜")},
-            PB0 => { write!(f,"▼馬")},
-            PS0 => { write!(f,"▼全")},
-            PN0 => { write!(f,"▼圭")},
-            PL0 => { write!(f,"▼杏")},
-            PP0 => { write!(f,"▼と")},
-            K1 => { write!(f,"△玉")},
-            R1 => { write!(f,"△飛")},
-            B1 => { write!(f,"△角")},
-            G1 => { write!(f,"△金")},
-            S1 => { write!(f,"△銀")},
-            N1 => { write!(f,"△桂")},
-            L1 => { write!(f,"△香")},
-            P1 => { write!(f,"△歩")},
-            PR1 => { write!(f,"△竜")},
-            PB1 => { write!(f,"△馬")},
-            PS1 => { write!(f,"△全")},
-            PN1 => { write!(f,"△圭")},
-            PL1 => { write!(f,"△杏")},
-            PP1 => { write!(f,"△と")},
-            Space => { write!(f,"　　")},
-            Num => { write!(f,"××")},
-        }
-    }
-}
-
-
-
 /// 指し手。最大で５桁の文字列。
 ///
 /// # Members.
@@ -303,91 +198,229 @@ pub fn parse_movement(
     return result;
 }
 
-/*
-/**
- * position コマンド 盤上部分のみ 読取
- */
- pub fn parse_banjo(line:&String, starts:&mut usize, len:usize){
+
+
+
+
+
+/// 先後付きの駒と空白
+#[derive(Copy, Clone)]
+pub enum Piece{
+    // ▼玉(King)。
+    K0,
+    // ▼飛車(Rook)。
+    R0,
+    // ▼角(Bishop)。
+    B0,
+    // ▼金(Gold)。
+    G0,
+    // ▼銀(Silver)。
+    S0,
+    // ▼桂(kNight)。
+    N0,
+    // ▼香(Lance)。
+    L0,
+    // ▼歩(Pawn)。
+    P0,
+    // ▼竜(Promoted Rook)。
+    PR0,
+    // ▼馬(Promoted Bishop)。
+    PB0,
+    // ▼全(Promoted Silver)。
+    PS0,
+    // ▼圭(Promoted kNight)。
+    PN0,
+    // ▼杏(Promoted Lance)。
+    PL0,
+    // ▼と(Promoted Pawn)。
+    PP0,
+    // △玉(King)。
+    K1,
+    // △飛車(Rook)。
+    R1,
+    // △角(Bishop)。
+    B1,
+    // △金(Gold)。
+    G1,
+    // △銀(Silver)。
+    S1,
+    // △桂(kNight)。
+    N1,
+    // △香(Lance)。
+    L1,
+    // △歩(Pawn)。
+    P1,
+    // △竜(Promoted Rook)。
+    PR1,
+    // △馬(Promoted Bishop)。
+    PB1,
+    // △全(Promoted Silver)。
+    PS1,
+    // △圭(Promoted kNight)。
+    PN1,
+    // △杏(Promoted Lance)。
+    PL1,
+    // △と(Promoted Pawn)。
+    PP1,
+    // 空マス
+    Space,
+    // 要素数より1小さい数。該当なしや、エラー値用としても兼用する
+    Num
+}
+impl fmt::Display for Piece{
+    fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
+        // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
+        use tusin::usi::Piece::*;
+        match *self{
+            K0 => { write!(f,"▼玉")},
+            R0 => { write!(f,"▼飛")},
+            B0 => { write!(f,"▼角")},
+            G0 => { write!(f,"▼金")},
+            S0 => { write!(f,"▼銀")},
+            N0 => { write!(f,"▼桂")},
+            L0 => { write!(f,"▼香")},
+            P0 => { write!(f,"▼歩")},
+            PR0 => { write!(f,"▼竜")},
+            PB0 => { write!(f,"▼馬")},
+            PS0 => { write!(f,"▼全")},
+            PN0 => { write!(f,"▼圭")},
+            PL0 => { write!(f,"▼杏")},
+            PP0 => { write!(f,"▼と")},
+            K1 => { write!(f,"△玉")},
+            R1 => { write!(f,"△飛")},
+            B1 => { write!(f,"△角")},
+            G1 => { write!(f,"△金")},
+            S1 => { write!(f,"△銀")},
+            N1 => { write!(f,"△桂")},
+            L1 => { write!(f,"△香")},
+            P1 => { write!(f,"△歩")},
+            PR1 => { write!(f,"△竜")},
+            PB1 => { write!(f,"△馬")},
+            PS1 => { write!(f,"△全")},
+            PN1 => { write!(f,"△圭")},
+            PL1 => { write!(f,"△杏")},
+            PP1 => { write!(f,"△と")},
+            Space => { write!(f,"　　")},
+            Num => { write!(f,"××")},
+        }
+    }
+}
+
+pub const FILE0 :i8 = 0;
+pub const FILE9 :i8 = 9;
+pub const FILE10 :i8 = 10;
+pub const RANK0 :i8 = 0;
+pub const RANK1 :i8 = 1;
+pub const RANK10 :i8 = 10;
+
+
+pub fn file_rank_to_cell(file:i8, rank:i8)->usize{
+    debug_assert!(
+            (FILE0<file && file<FILE10)
+         && (RANK0<rank && rank<RANK10)
+         , "(204)file_rank_to_cell file={},rank={}",file, rank);
+
+    (file*10 + rank) as usize
+}
+
+/// TODO position コマンド 盤上部分のみ 読取
+pub fn parse_banjo(line:&String, starts:&mut usize, len:usize) -> [Piece;100] {
+
+    use tusin::usi::Piece::Space;
+    // 初期局面の盤面
+    let mut ban = [
+        Space,Space,Space,Space,Space,Space,Space,Space,Space,Space,
+        Space,Space,Space,Space,Space,Space,Space,Space,Space,Space,
+        Space,Space,Space,Space,Space,Space,Space,Space,Space,Space,
+        Space,Space,Space,Space,Space,Space,Space,Space,Space,Space,
+        Space,Space,Space,Space,Space,Space,Space,Space,Space,Space,
+        Space,Space,Space,Space,Space,Space,Space,Space,Space,Space,
+        Space,Space,Space,Space,Space,Space,Space,Space,Space,Space,
+        Space,Space,Space,Space,Space,Space,Space,Space,Space,Space,
+        Space,Space,Space,Space,Space,Space,Space,Space,Space,Space,
+        Space,Space,Space,Space,Space,Space,Space,Space,Space,Space,
+    ];
 
     // 盤部
-    let mut suji = SUJI_9;//９筋から右方向へ読取
-    let mut dan = DAN_1;
+    use tusin::usi::Piece;
+    let mut file = FILE9;//９筋から右方向へ読取
+    let mut rank = RANK1;
     'ban: while 0<(len-*starts) {
         match &line[*starts..(*starts+1)]{
-            "/" => { *starts+=1; suji=SUJI_9; dan+=1; },
+            "/" => { *starts+=1; file=FILE9; rank+=1; },
             "1" => { *starts+=1;
-                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                ban[file_rank_to_cell(file,rank)] = Space; file-=1;
             },
             "2" => { *starts+=1;
-                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                ban[file_rank_to_cell(file,rank)] = Space; file-=1;
+                ban[file_rank_to_cell(file,rank)] = Space; file-=1;
             },
             "3" => { *starts+=1;
-                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                ban[file_rank_to_cell(file,rank)] = Space; file-=1;
+                ban[file_rank_to_cell(file,rank)] = Space; file-=1;
+                ban[file_rank_to_cell(file,rank)] = Space; file-=1;
             },
             "4" => { *starts+=1;
                 for _i_kara in 0..4{
-                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                    ban[file_rank_to_cell(file,rank)] = Space; file-=1;
                 }
             },
             "5" => { *starts+=1;
                 for _i_kara in 0..5{
-                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                    ban[file_rank_to_cell(file,rank)] = Space; file-=1;
                 }
             },
             "6" => { *starts+=1;
                 for _i_kara in 0..6{
-                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                    ban[file_rank_to_cell(file,rank)] = Space; file-=1;
                 }
             },
             "7" => { *starts+=1;
                 for _i_kara in 0..7{
-                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                    ban[file_rank_to_cell(file,rank)] = Space; file-=1;
                 }
             },
             "8" => { *starts+=1;
                 for _i_kara in 0..8{
-                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                    ban[file_rank_to_cell(file,rank)] = Space; file-=1;
                 }
             },
             "9" => { *starts+=1;
                 for _i_kara in 0..9{
-                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
+                    ban[file_rank_to_cell(file,rank)] = Space; file-=1;
                 }
             },
-            "K" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::R0); suji-=1; },
-            "R" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::K0); suji-=1; },
-            "B" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Z0); suji-=1; },
-            "G" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::I0); suji-=1; },
-            "S" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::N0); suji-=1; },
-            "N" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::U0); suji-=1; },
-            "L" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::S0); suji-=1; },
-            "P" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::H0); suji-=1; },
-            "k" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::R1); suji-=1; },
-            "r" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::K1); suji-=1; },
-            "b" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Z1); suji-=1; },
-            "g" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::I1); suji-=1; },
-            "s" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::N1); suji-=1; },
-            "n" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::U1); suji-=1; },
-            "l" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::S1); suji-=1; },
-            "p" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::H1); suji-=1; },
+            "K" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::K0; file-=1; },
+            "R" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::R0; file-=1; },
+            "B" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::B0; file-=1; },
+            "G" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::G0; file-=1; },
+            "S" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::S0; file-=1; },
+            "N" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::N0; file-=1; },
+            "L" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::L0; file-=1; },
+            "P" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::P0; file-=1; },
+            "k" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::K1; file-=1; },
+            "r" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::R1; file-=1; },
+            "b" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::B1; file-=1; },
+            "g" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::G1; file-=1; },
+            "s" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::S1; file-=1; },
+            "n" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::N1; file-=1; },
+            "l" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::L1; file-=1; },
+            "p" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::P1; file-=1; },
             "+" => {
                 *starts+=1;
                 match &line[*starts..(*starts+1)]{
-                    "R" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PK0); suji-=1; },
-                    "B" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PZ0); suji-=1; },
-                    "S" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PN0); suji-=1; },
-                    "N" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PU0); suji-=1; },
-                    "L" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PS0); suji-=1; },
-                    "P" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PH0); suji-=1; },
-                    "r" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PK1); suji-=1; },
-                    "b" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PZ1); suji-=1; },
-                    "s" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PN1); suji-=1; },
-                    "n" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PU1); suji-=1; },
-                    "l" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PS1); suji-=1; },
-                    "p" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PH1); suji-=1; },
+                    "R" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::PR0; file-=1; },
+                    "B" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::PB0; file-=1; },
+                    "S" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::PS0; file-=1; },
+                    "N" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::PN0; file-=1; },
+                    "L" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::PL0; file-=1; },
+                    "P" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::PP0; file-=1; },
+                    "r" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::PR1; file-=1; },
+                    "b" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::PB1; file-=1; },
+                    "s" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::PS1; file-=1; },
+                    "n" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::PN1; file-=1; },
+                    "l" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::PL1; file-=1; },
+                    "p" => { *starts+=1;  ban[file_rank_to_cell(file,rank)] = Piece::PP1; file-=1; },
                     _ => { g_writeln(&format!("盤部(0) '{}' だった。", &line[*starts..(*starts+1)])); break 'ban;},
                 }                    
             },
@@ -395,8 +428,6 @@ pub fn parse_movement(
         }
     }
 
-    // 初期局面ハッシュを作り直す
-    let ky_hash = UCHU_WRAP.write().unwrap().create_ky0_hash();
-    UCHU_WRAP.write().unwrap().set_ky0_hash( ky_hash );
+    // 盤面を返却
+    ban
 }
-*/
