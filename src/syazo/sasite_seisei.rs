@@ -46,7 +46,7 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64> ) {
                         source: ms_src,
                         destination: *ms_dst,
                         promotion: false, // 成らず
-                        drop: kms_to_pt(&KmSyurui::Kara),
+                        drop: KmSyurui::Kara,
                     }.to_hash() );
                 }
 
@@ -59,7 +59,7 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64> ) {
                         source: ms_src,
                         destination: *ms_dst,
                         promotion: true, // 成り
-                        drop: kms_to_pt(&KmSyurui::Kara),
+                        drop: KmSyurui::Kara,
                     }.to_hash() );
                 }
             }
@@ -91,7 +91,7 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64> ) {
                             source: SS_SRC_DA,    // 駒大
                             destination: ms_dst,       // どの升へ行きたいか
                             promotion: false,        // 打に成りは無し
-                            drop: kms_to_pt(&kms),         // 打った駒種類
+                            drop: kms,         // 打った駒種類
                         }.to_hash() );
                     }
                 },
@@ -141,7 +141,7 @@ pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut H
         ss_hash_builder.source = *ms_src;
         // 成らず
         ss_hash_builder.promotion = false;
-        ss_hash_builder.drop = kms_to_pt(&KmSyurui::Kara);
+        ss_hash_builder.drop = KmSyurui::Kara;
         ss_hashset.insert( ss_hash_builder.to_hash() );
     }
 
@@ -161,7 +161,7 @@ pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut H
         ss_hash_builder.source = *ms_src;
         // 成り
         ss_hash_builder.promotion = true;
-        ss_hash_builder.drop = kms_to_pt(&KmSyurui::Kara);
+        ss_hash_builder.drop = KmSyurui::Kara;
         ss_hashset.insert( ss_hash_builder.to_hash() );
     }
 }
@@ -204,7 +204,7 @@ pub fn insert_ss_by_ms_km_on_da(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut Hash
             source: SS_SRC_DA,
             destination: ms_dst,
             promotion: false,
-            drop: kms_to_pt(&kms_da),
+            drop: kms_da,
         }.to_hash();
         ss_hashset.insert( hash_ss );
     }

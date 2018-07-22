@@ -5,10 +5,8 @@ use consoles::asserts::*;
 use teigi::conv::*;
 use teigi::constants::*;
 use std::fmt;
-use teigi;
 use teigi::shogi_syugo::*;
 use memory::uchu::*;
-use tusin;
 use tusin::usi::*;
 
 use UCHU_WRAP;
@@ -24,15 +22,16 @@ pub struct Movement{
     pub source : umasu,
     pub destination : umasu,
     pub promotion : bool,
-    pub drop : PieceType,
+    pub drop : KmSyurui,
 }
+
 impl Movement{
     pub fn new()->Movement{
         Movement{
             source: 0,
             destination: 0,
             promotion: false,
-            drop: PieceType::Space,
+            drop: KmSyurui::Kara,
         }
     }
     #[allow(dead_code)]
@@ -40,12 +39,21 @@ impl Movement{
         self.source = 0;
         self.destination = 0;
         self.promotion = false;
-        self.drop = PieceType::Space;
+        self.drop = KmSyurui::Kara;
     }
+
+    /**
+     * 考えた結果、指し手が考え付いていれば真。
+     */
+    pub fn exists(&self) -> bool{
+        self.destination != MASU_0
+    }
+}
+impl Movement{
     pub fn to_hash(&self)->u64{
         let mut hash = 0;
         // 正順で取り出すことを考えて、逆順で押し込む☆（＾～＾）
-        hash = push_kms_to_hash(hash, &pt_to_kms(&self.drop));
+        hash = push_kms_to_hash(hash, &self.drop);
         hash = push_bool_to_hash(hash, self.promotion);
         hash = push_ms_to_hash(hash, self.destination);
         push_ms_to_hash(hash, self.source)
@@ -60,15 +68,8 @@ impl Movement{
             source: src,
             destination: dst,
             promotion: pro,
-            drop: kms_to_pt(&drop),
+            drop: drop,
         }
-    }
-
-    /**
-     * 考えた結果、指し手が考え付いていれば真。
-     */
-    pub fn exists(&self) -> bool{
-        self.destination != MASU_0
     }
 }
 impl fmt::Display for Movement{
@@ -83,16 +84,16 @@ impl fmt::Display for Movement{
         let (dx,dy) = ms_to_suji_dan(self.destination);
 
         if self.source==SS_SRC_DA {
-            use tusin::usi::PieceType::*;
+            use teigi::shogi_syugo::KmSyurui;
             write!(f, "{}*{}{}{}",
                 match self.drop {
-                    R => { "R" },
-                    B => { "B" },
-                    G => { "G" },
-                    S => { "S" },
-                    N => { "N" },
-                    L => { "L" },
-                    P => { "P" },
+                    KmSyurui::K => { "R" },
+                    KmSyurui::Z => { "B" },
+                    KmSyurui::I => { "G" },
+                    KmSyurui::N => { "S" },
+                    KmSyurui::U => { "N" },
+                    KmSyurui::S => { "L" },
+                    KmSyurui::H => { "P" },
                     _  => { "?" },
                 },
                 dx,
@@ -477,21 +478,21 @@ pub fn kms_to_pt (kms: &KmSyurui) -> PieceType {
     use tusin::usi::PieceType;
     match *kms{
         R => PieceType::K,
-        K => tusin::usi::PieceType::R,
-        Z => tusin::usi::PieceType::B,
-        I => tusin::usi::PieceType::G,
-        N => tusin::usi::PieceType::S,
-        U => tusin::usi::PieceType::N,
-        S => tusin::usi::PieceType::L,
-        H => tusin::usi::PieceType::P,
-        PK => tusin::usi::PieceType::PR,
-        PZ => tusin::usi::PieceType::PB,
-        PN => tusin::usi::PieceType::PS,
-        PU => tusin::usi::PieceType::PN,
-        PS => tusin::usi::PieceType::PL,
-        PH => tusin::usi::PieceType::PP,
-        Kara => tusin::usi::PieceType::Space,
-        Owari => tusin::usi::PieceType::Num,
+        K => PieceType::R,
+        Z => PieceType::B,
+        I => PieceType::G,
+        N => PieceType::S,
+        U => PieceType::N,
+        S => PieceType::L,
+        H => PieceType::P,
+        PK => PieceType::PR,
+        PZ => PieceType::PB,
+        PN => PieceType::PS,
+        PU => PieceType::PN,
+        PS => PieceType::PL,
+        PH => PieceType::PP,
+        Kara => PieceType::Space,
+        Owari => PieceType::Num,
     }
 }
 
@@ -500,20 +501,60 @@ pub fn pt_to_kms (pt: &PieceType) -> KmSyurui {
     use teigi::shogi_syugo::KmSyurui;
     match *pt{
         K => KmSyurui::R,
-        R => teigi::shogi_syugo::KmSyurui::K,
-        B => teigi::shogi_syugo::KmSyurui::Z,
-        G => teigi::shogi_syugo::KmSyurui::I,
-        S => teigi::shogi_syugo::KmSyurui::N,
-        N => teigi::shogi_syugo::KmSyurui::U,
-        L => teigi::shogi_syugo::KmSyurui::S,
-        P => teigi::shogi_syugo::KmSyurui::H,
-        PR => teigi::shogi_syugo::KmSyurui::PK,
-        PB => teigi::shogi_syugo::KmSyurui::PZ,
-        PS => teigi::shogi_syugo::KmSyurui::PN,
-        PN => teigi::shogi_syugo::KmSyurui::PU,
-        PL => teigi::shogi_syugo::KmSyurui::PS,
-        PP => teigi::shogi_syugo::KmSyurui::PH,
-        Space => teigi::shogi_syugo::KmSyurui::Kara,
-        Num => teigi::shogi_syugo::KmSyurui::Owari,
+        R => KmSyurui::K,
+        B => KmSyurui::Z,
+        G => KmSyurui::I,
+        S => KmSyurui::N,
+        N => KmSyurui::U,
+        L => KmSyurui::S,
+        P => KmSyurui::H,
+        PR => KmSyurui::PK,
+        PB => KmSyurui::PZ,
+        PS => KmSyurui::PN,
+        PN => KmSyurui::PU,
+        PL => KmSyurui::PS,
+        PP => KmSyurui::PH,
+        Space => KmSyurui::Kara,
+        Num => KmSyurui::Owari,
+    }
+}
+
+pub fn usi_to_movement(mv: &UsiMovement) -> Movement {
+    let source : umasu = match mv.drop {
+        PieceType::Space => suji_dan_to_ms(mv.source_file, mv.source_rank),
+        _ => 0,
+    };
+
+    let drop : KmSyurui = match mv.drop {
+        PieceType::Space => KmSyurui::Kara,
+        _ => pt_to_kms(&mv.drop),
+    };
+
+    Movement {
+        source : source,
+        destination : suji_dan_to_ms(mv.destination_file, mv.destination_rank),
+        promotion : mv.promotion,
+        drop : drop,
+    }
+}
+
+pub fn movement_to_usi(mv: &Movement) -> UsiMovement {
+    let (src_file, src_rank, drop) = match mv.drop {
+        KmSyurui::Kara => {
+            let (src_file, src_rank) = ms_to_suji_dan(mv.source);
+            (src_file, src_rank, PieceType::Space)
+        },
+        _ => (-1, -1, PieceType::Space),
+    };
+
+    let (dst_file, dst_rank) = ms_to_suji_dan(mv.destination);
+
+    UsiMovement{
+        source_file : src_file,
+        source_rank : src_rank,
+        drop : drop,
+        destination_file : dst_file,
+        destination_rank : dst_rank,
+        promotion : mv.promotion,
     }
 }

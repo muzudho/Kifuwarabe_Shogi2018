@@ -89,3 +89,21 @@ pub const KMS_ARRAY : [KmSyurui;KMS_ARRAY_LN] = [
     KmSyurui::PH,// ぱわーあっぷひよこ
 ];
 */
+
+/// 指し手。最大で５桁の文字列。
+///
+/// * `source_file` - 移動元の筋。
+/// * `source_rank` - 移動元の段。
+/// * `drop` - 打の場合、打った駒種類。
+/// * `destination_file` - 移動先の筋。
+/// * `destination_rank` - 移動先の段。
+/// * `promotion` - 移動後に成るなら真。
+#[derive(Copy,Clone)]
+pub struct UsiMovement{
+    pub source_file : i8,
+    pub source_rank : i8,
+    pub drop : PieceType,
+    pub destination_file : i8,
+    pub destination_rank : i8,
+    pub promotion : bool,
+}

@@ -332,7 +332,7 @@ impl Uchu{
         self.kifu[ self.teme ].promotion = pro
     }
     pub fn set_sasite_drop(&mut self, kms:KmSyurui){
-        self.kifu[ self.teme ].drop = kms_to_pt(&kms)
+        self.kifu[ self.teme ].drop = kms
     }
     pub fn set_ky0_hash(&mut self, hash:u64){
         self.ky0_hash = hash
