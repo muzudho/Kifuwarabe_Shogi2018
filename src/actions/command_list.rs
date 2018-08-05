@@ -77,9 +77,35 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
     let position_parser = tusin::us2::PositionParser::new();
     // positionコマンドの読取を丸投げ
     position_parser.read_position(&row,
-        |mv|{
-            let mut uchu_w2 = UCHU_WRAP.try_write().unwrap();
-            uchu_w2.set_movement(mv);
+        |ban: [Piece;100]|{
+            // 盤面コピー
+            for file in SUJI_1..SUJI_10 {
+                for rank in DAN_1..DAN_10 {
+                    UCHU_WRAP.try_write().unwrap().set_ky0_ban_km(
+                        file,rank,pc_to_km(&ban[file_rank_to_cell(file,rank)])
+                    );
+                }
+            }
+
+            // グローバル変数に内容をセット。
+            {
+                // 初期局面ハッシュを作り直す
+                let ky_hash = UCHU_WRAP.try_write().unwrap().create_ky0_hash();
+                UCHU_WRAP.try_write().unwrap().set_ky0_hash( ky_hash );
+
+                // 初期局面を、現局面にコピーします
+                UCHU_WRAP.try_write().unwrap().copy_ky0_to_ky1();            
+            }
+        },
+        |successful, mv|{
+            let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+            uchu_w.set_movement(mv);
+            if successful {
+                // 入っている指し手の通り指すぜ☆（＾～＾）
+                let teme = uchu_w.teme;
+                let ss = uchu_w.kifu[ teme ];
+                uchu_w.do_ss( &ss );                
+            }
         }
     );
 }
@@ -111,9 +137,35 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
 
     let position_parser = tusin::us2::PositionParser::new();
     position_parser.read_position(&KY1.to_string(),
-        |mv|{
-            let mut uchu_w2 = UCHU_WRAP.try_write().unwrap();
-            uchu_w2.set_movement(mv);
+        |ban: [Piece;100]|{
+            // 盤面コピー
+            for file in SUJI_1..SUJI_10 {
+                for rank in DAN_1..DAN_10 {
+                    UCHU_WRAP.try_write().unwrap().set_ky0_ban_km(
+                        file,rank,pc_to_km(&ban[file_rank_to_cell(file,rank)])
+                    );
+                }
+            }
+
+            // グローバル変数に内容をセット。
+            {
+                // 初期局面ハッシュを作り直す
+                let ky_hash = UCHU_WRAP.try_write().unwrap().create_ky0_hash();
+                UCHU_WRAP.try_write().unwrap().set_ky0_hash( ky_hash );
+
+                // 初期局面を、現局面にコピーします
+                UCHU_WRAP.try_write().unwrap().copy_ky0_to_ky1();            
+            }
+        },
+        |successful, mv|{
+            let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+            uchu_w.set_movement(mv);
+            if successful {
+                // 入っている指し手の通り指すぜ☆（＾～＾）
+                let teme = uchu_w.teme;
+                let ss = uchu_w.kifu[ teme ];
+                uchu_w.do_ss( &ss );                
+            }
         }
     );
 }

@@ -83,7 +83,8 @@ impl PositionParser{
     pub fn read_position(
         &self,
         line:&String,
-        callback1: fn(Movement)
+        callback0: fn([Piece;100]),
+        callback1: fn(bool, Movement)
         ){
 
         let mut starts = 0;
@@ -93,7 +94,7 @@ impl PositionParser{
 
 
 
-        let ban;
+        let ban : [Piece;100];
         if 16<(len-starts) && &line[starts..(starts+17)]=="position startpos"{
             // 'position startpos' を読み飛ばし
             starts += 17;
@@ -146,27 +147,8 @@ impl PositionParser{
             panic!("'position startpos' でも、'position sfen ' でも始まらなかった。");
         }
 
-
-        // 盤面コピー
-        for file in SUJI_1..SUJI_10 {
-            for rank in DAN_1..DAN_10 {
-                UCHU_WRAP.try_write().unwrap().set_ky0_ban_km(
-                    file,rank,pc_to_km(&ban[file_rank_to_cell(file,rank)])
-                );
-            }
-        }
-
-        // グローバル変数に内容をセット。
-        {
-            // 初期局面ハッシュを作り直す
-            let ky_hash = UCHU_WRAP.try_write().unwrap().create_ky0_hash();
-            UCHU_WRAP.try_write().unwrap().set_ky0_hash( ky_hash );
-
-            // 初期局面を、現局面にコピーします
-            UCHU_WRAP.try_write().unwrap().copy_ky0_to_ky1();            
-        }
-
-
+        // 盤を返す。
+        callback0(ban);
 
         if 4<(len-starts) && &line[starts..(starts+5)]=="moves"{
             starts += 5;
@@ -176,45 +158,16 @@ impl PositionParser{
             starts += 1;
         }
 
-        // 指し手を全部読んでいくぜ☆（＾～＾）手目のカウントも増えていくぜ☆（＾～＾）
+        // 指し手を1つずつ返すぜ☆（＾～＾）
         loop {
             let (successful, umov) = parse_movement(line, &mut starts, len);
-            let mov;
             if successful {
-                mov = usi_to_movement(&umov);
+                callback1(successful, usi_to_movement(&umov));
             } else {
-                // 読取失敗時、または 指し手読取終了時に successfulの外を通るぜ☆（＾～＾）
-                mov = Movement::new();
+                // 読取終了時(失敗時)、最後に投了を送るぜ☆（＾～＾）
+                callback1(successful, Movement::new());
+                break;
             }
-
-            // コールバック
-            {
-                /*
-                let func = |mv|{
-                    let mut uchu_w2 = UCHU_WRAP.try_write().unwrap();
-                    uchu_w2.set_movement(mv);
-                };
-                func(mov);
-                 */
-
-                callback1(mov);
-            }
-
-            // グローバル変数に内容をセット。
-            {
-                let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-            
-                if successful {
-                    // 入っている指し手の通り指すぜ☆（＾～＾）
-                    let teme = uchu_w.teme;
-                    let ss = uchu_w.kifu[ teme ];
-                    uchu_w.do_ss( &ss );
-                } else {
-                    // 読取失敗時、または 指し手読取終了時に successfulの外を通るぜ☆（＾～＾）
-                    break;
-                }
-            }
-
         } // loop
     }
 }
