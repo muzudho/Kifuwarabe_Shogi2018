@@ -153,16 +153,21 @@ pub fn usi_to_movement(mv: &UsiMovement) -> Movement {
 }
 
 pub fn movement_to_usi(mv: &Movement) -> UsiMovement {
+    // 先に投了判定を行う。
+    if mv.destination==0 {
+        return UsiMovement::new();
+    }
+    
+    let (dst_file, dst_rank) = ms_to_suji_dan(mv.destination);
+
     let (src_file, src_rank, drop) = match mv.drop {
         KmSyurui::Kara => {
             let (src_file, src_rank) = ms_to_suji_dan(mv.source);
             (src_file, src_rank, PieceType::Space)
         },
         // 打なら
-        _ => (-1, -1, kms_to_pt(&mv.drop)),
+        _ => (SUJI_0, DAN_0, kms_to_pt(&mv.drop)),
     };
-
-    let (dst_file, dst_rank) = ms_to_suji_dan(mv.destination);
 
     UsiMovement{
         source_file : src_file,

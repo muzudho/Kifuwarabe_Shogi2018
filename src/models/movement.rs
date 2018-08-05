@@ -1,6 +1,7 @@
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
-
+use std::fmt;
+use consoles::asserts::*;
 
 /// # Movement (ムーブメント;指し手)
 ///
@@ -62,7 +63,6 @@ impl Movement{
         }
     }
 }
-/*
 impl fmt::Display for Movement{
     fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
 
@@ -111,7 +111,6 @@ impl fmt::Display for Movement{
 }
 impl fmt::Debug for Movement{
     fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Movement({}{}{}{})", self.source, self.destination, self.promotion, self.drop)
+        write!(f, "Movement(source:{}, destination:{}, promotion:{}, drop:{})", self.source, self.destination, self.promotion, self.drop)
     }
 }
-*/
