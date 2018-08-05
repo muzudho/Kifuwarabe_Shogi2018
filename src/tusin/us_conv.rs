@@ -171,92 +171,15 @@ pub fn read_sasite(
  */
  pub fn read_banjo(line:&String, starts:&mut usize, len:usize){
 
-    //let mut starts1 = starts;
-    //parse_banjo(&line, &starts1, len);
-
     // 盤部
-    let mut suji = SUJI_9;//９筋から右方向へ読取
-    let mut dan = DAN_1;
-    'ban: while 0<(len-*starts) {
-        match &line[*starts..(*starts+1)]{
-            "/" => { *starts+=1; suji=SUJI_9; dan+=1; },
-            "1" => { *starts+=1;
-                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-            },
-            "2" => { *starts+=1;
-                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-            },
-            "3" => { *starts+=1;
-                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-            },
-            "4" => { *starts+=1;
-                for _i_kara in 0..4{
-                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                }
-            },
-            "5" => { *starts+=1;
-                for _i_kara in 0..5{
-                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                }
-            },
-            "6" => { *starts+=1;
-                for _i_kara in 0..6{
-                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                }
-            },
-            "7" => { *starts+=1;
-                for _i_kara in 0..7{
-                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                }
-            },
-            "8" => { *starts+=1;
-                for _i_kara in 0..8{
-                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                }
-            },
-            "9" => { *starts+=1;
-                for _i_kara in 0..9{
-                    UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Kara); suji-=1;
-                }
-            },
-            "K" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::R0); suji-=1; },
-            "R" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::K0); suji-=1; },
-            "B" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Z0); suji-=1; },
-            "G" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::I0); suji-=1; },
-            "S" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::N0); suji-=1; },
-            "N" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::U0); suji-=1; },
-            "L" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::S0); suji-=1; },
-            "P" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::H0); suji-=1; },
-            "k" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::R1); suji-=1; },
-            "r" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::K1); suji-=1; },
-            "b" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::Z1); suji-=1; },
-            "g" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::I1); suji-=1; },
-            "s" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::N1); suji-=1; },
-            "n" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::U1); suji-=1; },
-            "l" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::S1); suji-=1; },
-            "p" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::H1); suji-=1; },
-            "+" => {
-                *starts+=1;
-                match &line[*starts..(*starts+1)]{
-                    "R" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PK0); suji-=1; },
-                    "B" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PZ0); suji-=1; },
-                    "S" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PN0); suji-=1; },
-                    "N" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PU0); suji-=1; },
-                    "L" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PS0); suji-=1; },
-                    "P" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PH0); suji-=1; },
-                    "r" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PK1); suji-=1; },
-                    "b" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PZ1); suji-=1; },
-                    "s" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PN1); suji-=1; },
-                    "n" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PU1); suji-=1; },
-                    "l" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PS1); suji-=1; },
-                    "p" => { *starts+=1; UCHU_WRAP.write().unwrap().set_ky0_ban_km(suji,dan,Koma::PH1); suji-=1; },
-                    _ => { g_writeln(&format!("盤部(0) '{}' だった。", &line[*starts..(*starts+1)])); break 'ban;},
-                }                    
-            },
-            _ => {break 'ban;}, // 盤部正常終了
+    let ban = parse_banjo(&line, starts, len);
+
+    // コピー
+    for file in SUJI_1..SUJI_10 {
+        for rank in DAN_1..DAN_10 {
+            UCHU_WRAP.write().unwrap().set_ky0_ban_km(
+                file,rank,pc_to_km(&ban[file_rank_to_cell(file,rank)])
+            );
         }
     }
 
@@ -446,6 +369,84 @@ pub fn pt_to_kms (pt: &PieceType) -> KmSyurui {
         Num => KmSyurui::Owari,
     }
 }
+
+
+
+pub fn km_to_pc (km: &Koma) -> Piece {
+    use teigi::shogi_syugo::Koma::*;
+    use tusin::usi::Piece;
+    match *km{
+        R0 => Piece::K0,
+        K0 => Piece::R0,
+        Z0 => Piece::B0,
+        I0 => Piece::G0,
+        N0 => Piece::S0,
+        U0 => Piece::N0,
+        S0 => Piece::L0,
+        H0 => Piece::P0,
+        PK0 => Piece::PR0,
+        PZ0 => Piece::PB0,
+        PN0 => Piece::PS0,
+        PU0 => Piece::PN0,
+        PS0 => Piece::PL0,
+        PH0 => Piece::PP0,
+        R1 => Piece::K1,
+        K1 => Piece::R1,
+        Z1 => Piece::B1,
+        I1 => Piece::G1,
+        N1 => Piece::S1,
+        U1 => Piece::N1,
+        S1 => Piece::L1,
+        H1 => Piece::P1,
+        PK1 => Piece::PR1,
+        PZ1 => Piece::PB1,
+        PN1 => Piece::PS1,
+        PU1 => Piece::PN1,
+        PS1 => Piece::PL1,
+        PH1 => Piece::PP1,
+        Kara => Piece::Space,
+        Owari => Piece::Num,
+    }
+}
+
+pub fn pc_to_km (pc: &Piece) -> Koma {
+    use tusin::usi::Piece::*;
+    use teigi::shogi_syugo::Koma;
+    match *pc{
+        K0 => Koma::R0,
+        R0 => Koma::K0,
+        B0 => Koma::Z0,
+        G0 => Koma::I0,
+        S0 => Koma::N0,
+        N0 => Koma::U0,
+        L0 => Koma::S0,
+        P0 => Koma::H0,
+        PR0 => Koma::PK0,
+        PB0 => Koma::PZ0,
+        PS0 => Koma::PN0,
+        PN0 => Koma::PU0,
+        PL0 => Koma::PS0,
+        PP0 => Koma::PH0,
+        K1 => Koma::R1,
+        R1 => Koma::K1,
+        B1 => Koma::Z1,
+        G1 => Koma::I1,
+        S1 => Koma::N1,
+        N1 => Koma::U1,
+        L1 => Koma::S1,
+        P1 => Koma::H1,
+        PR1 => Koma::PK1,
+        PB1 => Koma::PZ1,
+        PS1 => Koma::PN1,
+        PN1 => Koma::PU1,
+        PL1 => Koma::PS1,
+        PP1 => Koma::PH1,
+        Space => Koma::Kara,
+        Num => Koma::Owari,
+    }
+}
+
+
 
 pub fn usi_to_movement(mv: &UsiMovement) -> Movement {
     let source : umasu = match mv.drop {
