@@ -6,6 +6,7 @@ extern crate rand;
 use rand::Rng;
 use std::collections::HashSet;
 
+use CUR_POSITION_WRAP;
 use consoles::asserts::*;
 use memory::uchu::*;
 use models::movement::*;
@@ -14,7 +15,6 @@ use syazo::sasite_element::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
-
 use UCHU_WRAP;
 
 pub fn choice_1ss_by_hashset( ss_hashset:&HashSet<u64> ) -> Movement {
@@ -110,7 +110,7 @@ pub fn filtering_ss_except_jisatusyu(
     let mut ss_hashset_pickup : HashSet<u64> = HashSet::new();
 
     // 自玉の位置
-    let ms_r = UCHU_WRAP.try_read().unwrap().ky.ms_r[ sn_to_num(&UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji)) ];
+    let ms_r = CUR_POSITION_WRAP.try_read().unwrap().ms_r[ sn_to_num(&UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji)) ];
 
 
     // 王手回避カードを発行する

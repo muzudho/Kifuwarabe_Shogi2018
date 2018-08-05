@@ -45,7 +45,7 @@ pub fn think()->Movement{
     for sn in SN_ARRAY.iter() {
         let ai_sn = hanten_sn( sn );
         // 相手の　らいおん　の位置を覚える
-        let ai_ms_r = UCHU_WRAP.try_read().unwrap().ky.ms_r[sn_to_num(&ai_sn)];
+        let ai_ms_r = CUR_POSITION_WRAP.try_read().unwrap().ms_r[sn_to_num(&ai_sn)];
         insert_rakkansuji(&sn, &mut UCHU_WRAP.try_write().unwrap().vision_tree_by_sn[sn_to_num(sn)], ai_ms_r);
     }
     // TODO 楽観筋はまだ使ってない☆（＾～＾）

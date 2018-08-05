@@ -2,10 +2,10 @@
  * 探索部だぜ☆（＾～＾）
  */
 
+use CUR_POSITION_WRAP;
 use mediators::med_kikisu::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
-
 use UCHU_WRAP;
 
 /**
@@ -47,7 +47,7 @@ impl Searcher{
         // 相手の利き升調べ（自殺手防止のため）
         let (local_kiki_su_by_sn, local_kiki_su_by_km) = refresh_kikisu(
             // 現局面を読取専用で取得し、ロック。
-            &uchu.ky
+            &CUR_POSITION_WRAP.try_read().unwrap()
             );
         // g_writeln( &format!("info test is_s={}", kasetu::atamakin::is_s() ) );
 

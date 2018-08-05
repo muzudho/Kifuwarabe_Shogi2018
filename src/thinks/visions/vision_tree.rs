@@ -62,7 +62,7 @@ pub fn insert_rakkansuji(
                 mv_src_hashset.clear();
                 //da_kms_hashset.clear();
                 // 現局面を読取専用で取得し、ロック。
-                let gen_ky = &UCHU_WRAP.try_read().unwrap().ky;
+                let gen_ky = &CUR_POSITION_WRAP.try_read().unwrap();
                 insert_narazu_src_by_ms_km  (&_gen_ky, ms_dst, &km_dst, &mut mv_src_hashset );
                 insert_narumae_src_by_ms_km (&gen_ky, ms_dst, &km_dst, &mut mv_src_hashset );
                 // TODO 王手になるところに打ちたい
@@ -70,7 +70,7 @@ pub fn insert_rakkansuji(
                 // 盤上
                 for ms_src in mv_src_hashset.iter() {
                     // 成り
-                    let pro = &UCHU_WRAP.try_read().unwrap().ky.is_natta( *ms_src, ms_dst );
+                    let pro = &CUR_POSITION_WRAP.try_read().unwrap().is_natta( *ms_src, ms_dst );
                     let hash_ss = Movement{
                         source:*ms_src,
                         destination:ms_dst,

@@ -3,12 +3,12 @@
  * 頭金仮説
  */
 
+use CUR_POSITION_WRAP;
 use memory::uchu::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use teigi::shogi_syugo_seki::*;
 use teigi::banjometries::*;
-
 use UCHU_WRAP;
 
 /**
@@ -23,7 +23,7 @@ pub fn is_s()->bool{
     if !p_in_ban(&p_south_r){ return true; }
 
     let ms_south_r = p_to_ms( &p_south_r );
-    let km = UCHU_WRAP.try_read().unwrap().ky.get_km_by_ms( ms_south_r );
+    let km = CUR_POSITION_WRAP.try_read().unwrap().get_km_by_ms( ms_south_r );
     let jiai_km = UCHU_WRAP.try_read().unwrap().get_jiai_by_km( &km );
     if !match_jiai( &jiai_km, &Jiai::Ji ) { return true; }
 

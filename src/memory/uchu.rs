@@ -7,9 +7,9 @@
 extern crate rand;
 use rand::Rng;
 
+use CUR_POSITION_WRAP;
 use config::*;
 use INI_POSITION_WRAP;
-use memory::ky::*;
 use memory::number_board::*;
 use models::movement::*;
 use thinks::visions::vision_tree::*;
@@ -95,8 +95,6 @@ pub struct KyHashSeed {
 pub struct Uchu{
     // 対話モード
     pub dialogue_mode : bool,
-    // 現局面
-    pub ky : Kyokumen,
     // 局面ハッシュ種
     pub ky_hash_seed : KyHashSeed,
     // 手目
@@ -127,8 +125,6 @@ impl Uchu{
     pub fn new()->Uchu{
         Uchu{
             dialogue_mode : false,
-            // 現局面
-            ky : Kyokumen::new(),
             ky_hash_seed : KyHashSeed{
                 // 盤上の駒
                 km : [[0;KM_LN];BAN_SIZE],
@@ -249,9 +245,9 @@ impl Uchu{
 
         {
             INI_POSITION_WRAP.try_write().unwrap().clear();
+            CUR_POSITION_WRAP.try_write().unwrap().clear();
         }
 
-        self.ky.clear();
         self.set_teme(0);
     }
     /**
@@ -263,13 +259,12 @@ impl Uchu{
             let ini_pos =  INI_POSITION_WRAP.try_read().unwrap();
             // 盤上
             for i_ms in 0..BAN_SIZE{
-
-                self.ky.set_km_by_ms(i_ms, ini_pos.get_km_by_ms(i_ms));
+                CUR_POSITION_WRAP.try_write().unwrap().set_km_by_ms(i_ms, ini_pos.get_km_by_ms(i_ms));
             }
 
             // 持ち駒
             for i_mg in 0..KM_LN{
-                self.ky.mg[i_mg] = ini_pos.mg[i_mg];
+                CUR_POSITION_WRAP.try_write().unwrap().mg[i_mg] = ini_pos.mg[i_mg];
             }
         }
     }
@@ -427,10 +422,11 @@ impl Uchu{
      */
     pub fn kaku_ky(&self, num:&KyNums)->String{
         // グローバル変数を使う場合がある。
+        let cur_position = CUR_POSITION_WRAP.try_read().unwrap();
         let ini_position = INI_POSITION_WRAP.try_read().unwrap();
 
         let ky = match *num {
-            KyNums::Current => &self.ky,
+            KyNums::Current => &cur_position,
             KyNums::Start => &ini_position,
         };
 
@@ -541,7 +537,7 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
     pub fn do_ss(&mut self, ss:&Movement) {
         // もう入っているかも知れないが、棋譜に入れる☆
         let sn = self.get_teban(&Jiai::Ji);
-        let cap = self.ky.do_sasite( &sn, ss );
+        let cap = CUR_POSITION_WRAP.try_write().unwrap().do_sasite( &sn, ss );
         let teme = self.teme;
         self.kifu[teme] = *ss;
         self.set_cap( teme, cap );
@@ -560,7 +556,7 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
             let sn = self.get_teban(&Jiai::Ji);
             let ss = &self.get_sasite();
             let cap = self.cap[self.teme];
-            self.ky.undo_sasite( &sn, &ss, &cap );
+            CUR_POSITION_WRAP.try_write().unwrap().undo_sasite( &sn, &ss, &cap );
             // 棋譜にアンドゥした指し手がまだ残っているが、とりあえず残しとく
             true
         } else {
@@ -600,7 +596,7 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
      */
     pub fn create_ky1_hash( &self ) -> u64 {
         let ky_hash_seed = &self.ky_hash_seed;
-        let mut hash = self.ky.create_hash(&ky_hash_seed);
+        let mut hash = CUR_POSITION_WRAP.try_read().unwrap().create_hash(&ky_hash_seed);
 
         // 手番ハッシュ
         use teigi::shogi_syugo::Sengo::*;

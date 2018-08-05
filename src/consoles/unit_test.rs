@@ -4,6 +4,7 @@
  * test コマンドで実行しろだぜ☆（＾～＾）
  */
 use consoles::visuals::dumps::*;
+use CUR_POSITION_WRAP;
 use memory::uchu::*;
 use meidai::math_meidai::*;
 use models::movement::*;
@@ -14,7 +15,6 @@ use thinks::randommove;
 use teigi::geometries::geo_teigi::*;
 use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
-
 use UCHU_WRAP;
 
 /**
@@ -27,7 +27,7 @@ pub fn test( line:&String, starts:&mut usize, len:usize) {
     g_writeln( &format!("test starts={} len={}", *starts, len));
 
     // 現局面を読取専用で取得し、ロック。
-    let gen_ky = &UCHU_WRAP.try_read().unwrap().ky;
+    let gen_ky = &CUR_POSITION_WRAP.try_read().unwrap();
 
     if 4<(len-*starts) && &line[*starts..*starts+5] == "mvsrc" {
         *starts += 5;
