@@ -323,6 +323,12 @@ impl Uchu{
     /**
      * 棋譜の作成
      */
+    pub fn set_movement(&mut self, mv: Movement){
+        self.set_sasite_src(mv.source);
+        self.set_sasite_drop(mv.drop);
+        self.set_sasite_dst(mv.destination);
+        self.set_sasite_pro(mv.promotion);
+    }
     pub fn set_sasite_src(&mut self, src:umasu){
         self.kifu[ self.teme ].source = src
     }

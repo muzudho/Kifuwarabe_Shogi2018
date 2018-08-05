@@ -1,5 +1,5 @@
 use kifuwarabe_usi::*;
-use memory::uchu::*;
+//use memory::uchu::*;
 use models::movement::*;
 use teigi::constants::*;
 //use teigi::conv::*;
@@ -82,7 +82,9 @@ impl PositionParser{
     /// position コマンド読取
     pub fn read_position(
         &self,
-        line:&String){
+        line:&String,
+        callback1: fn(Movement)
+        ){
 
         let mut starts = 0;
 
@@ -115,6 +117,7 @@ impl PositionParser{
                 starts += 1;
             }
 
+            // 先後も読み飛ばす。
             if 0<(len-starts) && &line[starts..(starts+1)]=="w"{
                 starts += 1;
             }else if 0<(len-starts) && &line[starts..(starts+1)]=="b"{
@@ -125,78 +128,16 @@ impl PositionParser{
                 starts += 1;
             }
 
-            // 持ち駒数。持ち駒に使える、成らずの駒の部分だけ使用。
-            // 増減させたいので、u8 ではなく i8。
-            let mut hand_count_arr = [0; HAND_PIECE_ARRAY_LN];
+            // 持ち駒数。増減させたいので、u8 ではなく i8。
+            let hand_count_arr = parse_hand_piece(line, &mut starts, len);
+            // 持ち駒数コピー。
+            let mut i=0;
+            for item in HAND_PIECE_ARRAY.iter() {
+                let km = pc_to_km(item);
+                UCHU_WRAP.try_write().unwrap().set_ky0_mg(km, hand_count_arr[i]);
+                i+=1;
+            }
 
-            // 持ち駒の読取
-            if 0<(len-starts) && &line[starts..(starts+1)]=="-"{
-                starts += 1;
-            } else {
-                'mg:loop{
-                    if 0<(len-starts){
-                        // 持ち駒の枚数。
-                        let mut count = 1;
-                        match &line[starts..(starts+1)]{
-                            "1"=>{
-                                // 1枚のときは数字は付かないので、10～18 と確定☆
-                                match &line[starts..(starts+1)]{
-                                    "0"=>{count=10; starts+=2;},
-                                    "1"=>{count=11; starts+=2;},
-                                    "2"=>{count=12; starts+=2;},
-                                    "3"=>{count=13; starts+=2;},
-                                    "4"=>{count=14; starts+=2;},
-                                    "5"=>{count=15; starts+=2;},
-                                    "6"=>{count=16; starts+=2;},
-                                    "7"=>{count=17; starts+=2;},
-                                    "8"=>{count=18; starts+=2;},
-                                    _ => { g_writeln(&format!("持駒部(0) '{}' だった。", &line[starts..(starts+2)])); return;},
-                                }
-                            },
-                            "2"=>{count=2; starts+=1;},
-                            "3"=>{count=3; starts+=1;},
-                            "4"=>{count=4; starts+=1;},
-                            "5"=>{count=5; starts+=1;},
-                            "6"=>{count=6; starts+=1;},
-                            "7"=>{count=7; starts+=1;},
-                            "8"=>{count=8; starts+=1;},
-                            "9"=>{count=9; starts+=1;},
-                            _ => {},// 駒の名前か、エラーなら次へ
-                        }
-
-                        use kifuwarabe_usi::Piece::*;
-                        let piece : Piece;
-                        match &line[starts..(starts+1)]{
-                            "R"=>{ piece=R0; starts+=1; },
-                            "B"=>{ piece=B0; starts+=1; },
-                            "G"=>{ piece=G0; starts+=1; },
-                            "S"=>{ piece=S0; starts+=1; },
-                            "N"=>{ piece=N0; starts+=1; },
-                            "L"=>{ piece=L0; starts+=1; },
-                            "P"=>{ piece=P0; starts+=1; },
-                            "r"=>{ piece=R1; starts+=1; },
-                            "b"=>{ piece=B1; starts+=1; },
-                            "g"=>{ piece=G1; starts+=1; },
-                            "s"=>{ piece=S1; starts+=1; },
-                            "n"=>{ piece=N1; starts+=1; },
-                            "l"=>{ piece=L1; starts+=1; },
-                            "p"=>{ piece=P1; starts+=1; },
-                            _ => { break 'mg; }, // 持駒部 正常終了
-                        }
-
-                        hand_count_arr[hand_piece_to_num(piece)] = count;
-                    }//if
-                }//loop
-
-                // コピー
-                let mut i=0;
-                for item in HAND_PIECE_ARRAY.iter() {
-                    let km = pc_to_km(item);
-                    UCHU_WRAP.try_write().unwrap().set_ky0_mg(km, hand_count_arr[i]);
-                    i+=1;
-                }
-
-            }//else
 
             if 2<(len-starts) && &line[starts..(starts+3)]==" 1 "{
                 starts += 3;
@@ -215,9 +156,16 @@ impl PositionParser{
             }
         }
 
-        // 初期局面ハッシュを作り直す
-        let ky_hash = UCHU_WRAP.try_write().unwrap().create_ky0_hash();
-        UCHU_WRAP.try_write().unwrap().set_ky0_hash( ky_hash );
+        // グローバル変数に内容をセット。
+        {
+            // 初期局面ハッシュを作り直す
+            let ky_hash = UCHU_WRAP.try_write().unwrap().create_ky0_hash();
+            UCHU_WRAP.try_write().unwrap().set_ky0_hash( ky_hash );
+
+            // 初期局面を、現局面にコピーします
+            UCHU_WRAP.try_write().unwrap().copy_ky0_to_ky1();            
+        }
+
 
 
         if 4<(len-starts) && &line[starts..(starts+5)]=="moves"{
@@ -226,11 +174,6 @@ impl PositionParser{
 
         if 0<(len-starts) && &line[starts..(starts+1)]==" "{
             starts += 1;
-        }
-
-        {
-            // 初期局面を、現局面にコピーします
-            UCHU_WRAP.try_write().unwrap().copy_ky0_to_ky1();
         }
 
         // 指し手を全部読んでいくぜ☆（＾～＾）手目のカウントも増えていくぜ☆（＾～＾）
@@ -244,13 +187,22 @@ impl PositionParser{
                 mov = Movement::new();
             }
 
+            // コールバック
+            {
+                /*
+                let func = |mv|{
+                    let mut uchu_w2 = UCHU_WRAP.try_write().unwrap();
+                    uchu_w2.set_movement(mv);
+                };
+                func(mov);
+                 */
+
+                callback1(mov);
+            }
+
             // グローバル変数に内容をセット。
             {
                 let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-                uchu_w.set_sasite_src(mov.source);
-                uchu_w.set_sasite_drop(mov.drop);
-                uchu_w.set_sasite_dst(mov.destination);
-                uchu_w.set_sasite_pro(mov.promotion);
             
                 if successful {
                     // 入っている指し手の通り指すぜ☆（＾～＾）
@@ -263,9 +215,6 @@ impl PositionParser{
                 }
             }
 
-            // 現局面表示
-            //let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky( &KyNums::Current );
-            //g_writeln( &s1 );
-        }
+        } // loop
     }
 }

@@ -76,7 +76,12 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
 
     let position_parser = tusin::us2::PositionParser::new();
     // positionコマンドの読取を丸投げ
-    position_parser.read_position(&row);
+    position_parser.read_position(&row,
+        |mv|{
+            let mut uchu_w2 = UCHU_WRAP.try_write().unwrap();
+            uchu_w2.set_movement(mv);
+        }
+    );
 }
 
 /**
@@ -105,7 +110,12 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
     UCHU_WRAP.try_write().unwrap().clear_ky01();
 
     let position_parser = tusin::us2::PositionParser::new();
-    position_parser.read_position(&KY1.to_string());
+    position_parser.read_position(&KY1.to_string(),
+        |mv|{
+            let mut uchu_w2 = UCHU_WRAP.try_write().unwrap();
+            uchu_w2.set_movement(mv);
+        }
+    );
 }
 
 /**

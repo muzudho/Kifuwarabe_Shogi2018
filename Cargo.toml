@@ -13,4 +13,4 @@ rev = "fb4e862195e29a60cfc3d3a9bc2f98db6586acf6"
 
 [dependencies.kifuwarabe_usi]
 git = "https://github.com/muzudho/rust_kifuwarabe_usi.git"
-rev = "6f7347653200b3ff21c47833c268a8cebb9d283b"
+rev = "091ea03e5ef06a985355e24955c0d9739d772768"
