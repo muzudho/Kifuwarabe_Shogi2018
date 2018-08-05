@@ -1,72 +1,8 @@
 use kifuwarabe_usi::*;
-//use memory::uchu::*;
 use models::movement::*;
 use teigi::constants::*;
-//use teigi::conv::*;
-use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
-use UCHU_WRAP;
 
-/*
-/// 関数を返す関数
-fn create_movement_function() -> fn(
-    source_file:i8,
-    source_rank:i8,
-    destination_file:i8,
-    destination_rank:i8,
-    drop:PieceType,
-    promotion:bool
-    ) -> bool
-{
-    |source_file,
-    source_rank,
-    destination_file,
-    destination_rank,
-    drop:PieceType,
-    promotion|
-    {
-        // 読取成否、移動元。
-        use kifuwarabe_usi::PieceType;
-        let src_ms;
-        match drop {
-            PieceType::Space=> {
-                if source_file == -1 {
-                    // 読取失敗時、または 指し手読取終了時にここを通るぜ☆（＾～＾）
-                    return false;
-                }
-                src_ms = suji_dan_to_ms(source_file, source_rank);
-            },
-            _=> {
-                // 打のとき。
-                src_ms = 0;
-            },
-        }
-
-        // グローバル変数に内容をセット。
-        {
-            // デッドロックしてしまう。
-            let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-            uchu_w.set_sasite_src(src_ms);
-            uchu_w.set_sasite_drop(pt_to_kms(&drop));
-            uchu_w.set_sasite_dst(suji_dan_to_ms(destination_file, destination_rank));
-            uchu_w.set_sasite_pro(promotion);
-            uchu_w.teme+=1;
-        }
-
-        true
-    }
-}
-*/
-/*
-type MovementCallback = fn(
-    source_file:i8,
-    source_rank:i8,
-    destination_file:i8,
-    destination_rank:i8,
-    drop:PieceType,
-    promotion:bool
-    ) -> bool;
-*/
 pub struct PositionParser{
     //movement_callback: MovementCallback,
 }
@@ -82,10 +18,11 @@ impl PositionParser{
     /// position コマンド読取
     pub fn read_position(
         &self,
-        line:&String,
-        callback0: fn([Piece;100]),
-        callback1: fn(bool, Movement)
-        ){
+        line: &String,
+        callback0: fn([i8; HAND_PIECE_ARRAY_LN]),
+        callback1: fn([Piece;100]),
+        callback2: fn(bool, Movement)
+    ){
 
         let mut starts = 0;
 
@@ -130,14 +67,8 @@ impl PositionParser{
             }
 
             // 持ち駒数。増減させたいので、u8 ではなく i8。
-            let hand_count_arr = parse_hand_piece(line, &mut starts, len);
-            // 持ち駒数コピー。
-            let mut i=0;
-            for item in HAND_PIECE_ARRAY.iter() {
-                let km = pc_to_km(item);
-                UCHU_WRAP.try_write().unwrap().set_ky0_mg(km, hand_count_arr[i]);
-                i+=1;
-            }
+            let hand_count_arr : [i8; HAND_PIECE_ARRAY_LN] = parse_hand_piece(line, &mut starts, len);
+            callback0(hand_count_arr);
 
 
             if 2<(len-starts) && &line[starts..(starts+3)]==" 1 "{
@@ -148,7 +79,7 @@ impl PositionParser{
         }
 
         // 盤を返す。
-        callback0(ban);
+        callback1(ban);
 
         if 4<(len-starts) && &line[starts..(starts+5)]=="moves"{
             starts += 5;
@@ -162,10 +93,10 @@ impl PositionParser{
         loop {
             let (successful, umov) = parse_movement(line, &mut starts, len);
             if successful {
-                callback1(successful, usi_to_movement(&umov));
+                callback2(successful, usi_to_movement(&umov));
             } else {
                 // 読取終了時(失敗時)、最後に投了を送るぜ☆（＾～＾）
-                callback1(successful, Movement::new());
+                callback2(successful, Movement::new());
                 break;
             }
         } // loop

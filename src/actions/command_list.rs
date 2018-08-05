@@ -77,6 +77,15 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
     let position_parser = tusin::us2::PositionParser::new();
     // positionコマンドの読取を丸投げ
     position_parser.read_position(&row,
+        |hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|{
+            // 持ち駒数コピー。
+            let mut i=0;
+            for item in HAND_PIECE_ARRAY.iter() {
+                let km = pc_to_km(item);
+                UCHU_WRAP.try_write().unwrap().set_ky0_mg(km, hand_count_arr[i]);
+                i+=1;
+            }
+        },
         |ban: [Piece;100]|{
             // 盤面コピー
             for file in SUJI_1..SUJI_10 {
@@ -137,7 +146,16 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
 
     let position_parser = tusin::us2::PositionParser::new();
     position_parser.read_position(&KY1.to_string(),
-        |ban: [Piece;100]|{
+            |hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|{
+                // 持ち駒数コピー。
+                let mut i=0;
+                for item in HAND_PIECE_ARRAY.iter() {
+                    let km = pc_to_km(item);
+                    UCHU_WRAP.try_write().unwrap().set_ky0_mg(km, hand_count_arr[i]);
+                    i+=1;
+                }
+            },
+            |ban: [Piece;100]|{
             // 盤面コピー
             for file in SUJI_1..SUJI_10 {
                 for rank in DAN_1..DAN_10 {
