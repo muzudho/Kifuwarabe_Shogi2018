@@ -18,7 +18,6 @@ use syazo::sasite_seisei::*;
 use teigi::constants::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
-use tusin;
 use tusin::us_conv::*;
 
 use UCHU_WRAP;
@@ -74,9 +73,8 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
     // 局面をクリアー。手目も 0 に戻します。
     UCHU_WRAP.try_write().unwrap().clear_ky01();
 
-    let position_parser = tusin::us2::PositionParser::new();
     // positionコマンドの読取を丸投げ
-    position_parser.read_position(&row,
+    parse_position(&row,
         |hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|{
             // 持ち駒数コピー。
             let mut i=0;
@@ -106,9 +104,17 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
                 UCHU_WRAP.try_write().unwrap().copy_ky0_to_ky1();            
             }
         },
-        |successful, mv|{
+        |successful, usi_movement|{
+            let movement;
+            if successful {
+                movement = usi_to_movement(&usi_movement);
+            } else {
+                // 投了。
+                movement = Movement::new();
+            }
+
             let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-            uchu_w.set_movement(mv);
+            uchu_w.set_movement(movement);
             if successful {
                 // 入っている指し手の通り指すぜ☆（＾～＾）
                 let teme = uchu_w.teme;
@@ -144,8 +150,7 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 局面をクリアー。手目も 0 に戻します。
     UCHU_WRAP.try_write().unwrap().clear_ky01();
 
-    let position_parser = tusin::us2::PositionParser::new();
-    position_parser.read_position(&KY1.to_string(),
+    parse_position(&KY1.to_string(),
             |hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|{
                 // 持ち駒数コピー。
                 let mut i=0;
@@ -175,9 +180,17 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
                 UCHU_WRAP.try_write().unwrap().copy_ky0_to_ky1();            
             }
         },
-        |successful, mv|{
+        |successful, usi_movement|{
+            let movement;
+            if successful {
+                movement = usi_to_movement(&usi_movement);
+            } else {
+                // 投了。
+                movement = Movement::new();
+            }
+
             let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-            uchu_w.set_movement(mv);
+            uchu_w.set_movement(movement);
             if successful {
                 // 入っている指し手の通り指すぜ☆（＾～＾）
                 let teme = uchu_w.teme;

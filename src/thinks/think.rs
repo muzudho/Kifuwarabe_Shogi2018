@@ -13,8 +13,6 @@ use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
 use tusin::us_conv::*;
 
-use UCHU_WRAP;
-
 /**
  * 現局面での最善手を返すぜ☆（*＾～＾*）
  */
@@ -37,8 +35,10 @@ pub fn think()->Movement{
 
     filtering_ss_except_oute(&mut ss_hashset);
 
+    /*
     // 現局面を見て、ビジョンを作り直せだぜ☆（＾～＾）
     &UCHU_WRAP.try_write().unwrap().remake_visions();
+     */
 
     /*
     // 楽観筋
@@ -65,11 +65,11 @@ pub fn think()->Movement{
         // 投了
         return Movement::new();
     } else {
+        // 複数の手があれば、ランダムに1つに絞り込むぜ☆（＾～＾）
         let index = rand::thread_rng().gen_range(0,ss_hashset.len());
         let mut i = 0;
         for ss_hash in ss_hashset {
             if i==index {
-                //let result : Movement = ss.clone();
                 let ss = Movement::from_hash(ss_hash);
                 g_writeln(&format!("info solution:{}.", movement_to_usi(&ss) ));
                 return ss;

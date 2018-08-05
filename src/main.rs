@@ -37,6 +37,7 @@ mod teigi;
 mod tusin;
 
 use actions::command_list::*;
+use memory::ky::*;
 use memory::uchu::*;
 
 
@@ -44,6 +45,9 @@ use memory::uchu::*;
 use std::sync::RwLock;
 lazy_static! {
     static ref UCHU_WRAP: RwLock<Uchu> = RwLock::new(Uchu::new());
+
+    // 初期局面
+    static ref INI_POSITION_WRAP: RwLock<Kyokumen> = RwLock::new(Kyokumen::new());
 }
 
 fn main() {

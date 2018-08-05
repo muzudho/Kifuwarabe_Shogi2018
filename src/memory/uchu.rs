@@ -8,6 +8,7 @@ extern crate rand;
 use rand::Rng;
 
 use config::*;
+use INI_POSITION_WRAP;
 use memory::ky::*;
 use memory::number_board::*;
 use models::movement::*;
@@ -94,8 +95,6 @@ pub struct KyHashSeed {
 pub struct Uchu{
     // 対話モード
     pub dialogue_mode : bool,
-    // 初期局面
-    pub ky0 : Kyokumen,
     // 現局面
     pub ky : Kyokumen,
     // 局面ハッシュ種
@@ -128,8 +127,6 @@ impl Uchu{
     pub fn new()->Uchu{
         Uchu{
             dialogue_mode : false,
-            // 初期局面
-            ky0 : Kyokumen::new(),
             // 現局面
             ky : Kyokumen::new(),
             ky_hash_seed : KyHashSeed{
@@ -249,7 +246,11 @@ impl Uchu{
      * 手目も 0 に戻します。
      */
     pub fn clear_ky01(&mut self){
-        self.ky0.clear();
+
+        {
+            INI_POSITION_WRAP.try_write().unwrap().clear();
+        }
+
         self.ky.clear();
         self.set_teme(0);
     }
@@ -257,13 +258,19 @@ impl Uchu{
      * 初期局面を、現局面にコピーします
      */
     pub fn copy_ky0_to_ky1(&mut self){
-        // 盤上
-        for i_ms in 0..BAN_SIZE{
-            self.ky.set_km_by_ms(i_ms, self.ky0.get_km_by_ms(i_ms));
-        }
-        // 持ち駒
-        for i_mg in 0..KM_LN{
-            self.ky.mg[i_mg] = self.ky0.mg[i_mg];
+        // グローバル変数を使う。
+        {
+            let ini_pos =  INI_POSITION_WRAP.try_read().unwrap();
+            // 盤上
+            for i_ms in 0..BAN_SIZE{
+
+                self.ky.set_km_by_ms(i_ms, ini_pos.get_km_by_ms(i_ms));
+            }
+
+            // 持ち駒
+            for i_mg in 0..KM_LN{
+                self.ky.mg[i_mg] = ini_pos.mg[i_mg];
+            }
         }
     }
 
@@ -275,10 +282,16 @@ impl Uchu{
      * 初期局面の盤上に駒の位置を設定するもの
      */
     pub fn set_ky0_ban_km(&mut self, suji:i8, dan:i8, km:Koma){
-        self.ky0.set_km_by_ms(suji_dan_to_ms(suji, dan), km);
+        // グローバル変数を使う。
+        {
+            INI_POSITION_WRAP.try_write().unwrap().set_km_by_ms(suji_dan_to_ms(suji, dan), km);
+        }
     }
     pub fn set_ky0_mg(&mut self, km:Koma, maisu:i8){
-        self.ky0.mg[km as usize] = maisu;
+        // グローバル変数を使う。
+        {
+            INI_POSITION_WRAP.try_write().unwrap().mg[km as usize] = maisu;
+        }
     }
     pub fn get_jiai_by_km(&self, km:&Koma ) -> Jiai {
         let (sn,_kms) = km_to_sn_kms( km );
@@ -413,9 +426,12 @@ impl Uchu{
      * デカルト座標の第一象限と x,y 方向が一致するメリットがあるぜ☆（＾～＾）
      */
     pub fn kaku_ky(&self, num:&KyNums)->String{
+        // グローバル変数を使う場合がある。
+        let ini_position = INI_POSITION_WRAP.try_read().unwrap();
+
         let ky = match *num {
             KyNums::Current => &self.ky,
-            KyNums::Start => &self.ky0,
+            KyNums::Start => &ini_position,
         };
 
         // 局面表示
@@ -552,6 +568,7 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
         }
     }
 
+    #[allow(dead_code)]
     pub fn remake_visions(&mut self) {
         for sn in SN_ARRAY.iter() {
             // 全部忘れる☆（＾～＾）
@@ -565,7 +582,12 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
     pub fn create_ky0_hash( &self ) -> u64 {
 
         let ky_hash_seed = &self.ky_hash_seed;
-        let mut hash = self.ky0.create_hash(&ky_hash_seed);
+
+        let mut hash : u64;
+        // グローバル変数を使う。
+        {
+            hash = INI_POSITION_WRAP.try_read().unwrap().create_hash(&ky_hash_seed);
+        }
 
         // 手番ハッシュ（後手固定）
         hash ^= self.ky_hash_seed.sn[SN_GO];

@@ -20,9 +20,3 @@ pub const KY1 : &'static str = "position startpos";
  */
 #[allow(dead_code)]
 pub const KY2 : &'static str = "position sfen lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1 moves 5a6b 7g7f 3a3b";
-
-/**
- * USIプロトコル表記: 平手初期局面（の盤上の駒配置部分のみ）
- */
-pub const STARTPOS_LN :usize = 57;
-pub const STARTPOS : &'static str = "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL";
