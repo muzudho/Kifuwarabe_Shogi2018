@@ -10,6 +10,7 @@ use rand::Rng;
 use config::*;
 use memory::ky::*;
 use memory::number_board::*;
+use models::movement::*;
 use thinks::visions::vision_tree::*;
 use teigi;
 use teigi::conv::*;
@@ -360,7 +361,7 @@ impl Uchu{
         let mut s = String::new();
         for teme in 0..self.teme {
             let ss = &self.kifu[teme];
-            s.push_str(&format!("[{}] {}", teme, ss));
+            s.push_str(&format!("[{}] {}", teme, movement_to_usi(ss)));
         }
         s
     }

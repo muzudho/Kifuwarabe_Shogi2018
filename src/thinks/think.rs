@@ -7,6 +7,7 @@ use rand::Rng;
 use std::collections::HashSet;
 
 use memory::uchu::*;
+use models::movement::*;
 use searchs::searcher::*;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
@@ -37,15 +38,15 @@ pub fn think()->Movement{
     filtering_ss_except_oute(&mut ss_hashset);
 
     // 現局面を見て、ビジョンを作り直せだぜ☆（＾～＾）
-    &UCHU_WRAP.write().unwrap().remake_visions();
+    &UCHU_WRAP.try_write().unwrap().remake_visions();
 
     /*
     // 楽観筋
     for sn in SN_ARRAY.iter() {
         let ai_sn = hanten_sn( sn );
         // 相手の　らいおん　の位置を覚える
-        let ai_ms_r = UCHU_WRAP.read().unwrap().ky.ms_r[sn_to_num(&ai_sn)];
-        insert_rakkansuji(&sn, &mut UCHU_WRAP.write().unwrap().vision_tree_by_sn[sn_to_num(sn)], ai_ms_r);
+        let ai_ms_r = UCHU_WRAP.try_read().unwrap().ky.ms_r[sn_to_num(&ai_sn)];
+        insert_rakkansuji(&sn, &mut UCHU_WRAP.try_write().unwrap().vision_tree_by_sn[sn_to_num(sn)], ai_ms_r);
     }
     // TODO 楽観筋はまだ使ってない☆（＾～＾）
     */
@@ -70,7 +71,7 @@ pub fn think()->Movement{
             if i==index {
                 //let result : Movement = ss.clone();
                 let ss = Movement::from_hash(ss_hash);
-                g_writeln(&format!("info solution:{}.", ss ));
+                g_writeln(&format!("info solution:{}.", movement_to_usi(&ss) ));
                 return ss;
             }
             i+=1;

@@ -16,15 +16,15 @@ use UCHU_WRAP;
  */
 pub fn is_s()->bool{
     // 相手玉の位置
-    let ms_r = UCHU_WRAP.read().unwrap().get_ms_r(&Jiai::Ai);
+    let ms_r = UCHU_WRAP.try_read().unwrap().get_ms_r(&Jiai::Ai);
 
     let p_r = ms_to_p( ms_r );
     let p_south_r = p_r.to_south();
     if !p_in_ban(&p_south_r){ return true; }
 
     let ms_south_r = p_to_ms( &p_south_r );
-    let km = UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_south_r );
-    let jiai_km = UCHU_WRAP.read().unwrap().get_jiai_by_km( &km );
+    let km = UCHU_WRAP.try_read().unwrap().ky.get_km_by_ms( ms_south_r );
+    let jiai_km = UCHU_WRAP.try_read().unwrap().get_jiai_by_km( &km );
     if !match_jiai( &jiai_km, &Jiai::Ji ) { return true; }
 
     g_writeln(&format!("info string south of My raion {} = {}. jiai_km={}.", ms_r, km, jiai_km ));
@@ -83,7 +83,7 @@ pub fn is_atamakin(
 ) -> bool {
 
     // 相手らいおんのマス
-    let ms_ai_r = UCHU_WRAP.read().unwrap().get_ms_r( &Jiai::Ai );
+    let ms_ai_r = UCHU_WRAP.try_read().unwrap().get_ms_r( &Jiai::Ai );
 
     // らいおん以外の相手の駒種類
     let mut kms_set_ai_c_r = KmsSyugo::new_all();

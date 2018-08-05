@@ -441,7 +441,7 @@ impl KmSyugo {
      * 自分相手
      */
     pub fn new_jiai(&self, jiai:&Jiai) -> KmSyugo {
-        let sn0 = UCHU_WRAP.read().unwrap().get_teban(&jiai);
+        let sn0 = UCHU_WRAP.try_read().unwrap().get_teban(&jiai);
         let mut num_syugo1 : HashSet<usize> = HashSet::new();
         for km in KM_ARRAY.iter() {
             let (sn1,_kms) = km_to_sn_kms( km );

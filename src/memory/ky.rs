@@ -8,11 +8,11 @@
  * 盤を想像すること☆（＾～＾）！
  */
 
+use memory::uchu::*;
+use models::movement::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use teigi::shogi_syugo::Koma::*;
-use tusin::us_conv::*;
-use memory::uchu::*;
 
 // 局面
 pub struct Kyokumen{

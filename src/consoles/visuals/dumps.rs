@@ -2,11 +2,12 @@
 /**
  * コレクションの内容をダンプ（全部見る）とかだぜ☆（＾～＾）
  */
+use memory::uchu::*;
+use models::movement::*;
+use std::collections::HashSet;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
-use std::collections::HashSet;
 use tusin::us_conv::*;
-use memory::uchu::*;
 
 /******
  * 升 *
@@ -61,7 +62,7 @@ pub fn hyoji_ss_hashset( ss_hashset:&HashSet<u64> ){
     let mut vec_ss_str = Vec::new();
     for ss_hash in ss_hashset {
         let ss = Movement::from_hash( *ss_hash );
-        let ss_str = format!( "{}", ss );
+        let ss_str = format!( "{}", movement_to_usi(&ss) );
         vec_ss_str.push( ss_str );
     }
     //vec_ss_str.sort();

@@ -12,6 +12,8 @@ extern crate kifuwarabe_shell;
 use kifuwarabe_shell::TokenMapping;
 use kifuwarabe_shell::Shell;
 
+extern crate kifuwarabe_usi;
+
 ///
 /// Rust言語の mod や ソース置き場の説明
 ///      「Rust のモジュールシステム」
@@ -26,6 +28,7 @@ mod kasetu;
 mod meidai;
 mod mediators;
 mod memory;
+mod models;
 mod searchs;
 mod syazo;
 mod thinks;
@@ -46,7 +49,7 @@ lazy_static! {
 fn main() {
 
     // 宇宙爆誕。
-    UCHU_WRAP.write().unwrap().big_bang();
+    UCHU_WRAP.try_write().unwrap().big_bang();
     
     // コマンド リスト。
     let mut shell = Shell::new();

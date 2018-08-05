@@ -31,7 +31,7 @@ impl Searcher{
         // | 王手放置漏れ回避対策 |
         // +----------------------+
 
-        let mut uchu = UCHU_WRAP.write().unwrap();
+        let mut uchu = UCHU_WRAP.try_write().unwrap();
 
         // ゼロ・リセット
         // 駒別に用意した盤を使った、利き数。

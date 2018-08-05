@@ -3,11 +3,11 @@
  */
 
 use consoles::asserts::*;
+use models::movement::*;
 use teigi::shogi_syugo::*;
 use teigi::conv::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
-use tusin::us_conv::*;
 
 use UCHU_WRAP;
 
@@ -26,10 +26,10 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64> ) {
     for dan_src in 1..10 {
         for suji_src in 1..10 {
             let ms_src = suji_dan_to_ms( suji_src, dan_src );
-            let km_src = UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_src );
+            let km_src = UCHU_WRAP.try_read().unwrap().ky.get_km_by_ms( ms_src );
             let sn = km_to_sn(&km_src);
 
-            if match_sn( &sn, &UCHU_WRAP.read().unwrap().get_teban(&Jiai::Ji) ) {
+            if match_sn( &sn, &UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji) ) {
                 // 手番の駒
 
                 let mut dst_hashset : HashSet<umasu> = HashSet::new();
@@ -72,15 +72,15 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64> ) {
     for dan_dst in 1..10 {
         for suji_dst in 1..10 {
             let ms_dst = suji_dan_to_ms( suji_dst, dan_dst );
-            let km_dst = UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms_dst );
+            let km_dst = UCHU_WRAP.try_read().unwrap().ky.get_km_by_ms( ms_dst );
             match km_dst {
                 Koma::Kara => {
                     // 駒が無いところに打つ
 
                     let mut da_kms_hashset = HashSet::new();
                     for kms_motigoma in MGS_ARRAY.iter() {
-                        let km_motigoma = sn_kms_to_km( &UCHU_WRAP.read().unwrap().get_teban(&Jiai::Ji), kms_motigoma );
-                        if 0<UCHU_WRAP.read().unwrap().ky.get_mg( &km_motigoma ) {
+                        let km_motigoma = sn_kms_to_km( &UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), kms_motigoma );
+                        if 0<UCHU_WRAP.try_read().unwrap().ky.get_mg( &km_motigoma ) {
                             // 駒を持っていれば
                             insert_da_kms_by_ms_km     ( ms_dst, &km_motigoma, &mut da_kms_hashset );
                         }
@@ -114,7 +114,7 @@ pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut H
     let (sn,_kms_dst) = km_to_sn_kms( &km_dst );
 
     // 移動先に自駒があれば、指し手は何もない。終わり。
-    if match_sn( &UCHU_WRAP.read().unwrap().ky.get_sn_by_ms(ms_dst), &sn ) {
+    if match_sn( &UCHU_WRAP.try_read().unwrap().ky.get_sn_by_ms(ms_dst), &sn ) {
         return;
     }
 
@@ -130,7 +130,7 @@ pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut H
     // | 盤上（成らず） |
     // +----------------+
     // 現局面を読取専用で取得し、ロック。
-    let gen_ky = &UCHU_WRAP.read().unwrap().ky;
+    let gen_ky = &UCHU_WRAP.try_read().unwrap().ky;
     insert_narazu_src_by_ms_km  (&gen_ky, ms_dst, &km_dst, &mut mv_src_hashset);
     for ms_src in &mv_src_hashset{
         assert_banjo_ms(
@@ -178,7 +178,7 @@ pub fn insert_ss_by_ms_km_on_da(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut Hash
     let (sn,_kms_dst) = km_to_sn_kms( &km_dst );
 
     // 移動先に自駒があれば、指し手は何もない。終わり。
-    if match_sn( &UCHU_WRAP.write().unwrap().ky.get_sn_by_ms(ms_dst), &sn ) {
+    if match_sn( &UCHU_WRAP.try_write().unwrap().ky.get_sn_by_ms(ms_dst), &sn ) {
         return;
     }
 

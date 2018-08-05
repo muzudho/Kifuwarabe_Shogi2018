@@ -6,10 +6,11 @@
 use consoles::visuals::dumps::*;
 use memory::uchu::*;
 use meidai::math_meidai::*;
-use teigi::conv::*;
-use syazo::sasite_element::*;
-use thinks::randommove;
+use models::movement::*;
 use std::collections::HashSet;
+use syazo::sasite_element::*;
+use teigi::conv::*;
+use thinks::randommove;
 use teigi::geometries::geo_teigi::*;
 use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
@@ -26,7 +27,7 @@ pub fn test( line:&String, starts:&mut usize, len:usize) {
     g_writeln( &format!("test starts={} len={}", *starts, len));
 
     // 現局面を読取専用で取得し、ロック。
-    let gen_ky = &UCHU_WRAP.read().unwrap().ky;
+    let gen_ky = &UCHU_WRAP.try_read().unwrap().ky;
 
     if 4<(len-*starts) && &line[*starts..*starts+5] == "mvsrc" {
         *starts += 5;
@@ -34,7 +35,7 @@ pub fn test( line:&String, starts:&mut usize, len:usize) {
         // 駒の移動元升
         g_writeln( "駒の移動元升");
         let kms = randommove::rnd_kms();
-        let km = sn_kms_to_km( &UCHU_WRAP.read().unwrap().get_teban(&Jiai::Ji), kms );
+        let km = sn_kms_to_km( &UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), kms );
         let ms_dst = randommove::rnd_ms();
         g_writeln( &format!("kms={} km={} ms_dst={}",kms,km,ms_dst) );
         let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
@@ -49,7 +50,7 @@ pub fn test( line:&String, starts:&mut usize, len:usize) {
         *starts += 4;
         // 移動後の駒
         let kms = randommove::rnd_kms();
-        let km = sn_kms_to_km( &UCHU_WRAP.read().unwrap().get_teban(&Jiai::Ji), &kms );
+        let km = sn_kms_to_km( &UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), &kms );
         // 移動先の升、および　不成駒／成駒
         let ms_dst = randommove::rnd_ms();
         let pro_dst = randommove::rnd_bool();
@@ -68,7 +69,7 @@ pub fn test( line:&String, starts:&mut usize, len:usize) {
             ss.drop = KmSyurui::Kara;
             break;
         }
-        g_writeln( &format!( "指し手にすると={}", ss) );
+        g_writeln( &format!( "指し手にすると={}", movement_to_usi(&ss) ) );
 
     } else if 0<(len-*starts) && &line[*starts..*starts+1] == "1" {
         *starts += 1;
@@ -322,8 +323,8 @@ pub fn test( line:&String, starts:&mut usize, len:usize) {
 
     } else {
         //g_writeln( &format!( "未定義のテスト「{}」", &line[*starts..len-1] ) );
-        //UCHU_WRAP.write().unwrap().push_command( &"position startpos moves 6i5h 8c8d 9i9h 8d8e 3g3f 8e8f 5h4h 8f8g+ 1i1h 8g9h 2g2f 9h8h 9g9f 8h7i 2i3g 8b8i+ 2f2e 7i7h".to_string() );
-        //UCHU_WRAP.write().unwrap().push_command( &"ky".to_string() );
-        //g_writeln( &UCHU_WRAP.write().unwrap().pop_command() );
+        //UCHU_WRAP.try_write().unwrap().push_command( &"position startpos moves 6i5h 8c8d 9i9h 8d8e 3g3f 8e8f 5h4h 8f8g+ 1i1h 8g9h 2g2f 9h8h 9g9f 8h7i 2i3g 8b8i+ 2f2e 7i7h".to_string() );
+        //UCHU_WRAP.try_write().unwrap().push_command( &"ky".to_string() );
+        //g_writeln( &UCHU_WRAP.try_write().unwrap().pop_command() );
     }
 }

@@ -7,6 +7,7 @@ use std::collections::HashSet;
 use consoles::asserts::*;
 use memory::uchu::*;
 use meidai::math_meidai::*;
+use models::movement::*;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
 use teigi::conv::*;
@@ -128,12 +129,12 @@ impl KomatoriResult{
                 // スライダーのいる筋の上で動いても、逃げたことにはならないぜ☆（＾～＾）
                 match match_argangle4( &argangle4a, &argangle4b ) {
                     MatchingResult::Unmatched => {
-                        g_writeln(&format!("info ss={} evaluated in slider.", ss ));
+                        g_writeln(&format!("info ss={} evaluated in slider.", movement_to_usi(ss) ));
                         // スライダーから逃げても、ひよこの利きに飛び込むことはあるが……☆
                         return KomatoriResultResult::NoneMoved
                     },
                     _ => {
-                        g_writeln(&format!("info ss={} in slider attack.", ss ));                    
+                        g_writeln(&format!("info ss={} in slider attack.", movement_to_usi(ss) ));                    
                     },
                 }
             }
@@ -190,7 +191,9 @@ pub fn lookup_banjo_catch(sn:&Sengo, ms_target:umasu)->HashSet<u64> {
             assert_banjo_ms(
                 ss.source,
                 &format!("(123)Ｌookup_banjo_catch ss.source /  ms_target={} km_dst={} ss={}"
-                    , ms_target, km_dst, ss)
+                    , ms_target, km_dst,
+                    movement_to_usi(&ss)
+                    )
             );
             
             let oute_result = KomatoriResult{

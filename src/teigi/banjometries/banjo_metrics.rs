@@ -8,9 +8,9 @@ use teigi::shogi_syugo::*;
 use UCHU_WRAP;
 
 pub fn is_ji_km_by_ms(ms:umasu) -> bool {
-    let km = UCHU_WRAP.read().unwrap().ky.get_km_by_ms( ms );
+    let km = UCHU_WRAP.try_read().unwrap().ky.get_km_by_ms( ms );
     let (sn,_kms) = km_to_sn_kms( &km );
-    match_sn( &sn, &UCHU_WRAP.read().unwrap().get_teban(&Jiai::Ji) )
+    match_sn( &sn, &UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji) )
 }
 
 // TODO

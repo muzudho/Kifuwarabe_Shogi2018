@@ -8,6 +8,7 @@ use consoles;
 use consoles::unit_test::*;
 use consoles::visuals::dumps::*;
 use consoles::visuals::title::*;
+use kifuwarabe_usi::*;
 use memory::uchu::*;
 use rand::Rng;
 use thinks;
@@ -26,7 +27,7 @@ use UCHU_WRAP;
 
 pub fn do_other(_row: &String, _starts:&mut usize, _res:&mut Response){
     // 書込許可モードで、ロック。
-    let mut uchu_w = UCHU_WRAP.write().unwrap();
+    let mut uchu_w = UCHU_WRAP.try_write().unwrap();
     if !&uchu_w.dialogue_mode {
         // 空打ち１回目なら、対話モードへ☆（＾～＾）
         uchu_w.dialogue_mode = true;
@@ -46,7 +47,7 @@ pub fn do_other(_row: &String, _starts:&mut usize, _res:&mut Response){
  */
 pub fn do_kmugokidir(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 読取許可モードで、ロック。
-    let uchu_r = UCHU_WRAP.read().unwrap();
+    let uchu_r = UCHU_WRAP.try_read().unwrap();
 
     // 駒の動きの移動元として有りえる方角
     let kms = thinks::randommove::rnd_kms();
@@ -60,7 +61,7 @@ pub fn do_kmugokidir(_row: &String, _starts:&mut usize, _res:&mut Response) {
  */
 pub fn do_usinewgame(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 書込許可モードで、ロック。
-    let mut uchu_w = UCHU_WRAP.write().unwrap();
+    let mut uchu_w = UCHU_WRAP.try_write().unwrap();
     
     uchu_w.clear_ky01();
 }
@@ -69,8 +70,12 @@ pub fn do_usinewgame(_row: &String, _starts:&mut usize, _res:&mut Response) {
  * USIプロトコル参照。
  */
 pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
+    // 局面をクリアー。手目も 0 に戻します。
+    UCHU_WRAP.try_write().unwrap().clear_ky01();
+
+    let position_parser = tusin::us2::PositionParser::new();
     // positionコマンドの読取を丸投げ
-    tusin::us_conv::read_position(&row);
+    position_parser.read_position(&row);
 }
 
 /**
@@ -85,7 +90,7 @@ pub fn do_isready(_row: &String, _starts:&mut usize, _res:&mut Response) {
  */
 pub fn do_kmugoki(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 読取許可モードで、ロック。
-    let uchu_r = UCHU_WRAP.read().unwrap();
+    let uchu_r = UCHU_WRAP.try_read().unwrap();
 
     // 駒の動きを出力
     uchu_r.hyoji_kmugoki();
@@ -95,7 +100,11 @@ pub fn do_kmugoki(_row: &String, _starts:&mut usize, _res:&mut Response) {
  * 平手初期局面にする。
  */
 pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
-    tusin::us_conv::read_position(&KY1.to_string());
+    // 局面をクリアー。手目も 0 に戻します。
+    UCHU_WRAP.try_write().unwrap().clear_ky01();
+
+    let position_parser = tusin::us2::PositionParser::new();
+    position_parser.read_position(&KY1.to_string());
 }
 
 /**
@@ -157,7 +166,7 @@ pub fn do_teigi_conv(_row: &String, _starts:&mut usize, _res:&mut Response) {
  */
 pub fn do_hash(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 読取許可モードで、ロック。
-    let uchu_r = UCHU_WRAP.read().unwrap();
+    let uchu_r = UCHU_WRAP.try_read().unwrap();
 
     let s = uchu_r.kaku_ky_hash();
     g_writeln( &s );
@@ -168,7 +177,7 @@ pub fn do_hash(_row: &String, _starts:&mut usize, _res:&mut Response) {
  */
 pub fn do_kifu(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 読取許可モードで、ロック。
-    let uchu_r = UCHU_WRAP.read().unwrap();
+    let uchu_r = UCHU_WRAP.try_read().unwrap();
 
     let s = uchu_r.kaku_kifu();
     g_writeln( &s );
@@ -194,7 +203,7 @@ pub fn do_rand(_row: &String, _starts:&mut usize, _res:&mut Response) {
  */
 pub fn do_same(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 読取許可モードで、ロック。
-    let uchu_r = UCHU_WRAP.read().unwrap();
+    let uchu_r = UCHU_WRAP.try_read().unwrap();
 
     let count = uchu_r.count_same_ky();
     g_writeln( &format!("同一局面調べ count={}", count));
@@ -216,7 +225,7 @@ pub fn do_test(row: &String, starts:&mut usize, _res:&mut Response) {
  */
 pub fn do_undo(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 書込許可モードで、ロック。
-    let mut uchu_w = UCHU_WRAP.write().unwrap();
+    let mut uchu_w = UCHU_WRAP.try_write().unwrap();
 
     if !uchu_w.undo_ss() {
         g_writeln( &format!("teme={} を、これより戻せません", uchu_w.teme ) );
@@ -227,21 +236,30 @@ pub fn do_undo(_row: &String, _starts:&mut usize, _res:&mut Response) {
  * 指し手を入れる。
  */
 pub fn do_do(row: &String, starts:&mut usize, _res:&mut Response) {
-    // 書込許可モードで、ロック。
-    let mut uchu_w = UCHU_WRAP.write().unwrap();
-
     // 1行の文字数です。
     let len = row.chars().count();
 
     // コマンド読取。棋譜に追加され、手目も増える
-    if read_sasite(&mut* uchu_w, &row, starts, len) {
-        // 手目を戻す
-        uchu_w.teme -= 1;
-        // 入っている指し手の通り指すぜ☆（＾～＾）
-        let teme = uchu_w.teme;
-        let ss = uchu_w.kifu[ teme ];
-        uchu_w.do_ss( &ss );
+    let (successful, umov) = parse_movement(&row, starts, len);
+    if successful {
+        let mov = usi_to_movement(&umov);
+
+        // グローバル変数に内容をセット。
+        {
+            // 書込許可モードで、ロック。
+            let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+            uchu_w.set_sasite_src(mov.source);
+            uchu_w.set_sasite_drop(mov.drop);
+            uchu_w.set_sasite_dst(mov.destination);
+            uchu_w.set_sasite_pro(mov.promotion);
+
+            // 入っている指し手の通り指すぜ☆（＾～＾）
+            let teme = uchu_w.teme;
+            let ss = uchu_w.kifu[ teme ];
+            uchu_w.do_ss( &ss );
+        }
     }
+    // 読取失敗時、または 指し手読取終了時は successfule の外を通るぜ☆（＾～＾）
 }
 
 /**
@@ -249,7 +267,7 @@ pub fn do_do(row: &String, starts:&mut usize, _res:&mut Response) {
  */
 pub fn do_ky0(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 読取許可モードで、ロック。
-    let uchu_r = UCHU_WRAP.read().unwrap();
+    let uchu_r = UCHU_WRAP.try_read().unwrap();
 
     let s = uchu_r.kaku_ky( &KyNums::Start );
     g_writeln( &s );
@@ -269,7 +287,7 @@ pub fn do_go(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // go btime 40000 wtime 50000 binc 10000 winc 10000
     let bestmove = think();
     // 例： bestmove 7g7f
-    g_writeln(&format!("bestmove {}", bestmove));
+    g_writeln(&format!("bestmove {}", movement_to_usi(&bestmove)));
 }
 
 /**
@@ -277,7 +295,7 @@ pub fn do_go(_row: &String, _starts:&mut usize, _res:&mut Response) {
  */
 pub fn do_ky(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 読取許可モードで、ロック。
-    let uchu_r = UCHU_WRAP.read().unwrap();
+    let uchu_r = UCHU_WRAP.try_read().unwrap();
 
     let s = uchu_r.kaku_ky( &KyNums::Current );
     g_writeln( &s );            
