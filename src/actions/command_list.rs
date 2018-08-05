@@ -9,6 +9,7 @@ use consoles::unit_test::*;
 use consoles::visuals::dumps::*;
 use consoles::visuals::title::*;
 use kifuwarabe_usi::*;
+use models::movement::*;
 use memory::uchu::*;
 use rand::Rng;
 use thinks;
@@ -240,26 +241,30 @@ pub fn do_do(row: &String, starts:&mut usize, _res:&mut Response) {
     let len = row.chars().count();
 
     // コマンド読取。棋譜に追加され、手目も増える
+    let mov;
     let (successful, umov) = parse_movement(&row, starts, len);
     if successful {
-        let mov = usi_to_movement(&umov);
+        mov = usi_to_movement(&umov);
+    } else {
+        // 読取失敗時、または 指し手読取終了時は successfule の外を通るぜ☆（＾～＾）
+        mov = Movement::new();
+    }
+    // グローバル変数に内容をセット。
+    {
+        // 書込許可モードで、ロック。
+        let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+        uchu_w.set_sasite_src(mov.source);
+        uchu_w.set_sasite_drop(mov.drop);
+        uchu_w.set_sasite_dst(mov.destination);
+        uchu_w.set_sasite_pro(mov.promotion);
 
-        // グローバル変数に内容をセット。
-        {
-            // 書込許可モードで、ロック。
-            let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-            uchu_w.set_sasite_src(mov.source);
-            uchu_w.set_sasite_drop(mov.drop);
-            uchu_w.set_sasite_dst(mov.destination);
-            uchu_w.set_sasite_pro(mov.promotion);
-
+        if successful {
             // 入っている指し手の通り指すぜ☆（＾～＾）
             let teme = uchu_w.teme;
             let ss = uchu_w.kifu[ teme ];
             uchu_w.do_ss( &ss );
         }
     }
-    // 読取失敗時、または 指し手読取終了時は successfule の外を通るぜ☆（＾～＾）
 }
 
 /**

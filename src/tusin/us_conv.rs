@@ -158,7 +158,8 @@ pub fn movement_to_usi(mv: &Movement) -> UsiMovement {
             let (src_file, src_rank) = ms_to_suji_dan(mv.source);
             (src_file, src_rank, PieceType::Space)
         },
-        _ => (-1, -1, PieceType::Space),
+        // 打なら
+        _ => (-1, -1, kms_to_pt(&mv.drop)),
     };
 
     let (dst_file, dst_rank) = ms_to_suji_dan(mv.destination);

@@ -1,5 +1,6 @@
 use kifuwarabe_usi::*;
 use memory::uchu::*;
+use models::movement::*;
 use teigi::constants::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
@@ -199,28 +200,32 @@ impl PositionParser{
         // 指し手を全部読んでいくぜ☆（＾～＾）手目のカウントも増えていくぜ☆（＾～＾）
         loop {
             let (successful, umov) = parse_movement(line, &mut starts, len);
+            let mov;
             if successful {
-                let mov = usi_to_movement(&umov);
+                mov = usi_to_movement(&umov);
+            } else {
+                // 読取失敗時、または 指し手読取終了時に successfulの外を通るぜ☆（＾～＾）
+                mov = Movement::new();
+            }
 
-                // グローバル変数に内容をセット。
-                {
-                    let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-                    uchu_w.set_sasite_src(mov.source);
-                    uchu_w.set_sasite_drop(mov.drop);
-                    uchu_w.set_sasite_dst(mov.destination);
-                    uchu_w.set_sasite_pro(mov.promotion);
-
+            // グローバル変数に内容をセット。
+            {
+                let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+                uchu_w.set_sasite_src(mov.source);
+                uchu_w.set_sasite_drop(mov.drop);
+                uchu_w.set_sasite_dst(mov.destination);
+                uchu_w.set_sasite_pro(mov.promotion);
+            
+                if successful {
                     // 入っている指し手の通り指すぜ☆（＾～＾）
                     let teme = uchu_w.teme;
                     let ss = uchu_w.kifu[ teme ];
                     uchu_w.do_ss( &ss );
+                } else {
+                    // 読取失敗時、または 指し手読取終了時に successfulの外を通るぜ☆（＾～＾）
+                    break;
                 }
-            } else {
-                // 読取失敗時、または 指し手読取終了時に successfulの外を通るぜ☆（＾～＾）
-                break;
             }
-
-
 
             // 現局面表示
             //let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky( &KyNums::Current );
