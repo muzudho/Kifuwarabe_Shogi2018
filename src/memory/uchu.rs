@@ -10,6 +10,7 @@ use rand::Rng;
 use CUR_POSITION_WRAP;
 use config::*;
 use INI_POSITION_WRAP;
+use memory::ky2::*;
 use memory::number_board::*;
 use models::movement::*;
 use thinks::visions::vision_tree::*;
@@ -537,7 +538,7 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
     pub fn do_ss(&mut self, ss:&Movement) {
         // もう入っているかも知れないが、棋譜に入れる☆
         let sn = self.get_teban(&Jiai::Ji);
-        let cap = CUR_POSITION_WRAP.try_write().unwrap().do_sasite( &sn, ss );
+        let cap = do_sasite(&sn, ss);
         let teme = self.teme;
         self.kifu[teme] = *ss;
         self.set_cap( teme, cap );
@@ -556,7 +557,7 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
             let sn = self.get_teban(&Jiai::Ji);
             let ss = &self.get_sasite();
             let cap = self.cap[self.teme];
-            CUR_POSITION_WRAP.try_write().unwrap().undo_sasite( &sn, &ss, &cap );
+            undo_sasite(&sn, &ss, &cap );
             // 棋譜にアンドゥした指し手がまだ残っているが、とりあえず残しとく
             true
         } else {
