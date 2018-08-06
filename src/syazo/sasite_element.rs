@@ -4,10 +4,10 @@
 
 use CUR_POSITION_WRAP;
 use consoles::asserts::*;
+use memory::ky::*;
 use teigi::shogi_syugo::*;
 use teigi::conv::*;
 use std::collections::HashSet;
-use memory::ky::*;
 
 /**
  * 成る前を含めない、移動元升生成
@@ -47,7 +47,7 @@ pub fn insert_narazu_src_by_ms_km(
     let kms_num = kms_to_num(&kms_dst);
 
     // 行先の無いところに駒を進めることの禁止☆（＾～＾）
-    use teigi::shogi_syugo::Koma::*;
+    use memory::ky::Koma::*;
     match *km_dst {
         U0      => {
             // ▼うさぎ　は１、２段目には進めない
@@ -640,7 +640,7 @@ pub fn insert_da_kms_by_ms_km( ms_dst:umasu, km_dst:&Koma, result_kms:&mut HashS
     //let (_x,y) = ms_to_suji_dan(ms);
 
     // 行先の無いところに駒を進めることの禁止☆（＾～＾）
-    use teigi::shogi_syugo::Koma::*;
+    use memory::ky::Koma::*;
     match *km_dst {
         U0 => {
             // ▼うさぎ　は１、２段目には進めない
@@ -910,7 +910,7 @@ pub fn insert_dst_by_ms_km(
         // +------------------------------+
         // | 成れる動き以外での成りの禁止 |
         // +------------------------------+
-        use teigi::shogi_syugo::Koma::*;
+        use memory::ky::Koma::*;
         match *km_src {
             K0 | Z0 | N0 => {
                 // ▼きりん、▼ぞう、▼ねこ　は
@@ -976,7 +976,7 @@ pub fn insert_dst_by_ms_km(
         // +----------------------------------------+
         // | 行先の無いところに駒を進めることの禁止 |
         // +----------------------------------------+
-        use teigi::shogi_syugo::Koma::*;
+        use memory::ky::Koma::*;
         match *km_src {
             U0      => {
                 // ▼うさぎ　は１、２段目には進めない
@@ -1056,7 +1056,7 @@ pub fn insert_narazu_src_by_sn_ms( sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
 
         // 行先の無いところに駒を進めることの禁止☆（＾～＾）
         let km = sn_kms_to_km( &sn, &kms );
-        use teigi::shogi_syugo::Koma::*;
+        use memory::ky::Koma::*;
         match km {
             U0      => {
                 // ▼うさぎ　は１、２段目には進めない

@@ -4,6 +4,8 @@
  */
 
 use consoles::asserts::*;
+use memory::ky::*;
+use memory::ky::Koma::*;
 use teigi::geometries::geo_teigi::*;
 use teigi::shogi_syugo::*;
 
@@ -242,7 +244,7 @@ pub fn kaiten180_ms_by_ms_sn(ms:umasu, sn:&Sengo) -> umasu {
 
 /// 先後付き駒の数値化。
 pub fn km_to_num(km:&Koma) -> usize{
-    use teigi::shogi_syugo::Koma::*;
+    use memory::ky::Koma::*;
     match *km {
         R0 =>0,
         K0 =>1,
@@ -277,7 +279,7 @@ pub fn km_to_num(km:&Koma) -> usize{
     }
 }
 pub fn num_to_km(km_num:usize) -> Koma{
-    use teigi::shogi_syugo::Koma::*;
+    use memory::ky::Koma::*;
     match km_num {
         0 =>R0,
         1 =>K0,
@@ -324,7 +326,7 @@ pub fn pop_km_from_hash(hash:u64) -> (u64,Koma) {
 }
 /// 駒→成駒　（成れない駒は、そのまま）
 pub fn km_to_prokm(km:&Koma) -> Koma{
-    use teigi::shogi_syugo::Koma::*;
+    use memory::ky::Koma::*;
     match *km {
         R0 =>R0,
         K0 =>PK0,
@@ -360,7 +362,7 @@ pub fn km_to_prokm(km:&Koma) -> Koma{
 }
 /// 成駒→駒
 pub fn prokm_to_km(km:&Koma) -> Koma{
-    use teigi::shogi_syugo::Koma::*;
+    use memory::ky::Koma::*;
     match *km {
         R0 =>R0,
         K0 =>K0,
@@ -400,8 +402,8 @@ pub fn km_is_nagaikiki(km:&Koma) -> bool{
 }
 /// 先後付き駒→駒種類
 pub fn km_to_sn_kms(km:&Koma)->(Sengo,KmSyurui){
-    use teigi::shogi_syugo::Koma;
-    use teigi::shogi_syugo::Koma::*;
+    use memory::ky::Koma;
+    use memory::ky::Koma::*;
     use teigi::shogi_syugo::Sengo::*;
     use teigi::shogi_syugo::KmSyurui;
     use teigi::shogi_syugo::KmSyurui::*;
@@ -441,7 +443,7 @@ pub fn km_to_sn_kms(km:&Koma)->(Sengo,KmSyurui){
 /// 先後付き駒　を　先後　へ変換。
 #[allow(dead_code)]
 pub fn km_to_sn(km:&Koma)->Sengo{
-    use teigi::shogi_syugo::Koma::*;
+    use memory::ky::Koma::*;
     use teigi::shogi_syugo::Sengo::*;
     match *km{
         R0 => { Sen},
@@ -478,8 +480,8 @@ pub fn km_to_sn(km:&Koma)->Sengo{
 }
 /// 先後付き駒→駒種類
 pub fn km_to_kms(km:&Koma)->KmSyurui{
-    use teigi::shogi_syugo::Koma;
-    use teigi::shogi_syugo::Koma::*;
+    use memory::ky::Koma;
+    use memory::ky::Koma::*;
     use teigi::shogi_syugo::KmSyurui;
     use teigi::shogi_syugo::KmSyurui::*;
     match *km{
@@ -518,7 +520,6 @@ pub fn km_to_kms(km:&Koma)->KmSyurui{
 /// 先後付き駒　を　持ち駒種類　へ変換。
 /// 持ち駒にするので、先後は反転するぜ☆（＾～＾）
 pub fn km_to_mg(km_cap:Koma)->Koma{
-    use teigi::shogi_syugo::Koma::*;
     match km_cap{
         R0 => { Owari},
         K0 => { K1},
@@ -737,7 +738,7 @@ pub fn kms_can_da(kms:&KmSyurui) -> bool {
 }
 // 先後＆駒種類→先後付き駒
 pub fn sn_kms_to_km(sn:&Sengo, kms:&KmSyurui)->Koma{
-     use teigi::shogi_syugo::Koma::*;
+    use memory::ky::Koma;
      use teigi::shogi_syugo::KmSyurui::*;
      match *sn{
         Sengo::Sen=>

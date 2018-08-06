@@ -4,6 +4,7 @@
 
 use CUR_POSITION_WRAP;
 use consoles::asserts::*;
+use memory::ky::*;
 use models::movement::*;
 use teigi::shogi_syugo::*;
 use teigi::conv::*;

@@ -4,6 +4,7 @@
  */
 
 use consoles::asserts::*;
+use memory::ky::*;
 use models::movement::*;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;

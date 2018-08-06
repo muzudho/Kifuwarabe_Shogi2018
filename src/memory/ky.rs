@@ -8,10 +8,277 @@
  * 盤を想像すること☆（＾～＾）！
  */
 
-use memory::uchu::*;
+use memory::ky::Koma::*;
+use std::*;
+use std::collections::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
-use teigi::shogi_syugo::Koma::*;
+use UCHU_WRAP;
+
+
+
+
+/******
+ * 駒 *
+ ******/
+/// 先後付き駒
+
+/// 持ち駒の駒のうち、最大の枚数は歩の 18。
+pub const MG_MAX : usize = 18;
+pub const KM_LN : usize = 30;
+/// 先後付きの駒と空白
+#[derive(Copy, Clone)]
+pub enum Koma{
+    // ▼らいおん
+    R0,
+    // ▼きりん
+    K0,
+    // ▼ぞう
+    Z0,
+    // ▼いぬ
+    I0,
+    // ▼ねこ
+    N0,
+    // ▼うさぎ
+    U0,
+    // ▼いのしし
+    S0,
+    // ▼ひよこ
+    H0,
+    // ▼ぱわーあっぷきりん
+    PK0,
+    // ▼ぱわーあっぷぞう
+    PZ0,
+    // ▼ぱわーあっぷねこ
+    PN0,
+    // ▼ぱわーあっぷうさぎ
+    PU0,
+    // ▼ぱわーあっぷいのしし
+    PS0,
+    // ▼ぱわーあっぷひよこ
+    PH0,
+    // △ライオン
+    R1,
+    // △キリン
+    K1,
+    // △ゾウ
+    Z1,
+    // △イヌ
+    I1,
+    // △ネコ
+    N1,
+    // △ウサギ
+    U1,
+    // △イノシシ
+    S1,
+    // △ヒヨコ
+    H1,
+    // △パワーアップキリン
+    PK1,
+    // △パワーアップゾウ
+    PZ1,
+    // △パワーアップネコ
+    PN1,
+    // △パワーアップウサギ
+    PU1,
+    // △パワーアップイノシシ
+    PS1,
+    // △パワーアップヒヨコ
+    PH1,
+    // 空マス
+    Kara,
+    // 要素数より1小さい数。該当なしや、エラー値用としても兼用する
+    Owari
+}
+impl fmt::Display for Koma{
+    fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
+        // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
+        use memory::ky::Koma::*;
+        match *self{
+            R0 => { write!(f,"▼ら")},
+            K0 => { write!(f,"▼き")},
+            Z0 => { write!(f,"▼ぞ")},
+            I0 => { write!(f,"▼い")},
+            N0 => { write!(f,"▼ね")},
+            U0 => { write!(f,"▼う")},
+            S0 => { write!(f,"▼し")},
+            H0 => { write!(f,"▼ひ")},
+            PK0 => { write!(f,"▼PK")},
+            PZ0 => { write!(f,"▼PZ")},
+            PN0 => { write!(f,"▼PN")},
+            PU0 => { write!(f,"▼PU")},
+            PS0 => { write!(f,"▼PS")},
+            PH0 => { write!(f,"▼PH")},
+            R1 => { write!(f,"△ラ")},
+            K1 => { write!(f,"△キ")},
+            Z1 => { write!(f,"△ゾ")},
+            I1 => { write!(f,"△イ")},
+            N1 => { write!(f,"△ネ")},
+            U1 => { write!(f,"△ウ")},
+            S1 => { write!(f,"△シ")},
+            H1 => { write!(f,"△ヒ")},
+            PK1 => { write!(f,"△pk")},
+            PZ1 => { write!(f,"△pz")},
+            PN1 => { write!(f,"△pn")},
+            PU1 => { write!(f,"△pu")},
+            PS1 => { write!(f,"△ps")},
+            PH1 => { write!(f,"△ph")},
+            Kara => { write!(f,"　　")},
+            Owari => { write!(f,"××")},
+        }
+    }
+}
+/**
+ * 駒の一致比較
+ */
+pub fn match_km(a:&Koma, b:&Koma)->bool{
+    km_to_num(a) == km_to_num(b)
+}
+
+#[allow(dead_code)]
+pub const KM_ARRAY_HALF_LN : usize = 14;
+pub const KM_ARRAY_LN : usize = 28;
+pub const KM_ARRAY : [Koma;KM_ARRAY_LN] = [
+    Koma::R0,// らいおん
+    Koma::K0,// きりん
+    Koma::Z0,// ぞう
+    Koma::I0,// いぬ
+    Koma::N0,// ねこ
+    Koma::U0,// うさぎ
+    Koma::S0,// いのしし
+    Koma::H0,// ひよこ
+    Koma::PK0,// ぱわーあっぷきりん
+    Koma::PZ0,// ぱわーあっぷぞう
+    Koma::PN0,// ぱわーあっぷねこ
+    Koma::PU0,// ぱわーあっぷうさぎ
+    Koma::PS0,// ぱわーあっぷいのしし
+    Koma::PH0,// ぱわーあっぷひよこ
+    Koma::R1,// らいおん
+    Koma::K1,// きりん
+    Koma::Z1,// ぞう
+    Koma::I1,// いぬ
+    Koma::N1,// ねこ
+    Koma::U1,// うさぎ
+    Koma::S1,// いのしし
+    Koma::H1,// ひよこ
+    Koma::PK1,// ぱわーあっぷきりん
+    Koma::PZ1,// ぱわーあっぷぞう
+    Koma::PN1,// ぱわーあっぷねこ
+    Koma::PU1,// ぱわーあっぷうさぎ
+    Koma::PS1,// ぱわーあっぷいのしし
+    Koma::PH1,// ぱわーあっぷひよこ
+];
+#[allow(dead_code)]
+pub const SN_KM_ARRAY : [[Koma;KM_ARRAY_HALF_LN];SN_LN] = [
+    [
+        Koma::R0,// らいおん
+        Koma::K0,// きりん
+        Koma::Z0,// ぞう
+        Koma::I0,// いぬ
+        Koma::N0,// ねこ
+        Koma::U0,// うさぎ
+        Koma::S0,// いのしし
+        Koma::H0,// ひよこ
+        Koma::PK0,// ぱわーあっぷきりん
+        Koma::PZ0,// ぱわーあっぷぞう
+        Koma::PN0,// ぱわーあっぷねこ
+        Koma::PU0,// ぱわーあっぷうさぎ
+        Koma::PS0,// ぱわーあっぷいのしし
+        Koma::PH0,// ぱわーあっぷひよこ
+    ],
+    [
+        Koma::R1,// らいおん
+        Koma::K1,// きりん
+        Koma::Z1,// ぞう
+        Koma::I1,// いぬ
+        Koma::N1,// ねこ
+        Koma::U1,// うさぎ
+        Koma::S1,// いのしし
+        Koma::H1,// ひよこ
+        Koma::PK1,// ぱわーあっぷきりん
+        Koma::PZ1,// ぱわーあっぷぞう
+        Koma::PN1,// ぱわーあっぷねこ
+        Koma::PU1,// ぱわーあっぷうさぎ
+        Koma::PS1,// ぱわーあっぷいのしし
+        Koma::PH1,// ぱわーあっぷひよこ
+    ],
+    [
+        Koma::Owari,// らいおん
+        Koma::Owari,// きりん
+        Koma::Owari,// ぞう
+        Koma::Owari,// いぬ
+        Koma::Owari,// ねこ
+        Koma::Owari,// うさぎ
+        Koma::Owari,// いのしし
+        Koma::Owari,// ひよこ
+        Koma::Owari,// ぱわーあっぷきりん
+        Koma::Owari,// ぱわーあっぷぞう
+        Koma::Owari,// ぱわーあっぷねこ
+        Koma::Owari,// ぱわーあっぷうさぎ
+        Koma::Owari,// ぱわーあっぷいのしし
+        Koma::Owari,// ぱわーあっぷひよこ
+    ],
+];
+/**
+ * 駒集合
+ */
+#[allow(dead_code)]
+pub struct KmSyugo {
+    num_syugo : HashSet<usize>,
+}
+impl KmSyugo {
+    /**
+     * 全ての元を含む
+     */
+    #[allow(dead_code)]
+    pub fn new_all() -> KmSyugo {
+        let mut num_syugo1 : HashSet<usize> = HashSet::new();
+        for km in KM_ARRAY.iter() {
+            num_syugo1.insert( km_to_num(km) );
+        }
+        let km_syugo = KmSyugo {
+            num_syugo : num_syugo1,
+        };
+        km_syugo
+    }
+    /// 自分相手
+    #[allow(dead_code)]
+    pub fn new_jiai(&self, jiai:&Jiai) -> KmSyugo {
+        let sn0 = UCHU_WRAP.try_read().unwrap().get_teban(&jiai);
+        let mut num_syugo1 : HashSet<usize> = HashSet::new();
+        for km in KM_ARRAY.iter() {
+            let (sn1,_kms) = km_to_sn_kms( km );
+            if match_sn( &sn0, &sn1 ) {
+                num_syugo1.insert( km_to_num(km) );
+            }
+        }
+        let km_syugo = KmSyugo {
+            num_syugo : num_syugo1,
+        };
+        km_syugo
+    }
+    #[allow(dead_code)]
+    pub fn remove( &mut self, km:&Koma ) {
+        self.num_syugo.remove( &km_to_num(km) );
+    }
+}
+
+
+
+
+
+/**
+ * 局面ハッシュ種
+ * ゾブリストハッシュを使って、局面の一致判定をするのに使う☆（＾～＾）
+ */
+pub struct KyHashSeed {
+    // 盤上の駒
+    pub km : [[u64;KM_LN];BAN_SIZE],
+    // 持ち駒
+    pub mg : [[u64;MG_MAX];KM_LN],
+    // 先後
+    pub sn : [u64;SN_LN],
+}
 
 // 局面
 pub struct Kyokumen{
@@ -60,7 +327,7 @@ impl Kyokumen{
             }
     }
     pub fn clear(&mut self){
-        use teigi::shogi_syugo::Koma::Kara;
+        use memory::ky::Koma::Kara;
         self.ban = [
             Kara,Kara,Kara,Kara,Kara,Kara,Kara,Kara,Kara,Kara,
             Kara,Kara,Kara,Kara,Kara,Kara,Kara,Kara,Kara,Kara,

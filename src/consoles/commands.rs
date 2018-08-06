@@ -3,6 +3,7 @@
  */
 
 use teigi::shogi_syugo::*;
+use memory::ky::*;
 use memory::uchu::*;
 
 use UCHU_WRAP;

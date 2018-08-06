@@ -3,6 +3,7 @@
  * 盤上の二項関係☆（＾～＾）
  */
 use consoles::asserts::*;
+use memory::ky::*;
 use teigi::conv::*;
 use teigi::geometries::geo_teigi::*;
 use teigi::geometries::geo_direction_niko_kankei::*;

@@ -1,4 +1,5 @@
 use CUR_POSITION_WRAP;
+use memory::ky::*;
 use models::movement::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;

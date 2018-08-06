@@ -2,6 +2,8 @@
 /**
  * USIプロトコル Rustフレームワーク
  */
+use memory::ky::*;
+use memory::ky::Koma::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use models::movement::*;
@@ -58,7 +60,6 @@ pub fn pt_to_kms (pt: &PieceType) -> KmSyurui {
 
 
 pub fn km_to_pc (km: &Koma) -> Piece {
-    use teigi::shogi_syugo::Koma::*;
     use kifuwarabe_usi::Piece;
     match *km{
         R0 => Piece::K0,
@@ -96,7 +97,7 @@ pub fn km_to_pc (km: &Koma) -> Piece {
 
 pub fn pc_to_km (pc: &Piece) -> Koma {
     use kifuwarabe_usi::Piece::*;
-    use teigi::shogi_syugo::Koma;
+    use memory::ky::Koma;
     match *pc{
         K0 => Koma::R0,
         R0 => Koma::K0,

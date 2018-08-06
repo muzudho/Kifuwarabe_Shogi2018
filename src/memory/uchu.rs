@@ -10,6 +10,7 @@ use rand::Rng;
 use CUR_POSITION_WRAP;
 use config::*;
 use INI_POSITION_WRAP;
+use memory::ky::*;
 use memory::ky2::*;
 use memory::number_board::*;
 use models::movement::*;
@@ -76,18 +77,6 @@ pub fn g_writeln(s:&str){
 }
 
 
-/**
- * 局面ハッシュ種
- * ゾブリストハッシュを使って、局面の一致判定をするのに使う☆（＾～＾）
- */
-pub struct KyHashSeed {
-    // 盤上の駒
-    pub km : [[u64;KM_LN];BAN_SIZE],
-    // 持ち駒
-    pub mg : [[u64;MG_MAX];KM_LN],
-    // 先後
-    pub sn : [u64;SN_LN],
-}
 
 /**
  * グローバル変数の作り方が分からないので、
