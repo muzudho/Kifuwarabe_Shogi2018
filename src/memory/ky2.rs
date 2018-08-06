@@ -2,7 +2,6 @@ use CUR_POSITION_WRAP;
 use memory::ky::*;
 use models::movement::*;
 use teigi::conv::*;
-use teigi::shogi_syugo::*;
 
 /**
  * 指し手の通りに、盤上の駒配置を動かすぜ☆（＾～＾）

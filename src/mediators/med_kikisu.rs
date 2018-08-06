@@ -8,7 +8,6 @@ use memory::ky::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
 use teigi::conv::*;
-use teigi::shogi_syugo::*;
 
 /**
  * 盤上の利き升調べ

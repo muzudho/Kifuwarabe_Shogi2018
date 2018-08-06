@@ -6,7 +6,6 @@ use CUR_POSITION_WRAP;
 use mediators::med_kikisu::*;
 use memory::ky::*;
 use teigi::conv::*;
-use teigi::shogi_syugo::*;
 use UCHU_WRAP;
 
 /**

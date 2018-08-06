@@ -2,7 +2,6 @@ use CUR_POSITION_WRAP;
 use memory::ky::*;
 use memory::uchu::*;
 use teigi::conv::*;
-use teigi::shogi_syugo::*;
 
 impl Uchu {
 

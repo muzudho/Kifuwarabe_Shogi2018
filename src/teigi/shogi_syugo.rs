@@ -2,7 +2,6 @@
 /**
  * いろんな値、定義☆（＾～＾）
  */
-use memory::ky::*;
 use std::collections::HashSet;
 use std::fmt;
 use teigi::conv::*;
@@ -22,128 +21,6 @@ pub const TEME_LN :usize = 257;
 pub const SENNTITE_NUM :i8 = 4;
 
 
-/********
- * 先後 *
- ********/
-pub const SN_LN : usize = 3;
-/**
- * 先後。単純にプレイヤー１を先手、プレイヤー２を後手とする。
- * 駒落ち戦での通称　上手／下手　の場合、上手は先手、下手は後手とする。
- */
-#[derive(Clone)]
-pub enum Sengo{
-    Sen,
-    Go,
-    // 空升の先後を調べようとした場合等
-    Owari,
-}
-pub const SN_SEN : usize = 0;
-pub const SN_GO : usize = 1;
-/**
- * 後手（上手）を盤の下側に持ってきて表示するのを基本とするぜ☆（＾～＾）
- */
-impl fmt::Display for Sengo{
-    fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
-        // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
-        use teigi::shogi_syugo::Sengo::*;
-        match *self{
-            Sen => { write!(f,"▼")},
-            Go => { write!(f,"△")},
-            Owari => { write!(f,"×")},
-        }
-    }
-}
-/**
- * 先後の一致比較
- */
-pub fn match_sn(a:&Sengo, b:&Sengo)->bool{
-    sn_to_num(a) == sn_to_num(b)
-}
-
-pub const SN_ARRAY_LN : usize = 2;
-pub const SN_ARRAY : [Sengo;SN_ARRAY_LN] = [
-    Sengo::Sen,
-    Sengo::Go,
-];
-
-
-/************
- * 自分相手 *
- ************/
-// 先後とは別物
-pub const JIAI_LN : usize = 3;
-/**
- * 先後。単純にプレイヤー１を先手、プレイヤー２を後手とする。
- * 駒落ち戦での通称　上手／下手　の場合、上手は先手、下手は後手とする。
- */
-#[derive(Clone)]
-pub enum Jiai{
-    Ji,
-    Ai,
-    Owari,
-}
-pub const JIAI_JI : usize = 0;
-pub const JIAI_AI : usize = 1;
-impl fmt::Display for Jiai {
-    fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
-        use teigi::shogi_syugo::Jiai::*;
-        match *self{
-            Ji => { write!(f,"自")},
-            Ai => { write!(f,"相")},
-            Owari => { write!(f,"×")},
-        }
-    }
-}
-/**
- * 一致比較
- */
-pub fn match_jiai(a:&Jiai, b:&Jiai)->bool{
-    jiai_to_num(a) == jiai_to_num(b)
-}
-
-pub const JIAI_ARRAY_LN : usize = 2;
-pub const JIAI_ARRAY : [Jiai;JIAI_ARRAY_LN] = [
-    Jiai::Ji,
-    Jiai::Ai,
-];
-
-
-
-
-
-/******
- * 陣 *
- ******/
-
-/**
- * 先手陣
- */
-pub struct SenteJin{
-}
-impl SenteJin{
-    pub fn to_elm()->Vec<umasu>{
-        vec![
-            91,81,71,61,51,41,31,21,11,
-            92,82,72,62,52,42,32,22,12,
-            93,83,73,63,53,43,33,23,13,
-        ]
-    }
-}
-
-/**
- * 後手陣
- */
-pub struct GoteJin{
-}
-impl GoteJin{
-    pub fn to_elm()->Vec<umasu>{
-        vec![
-            91,81,71,61,51,41,31,21,11,
-            92,82,72,62,52,42,32,22,12,
-            93,83,73,63,53,43,33,23,13,
-        ]
-    }
-}
 
 
 

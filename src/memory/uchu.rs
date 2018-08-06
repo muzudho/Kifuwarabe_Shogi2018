@@ -15,7 +15,6 @@ use memory::ky2::*;
 use memory::number_board::*;
 use models::movement::*;
 use thinks::visions::vision_tree::*;
-use teigi;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
@@ -296,7 +295,7 @@ impl Uchu{
     }
     // 手番
     pub fn get_teban(&self, jiai:&Jiai)->Sengo{
-        use teigi::shogi_syugo::Jiai::*;
+        use memory::ky::Jiai::*;
         match *jiai {
             Ji=>{
                 // 手番
@@ -387,9 +386,9 @@ impl Uchu{
     #[allow(dead_code)]
     pub fn get_ji_jin(&self)->Vec<umasu>{
         if let Sengo::Sen=self.get_teban(&Jiai::Ji) {
-            teigi::shogi_syugo::SenteJin::to_elm()
+            SenteJin::to_elm()
         } else {
-            teigi::shogi_syugo::GoteJin::to_elm()
+            GoteJin::to_elm()
         }
     }
     /**
@@ -398,9 +397,9 @@ impl Uchu{
     #[allow(dead_code)]
     pub fn get_aite_jin(&self)->Vec<umasu>{
         if let Sengo::Sen=self.get_teban(&Jiai::Ji) {
-            teigi::shogi_syugo::GoteJin::to_elm()
+            GoteJin::to_elm()
         } else {
-            teigi::shogi_syugo::SenteJin::to_elm()
+            SenteJin::to_elm()
         }
     }
 
@@ -589,7 +588,7 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
         let mut hash = CUR_POSITION_WRAP.try_read().unwrap().create_hash(&ky_hash_seed);
 
         // 手番ハッシュ
-        use teigi::shogi_syugo::Sengo::*;
+        use memory::ky::Sengo::*;
         match self.get_teban(&Jiai::Ji) {
             Sen => { hash ^= self.ky_hash_seed.sn[SN_SEN] },
             Go => { hash ^= self.ky_hash_seed.sn[SN_GO] },

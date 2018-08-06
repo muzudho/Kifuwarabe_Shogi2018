@@ -10,7 +10,6 @@ use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
 use teigi::conv::*;
 use std::collections::HashSet;
-use teigi::shogi_syugo::*;
 use thinks::randommove;
 use thinks::results::jisatusyu_result::*;
 

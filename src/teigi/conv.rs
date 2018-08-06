@@ -108,7 +108,7 @@ pub fn pop_dir8_from_hash(hash:u64) -> (u64, Dir8) {
  * 先後 *
  ********/
 pub fn sn_to_num(sn:&Sengo)->usize{
-    use teigi::shogi_syugo::Sengo::*;
+    use memory::ky::Sengo::*;
     match *sn {
         Sen   => 0,
         Go    => 1,
@@ -116,7 +116,7 @@ pub fn sn_to_num(sn:&Sengo)->usize{
     }
 }
 pub fn hanten_sn(sn:&Sengo)->Sengo{
-    use teigi::shogi_syugo::Sengo::*;
+    use memory::ky::Sengo::*;
     match *sn {
         Sen   => Go,
         Go    => Sen,
@@ -128,7 +128,7 @@ pub fn hanten_sn(sn:&Sengo)->Sengo{
  * 自分相手 *
  ************/
 pub fn jiai_to_num(jiai:&Jiai)->usize{
-    use teigi::shogi_syugo::Jiai::*;
+    use memory::ky::Jiai::*;
     match *jiai {
         Ji    => 0,
         Ai    => 1,
@@ -136,7 +136,7 @@ pub fn jiai_to_num(jiai:&Jiai)->usize{
     }
 }
 pub fn hanten_jiai(jiai:&Jiai)->Jiai{
-    use teigi::shogi_syugo::Jiai::*;
+    use memory::ky::Jiai::*;
     match *jiai {
         Ji    => Ai,
         Ai    => Ji,
@@ -227,7 +227,7 @@ pub fn num_to_lower_case(num:i8)->&'static str{
  * 先手であれば、後手のように番号を振った座標に変換 *
  ****************************************************/
 pub fn kaiten180_ms_by_ms_sn(ms:umasu, sn:&Sengo) -> umasu {
-    use teigi::shogi_syugo::Sengo::*;
+    use memory::ky::Sengo::*;
     match *sn {
         Sen   => {
             BAN_MAX - ms + BAN_MIN
@@ -404,7 +404,7 @@ pub fn km_is_nagaikiki(km:&Koma) -> bool{
 pub fn km_to_sn_kms(km:&Koma)->(Sengo,KmSyurui){
     use memory::ky::Koma;
     use memory::ky::Koma::*;
-    use teigi::shogi_syugo::Sengo::*;
+    use memory::ky::Sengo::*;
     use teigi::shogi_syugo::KmSyurui;
     use teigi::shogi_syugo::KmSyurui::*;
     match *km{
@@ -444,7 +444,7 @@ pub fn km_to_sn_kms(km:&Koma)->(Sengo,KmSyurui){
 #[allow(dead_code)]
 pub fn km_to_sn(km:&Koma)->Sengo{
     use memory::ky::Koma::*;
-    use teigi::shogi_syugo::Sengo::*;
+    use memory::ky::Sengo::*;
     match *km{
         R0 => { Sen},
         K0 => { Sen},

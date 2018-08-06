@@ -5,7 +5,6 @@
 use CUR_POSITION_WRAP;
 use memory::ky::*;
 use teigi::conv::*;
-use teigi::shogi_syugo::*;
 use UCHU_WRAP;
 
 pub fn is_ji_km_by_ms(ms:umasu) -> bool {

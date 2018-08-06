@@ -31,7 +31,7 @@ pub fn get_dir8_to_slider_from_target(
 
     let (sn_slider,kms) = km_to_sn_kms( &km_slider );
     use teigi::shogi_syugo::KmSyurui::*;
-    use teigi::shogi_syugo::Sengo::*;
+    use memory::ky::Sengo::*;
     match kms{
         K => {
             // 筋か、段かのどちらかが同じ
