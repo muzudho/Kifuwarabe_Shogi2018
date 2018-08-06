@@ -5,6 +5,7 @@
  */
 use consoles::visuals::dumps::*;
 use CUR_POSITION_WRAP;
+use memory::ky::*;
 use memory::uchu::*;
 use meidai::math_meidai::*;
 use models::movement::*;

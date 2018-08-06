@@ -1,4 +1,4 @@
-use teigi::shogi_syugo::*;
+use memory::ky::*;
 
 /**
  * 升に数が書いている将棋盤

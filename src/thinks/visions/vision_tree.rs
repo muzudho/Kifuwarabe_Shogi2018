@@ -2,14 +2,8 @@
 /**
  * 思考部だぜ☆（＾～＾）
  */
-//use syazo::sasite_element::*;
+use memory::ky::*;
 use std::collections::HashSet;
-//use teigi::conv::*;
-use teigi::shogi_syugo::*;
-//use tusin::us_conv::*;
-//use memory::ky::*;
-
-//use UCHU_WRAP;
 
 /**
  * 狙いは、この木にぶら下げていくぜ☆（*＾～＾*）

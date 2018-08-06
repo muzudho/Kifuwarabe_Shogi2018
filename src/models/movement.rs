@@ -1,7 +1,8 @@
+use consoles::asserts::*;
+use memory::ky::*;
+use std::fmt;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
-use std::fmt;
-use consoles::asserts::*;
 
 /// # Movement (ムーブメント;指し手)
 ///

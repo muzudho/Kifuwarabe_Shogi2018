@@ -2,11 +2,11 @@
 /**
  * コレクションの内容をダンプ（全部見る）とかだぜ☆（＾～＾）
  */
+use memory::ky::*;
 use memory::uchu::*;
 use models::movement::*;
 use std::collections::HashSet;
 use teigi::conv::*;
-use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
 
 /******

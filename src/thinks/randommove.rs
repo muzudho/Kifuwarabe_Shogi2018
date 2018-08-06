@@ -1,7 +1,8 @@
 // ランダムムーブ
 extern crate rand;
-use rand::Rng;
 
+use memory::ky::*;
+use rand::Rng;
 use teigi::shogi_syugo::*;
 use teigi::conv::*;
 

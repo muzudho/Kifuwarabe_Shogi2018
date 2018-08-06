@@ -1,7 +1,7 @@
 /**
  * 値チェック
  */
-use teigi::shogi_syugo::*;
+use memory::ky::*;
 
 /**
  * 打はテストできない

@@ -3,6 +3,7 @@
  */
 
 use CUR_POSITION_WRAP;
+use memory::ky::*;
 use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use UCHU_WRAP;

@@ -10,6 +10,7 @@ use consoles::visuals::dumps::*;
 use consoles::visuals::title::*;
 use kifuwarabe_usi::*;
 use models::movement::*;
+use memory::ky::*;
 use memory::uchu::*;
 use rand::Rng;
 use thinks;
