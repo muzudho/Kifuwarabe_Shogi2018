@@ -4,7 +4,7 @@
 
 use CUR_POSITION_WRAP;
 use consoles::asserts::*;
-use memory::ky::*;
+use kifuwarabe_position::*;
 use models::movement::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;

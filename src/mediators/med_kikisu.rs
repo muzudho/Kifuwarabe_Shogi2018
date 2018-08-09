@@ -3,8 +3,8 @@
  */
 
 use consoles::asserts::*;
+use kifuwarabe_position::*;
 use memory::number_board::*;
-use memory::ky::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
 

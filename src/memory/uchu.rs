@@ -10,7 +10,7 @@ use rand::Rng;
 use CUR_POSITION_WRAP;
 use config::*;
 use INI_POSITION_WRAP;
-use memory::ky::*;
+use kifuwarabe_position::*;
 use memory::ky2::*;
 use memory::number_board::*;
 use models::movement::*;
@@ -294,7 +294,7 @@ impl Uchu{
     }
     // 手番
     pub fn get_teban(&self, jiai:&Jiai)->Sengo{
-        use memory::ky::Jiai::*;
+        use kifuwarabe_position::Jiai::*;
         match *jiai {
             Ji=>{
                 // 手番
@@ -587,7 +587,7 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
         let mut hash = CUR_POSITION_WRAP.try_read().unwrap().create_hash(&ky_hash_seed);
 
         // 手番ハッシュ
-        use memory::ky::Sengo::*;
+        use kifuwarabe_position::Sengo::*;
         match self.get_teban(&Jiai::Ji) {
             Sen => { hash ^= self.ky_hash_seed.sn[SN_SEN] },
             Go => { hash ^= self.ky_hash_seed.sn[SN_GO] },

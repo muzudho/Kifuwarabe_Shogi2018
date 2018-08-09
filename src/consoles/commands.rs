@@ -2,7 +2,7 @@
  * コマンド一覧
  */
 
-use memory::ky::*;
+use kifuwarabe_position::*;
 use memory::uchu::*;
 
 use UCHU_WRAP;

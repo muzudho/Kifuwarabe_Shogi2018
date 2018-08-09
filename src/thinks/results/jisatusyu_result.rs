@@ -4,7 +4,7 @@
  */
 
 use CUR_POSITION_WRAP;
-use memory::ky::*;
+use kifuwarabe_position::*;
 use models::movement::*;
 use UCHU_WRAP;
 

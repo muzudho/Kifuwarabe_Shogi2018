@@ -1,4 +1,4 @@
-use memory::ky::*;
+use kifuwarabe_position::*;
 
 /**
  * 升に数が書いている将棋盤

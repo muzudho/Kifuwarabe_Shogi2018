@@ -2,15 +2,15 @@
 /**
  * USIプロトコル Rustフレームワーク
  */
-use memory::ky::*;
-use memory::ky::Koma::*;
 use models::movement::*;
+use kifuwarabe_position::*;
+use kifuwarabe_position::Koma::*;
 use kifuwarabe_usi::*;
 
 
 
 pub fn kms_to_pt (kms: &KmSyurui) -> PieceType {
-    use memory::ky::KmSyurui::*;
+    use kifuwarabe_position::KmSyurui::*;
     use kifuwarabe_usi::PieceType;
     match *kms{
         R => PieceType::K,
@@ -34,7 +34,7 @@ pub fn kms_to_pt (kms: &KmSyurui) -> PieceType {
 
 pub fn pt_to_kms (pt: &PieceType) -> KmSyurui {
     use kifuwarabe_usi::PieceType;
-    use memory::ky::KmSyurui;
+    use kifuwarabe_position::KmSyurui;
     match *pt{
         PieceType::K => KmSyurui::R,
         PieceType::R => KmSyurui::K,
@@ -95,7 +95,7 @@ pub fn km_to_pc (km: &Koma) -> Piece {
 
 pub fn pc_to_km (pc: &Piece) -> Koma {
     use kifuwarabe_usi::Piece::*;
-    use memory::ky::Koma;
+    use kifuwarabe_position::Koma;
     match *pc{
         K0 => Koma::R0,
         R0 => Koma::K0,

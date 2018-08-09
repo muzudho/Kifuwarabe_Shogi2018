@@ -5,7 +5,7 @@ use std::fmt;
 use std::collections::HashSet;
 
 use consoles::asserts::*;
-use memory::ky::*;
+use kifuwarabe_position::*;
 use memory::uchu::*;
 use meidai::math_meidai::*;
 use models::movement::*;

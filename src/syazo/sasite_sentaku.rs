@@ -8,7 +8,7 @@ use std::collections::HashSet;
 
 use CUR_POSITION_WRAP;
 use consoles::asserts::*;
-use memory::ky::*;
+use kifuwarabe_position::*;
 use memory::uchu::*;
 use models::movement::*;
 use thinks::results::komatori_result::*;

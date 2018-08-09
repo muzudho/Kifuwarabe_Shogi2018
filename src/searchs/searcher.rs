@@ -3,8 +3,8 @@
  */
 
 use CUR_POSITION_WRAP;
+use kifuwarabe_position::*;
 use mediators::med_kikisu::*;
-use memory::ky::*;
 use UCHU_WRAP;
 
 /**

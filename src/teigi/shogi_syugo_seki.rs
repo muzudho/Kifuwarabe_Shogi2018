@@ -3,7 +3,7 @@
  * 積☆（＾～＾）　要するに組み合わせ
  */
 
-use memory::ky::*;
+use kifuwarabe_position::*;
 
 /************
  * 升 × 駒 *

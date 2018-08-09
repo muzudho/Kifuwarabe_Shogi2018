@@ -2,7 +2,7 @@
 /**
  * いろんな値、定義☆（＾～＾）
  */
-use memory::ky::*;
+use kifuwarabe_position::*;
 use std::fmt;
 
 /********

@@ -1,7 +1,7 @@
 // ランダムムーブ
 extern crate rand;
 
-use memory::ky::*;
+use kifuwarabe_position::*;
 use rand::Rng;
 
 /**

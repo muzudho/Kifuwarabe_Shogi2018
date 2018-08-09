@@ -2,7 +2,7 @@
 /**
  * 思考部だぜ☆（＾～＾）
  */
-use memory::ky::*;
+use kifuwarabe_position::*;
 use std::collections::HashSet;
 
 /**

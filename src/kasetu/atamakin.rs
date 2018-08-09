@@ -4,7 +4,7 @@
  */
 
 use CUR_POSITION_WRAP;
-use memory::ky::*;
+use kifuwarabe_position::*;
 use memory::uchu::*;
 use teigi::conv::*;
 use teigi::shogi_syugo_seki::*;
@@ -31,7 +31,7 @@ pub fn is_s()->bool{
 
     let kms = km_to_kms( &km );
 
-    use memory::ky::KmSyurui::*;
+    use kifuwarabe_position::KmSyurui::*;
     match kms {
         Z | S => { return false; },
         _ => {},

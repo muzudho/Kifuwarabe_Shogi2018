@@ -1,5 +1,5 @@
 use consoles::asserts::*;
-use memory::ky::*;
+use kifuwarabe_position::*;
 use std::fmt;
 use teigi::conv::*;
 
@@ -75,7 +75,7 @@ impl fmt::Display for Movement{
         let (dx,dy) = ms_to_suji_dan(self.destination);
 
         if self.source==SS_SRC_DA {
-            use memory::ky::KmSyurui;
+            use kifuwarabe_position::KmSyurui;
             write!(f, "{}*{}{}{}",
                 match self.drop {
                     KmSyurui::K => { "R" },

@@ -1,7 +1,7 @@
 /**
  * 値チェック
  */
-use memory::ky::*;
+use kifuwarabe_position::*;
 
 /**
  * 打はテストできない

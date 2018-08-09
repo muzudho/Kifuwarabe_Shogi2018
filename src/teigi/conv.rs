@@ -4,7 +4,7 @@
  */
 
 use consoles::asserts::*;
-use memory::ky::*;
+use kifuwarabe_position::*;
 use teigi::geometries::geo_teigi::*;
 use teigi::shogi_syugo::*;
 

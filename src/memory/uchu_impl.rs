@@ -1,5 +1,5 @@
 use CUR_POSITION_WRAP;
-use memory::ky::*;
+use kifuwarabe_position::*;
 use memory::uchu::*;
 
 impl Uchu {

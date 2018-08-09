@@ -3,7 +3,7 @@
  */
 
 use CUR_POSITION_WRAP;
-use memory::ky::*;
+use kifuwarabe_position::*;
 use UCHU_WRAP;
 
 pub fn is_ji_km_by_ms(ms:umasu) -> bool {

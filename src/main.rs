@@ -14,6 +14,9 @@ use kifuwarabe_shell::Shell;
 
 extern crate kifuwarabe_usi;
 
+extern crate kifuwarabe_position;
+use kifuwarabe_position::*;
+
 ///
 /// Rust言語の mod や ソース置き場の説明
 ///      「Rust のモジュールシステム」
@@ -37,7 +40,6 @@ mod teigi;
 mod tusin;
 
 use actions::command_list::*;
-use memory::ky::*;
 use memory::uchu::*;
 
 
