@@ -14,7 +14,6 @@ use syazo::sasite_element::*;
 use teigi::conv::*;
 use thinks::randommove;
 use teigi::geometries::geo_teigi::*;
-use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
 use UCHU_WRAP;
 

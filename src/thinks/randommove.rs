@@ -3,7 +3,6 @@ extern crate rand;
 
 use memory::ky::*;
 use rand::Rng;
-use teigi::shogi_syugo::*;
 use teigi::conv::*;
 
 /**

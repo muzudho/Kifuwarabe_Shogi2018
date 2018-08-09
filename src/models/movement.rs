@@ -2,7 +2,6 @@ use consoles::asserts::*;
 use memory::ky::*;
 use std::fmt;
 use teigi::conv::*;
-use teigi::shogi_syugo::*;
 
 /// # Movement (ムーブメント;指し手)
 ///
@@ -76,7 +75,7 @@ impl fmt::Display for Movement{
         let (dx,dy) = ms_to_suji_dan(self.destination);
 
         if self.source==SS_SRC_DA {
-            use teigi::shogi_syugo::KmSyurui;
+            use memory::ky::KmSyurui;
             write!(f, "{}*{}{}{}",
                 match self.drop {
                     KmSyurui::K => { "R" },

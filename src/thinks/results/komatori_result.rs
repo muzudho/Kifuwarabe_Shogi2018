@@ -13,7 +13,6 @@ use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
 use teigi::conv::*;
 use teigi::geometries::geo_teigi::*;
-use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
 
 /********************

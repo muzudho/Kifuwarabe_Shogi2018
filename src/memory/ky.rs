@@ -8,12 +8,10 @@
  * 盤を想像すること☆（＾～＾）！
  */
 
-use memory::ky::Koma::*;
 use std::*;
 use std::collections::*;
 use teigi::conv::*;
-use teigi::shogi_syugo::*;
-use UCHU_WRAP;
+// use teigi::shogi_syugo::*;
 
 
 
@@ -437,49 +435,178 @@ pub const SN_KM_ARRAY : [[Koma;KM_ARRAY_HALF_LN];SN_LN] = [
         Koma::Owari,// ぱわーあっぷひよこ
     ],
 ];
+
+
+
+
+
+
+
+
+
+
+/**********
+ * 駒種類 *
+ **********/
+pub const KMS_LN : usize = 16;
+// 駒の動ける方向数、終端子込み
+pub const KM_UGOKI_LN : usize = 9;
+// 先後なしの駒と空白
+#[derive(Copy, Clone)]
+pub enum KmSyurui{
+    // らいおん
+    R,
+    // きりん
+    K,
+    // ぞう
+    Z,
+    // いぬ
+    I,
+    // ねこ
+    N,
+    // うさぎ
+    U,
+    // いのしし
+    S,
+    // ひよこ
+    H,
+    // ぱわーあっぷきりん
+    PK,
+    // ぱわーあっぷぞう
+    PZ,
+    // ぱわーあっぷねこ
+    PN,
+    // ぱわーあっぷうさぎ
+    PU,
+    // ぱわーあっぷいのしし
+    PS,
+    // ぱわーあっぷひよこ
+    PH,
+    // 空マス
+    Kara,
+    // 要素数より1小さい数。エラー値用に使っても可
+    Owari
+}
+impl fmt::Display for KmSyurui{
+    fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
+        // 文字列リテラルでないとダメみたいなんで、他に似たようなコードがあるのに、また書くことに☆（＾～＾）
+        use memory::ky::KmSyurui::*;
+        match *self{
+            R => { write!(f,"ら")},
+            K => { write!(f,"き")},
+            Z => { write!(f,"ぞ")},
+            I => { write!(f,"い")},
+            N => { write!(f,"ね")},
+            U => { write!(f,"う")},
+            S => { write!(f,"い")},
+            H => { write!(f,"ひ")},
+            PK => { write!(f,"PK")},
+            PZ => { write!(f,"PZ")},
+            PN => { write!(f,"PN")},
+            PU => { write!(f,"PU")},
+            PS => { write!(f,"PS")},
+            PH => { write!(f,"PH")},
+            Kara => { write!(f,"　")},
+            Owari => { write!(f,"×")},
+        }
+    }
+}
 /**
- * 駒集合
+ * 駒種類の一致比較
  */
+pub fn match_kms(a:&KmSyurui, b:&KmSyurui)->bool{
+    kms_to_num(a) == kms_to_num(b)
+}
+
+// 駒種類数
+pub const KMS_ARRAY_LN : usize = 14;
+// 駒種類
+pub const KMS_ARRAY : [KmSyurui;KMS_ARRAY_LN] = [
+    KmSyurui::R,// らいおん
+    KmSyurui::K,// きりん
+    KmSyurui::Z,// ぞう
+    KmSyurui::I,// いぬ
+    KmSyurui::N,// ねこ
+    KmSyurui::U,// うさぎ
+    KmSyurui::S,// いのしし
+    KmSyurui::H,// ひよこ
+    KmSyurui::PK,// ぱわーあっぷきりん
+    KmSyurui::PZ,// ぱわーあっぷぞう
+    KmSyurui::PN,// ぱわーあっぷねこ
+    KmSyurui::PU,// ぱわーあっぷうさぎ
+    KmSyurui::PS,// ぱわーあっぷいのしし
+    KmSyurui::PH,// ぱわーあっぷひよこ
+];
+
+/// 非成 駒種類数
 #[allow(dead_code)]
-pub struct KmSyugo {
+pub const KMS_NPRO_ARRAY_LN : usize = 8;
+/// 非成 駒種類
+#[allow(dead_code)]
+pub const KMS_NPRO_ARRAY : [KmSyurui;KMS_NPRO_ARRAY_LN] = [
+    KmSyurui::R,// らいおん
+    KmSyurui::K,// きりん
+    KmSyurui::Z,// ぞう
+    KmSyurui::I,// いぬ
+    KmSyurui::N,// ねこ
+    KmSyurui::U,// うさぎ
+    KmSyurui::S,// いのしし
+    KmSyurui::H,// ひよこ
+];
+
+/// 成 駒種類数
+#[allow(dead_code)]
+pub const KMS_PRO_ARRAY_LN : usize = 6;
+/// 成 駒種類
+#[allow(dead_code)]
+pub const KMS_PRO_ARRAY : [KmSyurui;KMS_PRO_ARRAY_LN] = [
+    KmSyurui::PK,// ぱわーあっぷきりん
+    KmSyurui::PZ,// ぱわーあっぷぞう
+    KmSyurui::PN,// ぱわーあっぷねこ
+    KmSyurui::PU,// ぱわーあっぷうさぎ
+    KmSyurui::PS,// ぱわーあっぷいのしし
+    KmSyurui::PH,// ぱわーあっぷひよこ
+];
+
+// 持駒種類数
+pub const MGS_ARRAY_LN : usize = 7;
+// 持駒種類
+pub const MGS_ARRAY : [KmSyurui;MGS_ARRAY_LN] = [
+    KmSyurui::K,
+    KmSyurui::Z,
+    KmSyurui::I,
+    KmSyurui::N,
+    KmSyurui::U,
+    KmSyurui::S,
+    KmSyurui::H,
+];
+
+/// 駒種類集合
+pub struct KmsSyugo {
     num_syugo : HashSet<usize>,
 }
-impl KmSyugo {
+impl KmsSyugo {
     /**
      * 全ての元を含む
      */
-    #[allow(dead_code)]
-    pub fn new_all() -> KmSyugo {
+    pub fn new_all() -> KmsSyugo {
         let mut num_syugo1 : HashSet<usize> = HashSet::new();
-        for km in KM_ARRAY.iter() {
-            num_syugo1.insert( km_to_num(km) );
+        for kms in KMS_ARRAY.iter() {
+            num_syugo1.insert( kms_to_num(kms) );
         }
-        let km_syugo = KmSyugo {
+        let kms_syugo = KmsSyugo {
             num_syugo : num_syugo1,
         };
-        km_syugo
+        kms_syugo
     }
-    /// 自分相手
-    #[allow(dead_code)]
-    pub fn new_jiai(&self, jiai:&Jiai) -> KmSyugo {
-        let sn0 = UCHU_WRAP.try_read().unwrap().get_teban(&jiai);
-        let mut num_syugo1 : HashSet<usize> = HashSet::new();
-        for km in KM_ARRAY.iter() {
-            let (sn1,_kms) = km_to_sn_kms( km );
-            if match_sn( &sn0, &sn1 ) {
-                num_syugo1.insert( km_to_num(km) );
-            }
-        }
-        let km_syugo = KmSyugo {
-            num_syugo : num_syugo1,
-        };
-        km_syugo
-    }
-    #[allow(dead_code)]
-    pub fn remove( &mut self, km:&Koma ) {
-        self.num_syugo.remove( &km_to_num(km) );
+    pub fn remove( &mut self, kms:&KmSyurui ) {
+        self.num_syugo.remove( &kms_to_num(kms) );
     }
 }
+
+
+
+
 
 
 
@@ -518,6 +645,7 @@ pub struct Kyokumen{
 }
 impl Kyokumen{
     pub fn new()->Kyokumen{
+        use memory::ky::Koma::*;
          Kyokumen{
                 // 盤上
                 ban:[

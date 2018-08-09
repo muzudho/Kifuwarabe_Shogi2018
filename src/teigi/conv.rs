@@ -405,8 +405,8 @@ pub fn km_to_sn_kms(km:&Koma)->(Sengo,KmSyurui){
     use memory::ky::Koma;
     use memory::ky::Koma::*;
     use memory::ky::Sengo::*;
-    use teigi::shogi_syugo::KmSyurui;
-    use teigi::shogi_syugo::KmSyurui::*;
+    use memory::ky::KmSyurui;
+    use memory::ky::KmSyurui::*;
     match *km{
         R0  => { (Sen,R ) },
         K0  => { (Sen,K ) },
@@ -482,8 +482,8 @@ pub fn km_to_sn(km:&Koma)->Sengo{
 pub fn km_to_kms(km:&Koma)->KmSyurui{
     use memory::ky::Koma;
     use memory::ky::Koma::*;
-    use teigi::shogi_syugo::KmSyurui;
-    use teigi::shogi_syugo::KmSyurui::*;
+    use memory::ky::KmSyurui;
+    use memory::ky::KmSyurui::*;
     match *km{
         R0 => { R},
         K0 => { K},
@@ -560,7 +560,7 @@ pub fn km_to_mg(km_cap:Koma)->Koma{
 
 /// 駒種類の数値化
 pub fn kms_to_num(kms:&KmSyurui) -> usize{
-    use teigi::shogi_syugo::KmSyurui::*;
+    use memory::ky::KmSyurui::*;
     match *kms {
         R=>0,
         K=>1,
@@ -584,7 +584,7 @@ pub fn kms_to_num(kms:&KmSyurui) -> usize{
  * 数値の駒種類化
  */
 pub fn num_to_kms(n:usize) -> KmSyurui {
-    use teigi::shogi_syugo::KmSyurui::*;
+    use memory::ky::KmSyurui::*;
     match n {
         0=>R,
         1=>K,
@@ -621,7 +621,7 @@ pub fn pop_kms_from_hash(hash:u64) -> (u64,KmSyurui) {
 }
 // 駒種類→｛　成駒,（不成駒、それ以外）　｝
 pub fn kms_is_pro(kms:&KmSyurui) -> bool{
-    use teigi::shogi_syugo::KmSyurui::*;
+    use memory::ky::KmSyurui::*;
     match *kms {
         R=>false,
         K=>false,
@@ -643,7 +643,7 @@ pub fn kms_is_pro(kms:&KmSyurui) -> bool{
 }
 // 成り駒種類→成る前の駒種類。成り駒でなければ、空に戻る。
 pub fn prokms_to_kms(kms:&KmSyurui) -> KmSyurui {
-    use teigi::shogi_syugo::KmSyurui::*;
+    use memory::ky::KmSyurui::*;
     match *kms {
         R=>Kara,
         K=>Kara,
@@ -668,7 +668,7 @@ pub fn prokms_to_kms(kms:&KmSyurui) -> KmSyurui {
  * 合い駒で防ぎえる可能性があれば真
  */
 pub fn kms_is_nagaikiki(kms:&KmSyurui) -> bool {
-    use teigi::shogi_syugo::KmSyurui::*;
+    use memory::ky::KmSyurui::*;
     match *kms {
         R=>false,
         K=>true,
@@ -692,7 +692,7 @@ pub fn kms_is_nagaikiki(kms:&KmSyurui) -> bool {
  * 成れる駒
  */
 pub fn kms_can_pro(kms:&KmSyurui) -> bool {
-    use teigi::shogi_syugo::KmSyurui::*;
+    use memory::ky::KmSyurui::*;
     match *kms {
         R=>false,
         K=>true,
@@ -716,7 +716,7 @@ pub fn kms_can_pro(kms:&KmSyurui) -> bool {
  * 打てる駒
  */
 pub fn kms_can_da(kms:&KmSyurui) -> bool {
-    use teigi::shogi_syugo::KmSyurui::*;
+    use memory::ky::KmSyurui::*;
     match *kms {
         R=>false,
         K=>true,
@@ -739,8 +739,8 @@ pub fn kms_can_da(kms:&KmSyurui) -> bool {
 // 先後＆駒種類→先後付き駒
 pub fn sn_kms_to_km(sn:&Sengo, kms:&KmSyurui)->Koma{
     use memory::ky::Koma;
-     use teigi::shogi_syugo::KmSyurui::*;
-     match *sn{
+    use memory::ky::KmSyurui::*;
+    match *sn{
         Sengo::Sen=>
             match *kms{
                 R=>R0,

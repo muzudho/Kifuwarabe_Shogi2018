@@ -347,7 +347,7 @@ pub fn insert_narumae_src_by_ms_km(
     // 「ぱひ」は、敵陣の１～３段目にいて、動きが北だった場合、元が「ひ」の可能性がある。
     let kms_src_narumae = prokms_to_kms( &kms_dst );
 
-    use teigi::shogi_syugo::KmSyurui::*;
+    use memory::ky::KmSyurui::*;
     match kms_src_narumae {
         Kara    => { return; },// 成れない駒は、成る動きを考えなくていいぜ☆（＾～＾）
         _       => {},// 成れる駒は、成る前の駒の動きも調べる

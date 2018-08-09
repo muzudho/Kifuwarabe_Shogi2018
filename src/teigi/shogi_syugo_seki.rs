@@ -4,7 +4,6 @@
  */
 
 use memory::ky::*;
-use teigi::shogi_syugo::*;
 
 /************
  * 升 × 駒 *

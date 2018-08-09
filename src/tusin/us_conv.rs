@@ -5,14 +5,13 @@
 use memory::ky::*;
 use memory::ky::Koma::*;
 use teigi::conv::*;
-use teigi::shogi_syugo::*;
 use models::movement::*;
 use kifuwarabe_usi::*;
 
 
 
 pub fn kms_to_pt (kms: &KmSyurui) -> PieceType {
-    use teigi::shogi_syugo::KmSyurui::*;
+    use memory::ky::KmSyurui::*;
     use kifuwarabe_usi::PieceType;
     match *kms{
         R => PieceType::K,
@@ -35,25 +34,25 @@ pub fn kms_to_pt (kms: &KmSyurui) -> PieceType {
 }
 
 pub fn pt_to_kms (pt: &PieceType) -> KmSyurui {
-    use kifuwarabe_usi::PieceType::*;
-    use teigi::shogi_syugo::KmSyurui;
+    use kifuwarabe_usi::PieceType;
+    use memory::ky::KmSyurui;
     match *pt{
-        K => KmSyurui::R,
-        R => KmSyurui::K,
-        B => KmSyurui::Z,
-        G => KmSyurui::I,
-        S => KmSyurui::N,
-        N => KmSyurui::U,
-        L => KmSyurui::S,
-        P => KmSyurui::H,
-        PR => KmSyurui::PK,
-        PB => KmSyurui::PZ,
-        PS => KmSyurui::PN,
-        PN => KmSyurui::PU,
-        PL => KmSyurui::PS,
-        PP => KmSyurui::PH,
-        Space => KmSyurui::Kara,
-        Num => KmSyurui::Owari,
+        PieceType::K => KmSyurui::R,
+        PieceType::R => KmSyurui::K,
+        PieceType::B => KmSyurui::Z,
+        PieceType::G => KmSyurui::I,
+        PieceType::S => KmSyurui::N,
+        PieceType::N => KmSyurui::U,
+        PieceType::L => KmSyurui::S,
+        PieceType::P => KmSyurui::H,
+        PieceType::PR => KmSyurui::PK,
+        PieceType::PB => KmSyurui::PZ,
+        PieceType::PS => KmSyurui::PN,
+        PieceType::PN => KmSyurui::PU,
+        PieceType::PL => KmSyurui::PS,
+        PieceType::PP => KmSyurui::PH,
+        PieceType::Space => KmSyurui::Kara,
+        PieceType::Num => KmSyurui::Owari,
     }
 }
 
