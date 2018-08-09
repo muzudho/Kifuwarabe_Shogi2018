@@ -4,7 +4,6 @@
  */
 use memory::ky::*;
 use memory::ky::Koma::*;
-use teigi::conv::*;
 use models::movement::*;
 use kifuwarabe_usi::*;
 

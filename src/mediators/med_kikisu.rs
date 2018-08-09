@@ -7,7 +7,6 @@ use memory::number_board::*;
 use memory::ky::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
-use teigi::conv::*;
 
 /**
  * 盤上の利き升調べ

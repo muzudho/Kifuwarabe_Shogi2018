@@ -11,7 +11,6 @@ use meidai::math_meidai::*;
 use models::movement::*;
 use std::collections::HashSet;
 use syazo::sasite_element::*;
-use teigi::conv::*;
 use thinks::randommove;
 use teigi::geometries::geo_teigi::*;
 use tusin::us_conv::*;

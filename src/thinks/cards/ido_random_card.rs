@@ -8,7 +8,6 @@ use memory::ky::*;
 use models::movement::*;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
-use teigi::conv::*;
 use std::collections::HashSet;
 use thinks::randommove;
 use thinks::results::jisatusyu_result::*;

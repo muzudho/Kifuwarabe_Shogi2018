@@ -2,7 +2,6 @@ use CUR_POSITION_WRAP;
 use memory::ky::*;
 use models::movement::*;
 use std::collections::*;
-use teigi::conv::*;
 use UCHU_WRAP;
 
 /**

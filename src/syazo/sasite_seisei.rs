@@ -6,7 +6,6 @@ use CUR_POSITION_WRAP;
 use consoles::asserts::*;
 use memory::ky::*;
 use models::movement::*;
-use teigi::conv::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
 use UCHU_WRAP;

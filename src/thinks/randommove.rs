@@ -3,7 +3,6 @@ extern crate rand;
 
 use memory::ky::*;
 use rand::Rng;
-use teigi::conv::*;
 
 /**
  * ランダムに真偽を返す。

@@ -6,7 +6,6 @@ use memory::ky::*;
 use memory::uchu::*;
 use models::movement::*;
 use std::collections::HashSet;
-use teigi::conv::*;
 use tusin::us_conv::*;
 
 /******

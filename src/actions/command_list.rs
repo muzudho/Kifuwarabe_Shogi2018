@@ -17,7 +17,6 @@ use thinks;
 use thinks::think::*;
 use syazo::sasite_seisei::*;
 use teigi::constants::*;
-use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
 use UCHU_WRAP;

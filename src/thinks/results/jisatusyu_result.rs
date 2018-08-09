@@ -4,7 +4,7 @@
  */
 
 use CUR_POSITION_WRAP;
-use teigi::conv::*;
+use memory::ky::*;
 use models::movement::*;
 use UCHU_WRAP;
 

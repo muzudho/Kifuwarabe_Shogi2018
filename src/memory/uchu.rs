@@ -15,7 +15,6 @@ use memory::ky2::*;
 use memory::number_board::*;
 use models::movement::*;
 use thinks::visions::vision_tree::*;
-use teigi::conv::*;
 use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
 
