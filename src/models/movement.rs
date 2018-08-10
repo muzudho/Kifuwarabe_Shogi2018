@@ -68,6 +68,8 @@ pub const SENNTITE_NUM :i8 = 4;
 
 /// 棋譜
 pub struct GameRecord{
+    /// 手目
+    pub teme : usize,
     /// 棋譜
     //#[derive(Copy, Clone)]
     pub moves : [Movement; TEME_LN],
@@ -75,6 +77,7 @@ pub struct GameRecord{
 impl GameRecord {
     pub fn new()->GameRecord{
         GameRecord{
+            teme : 0,
             moves : [
                 // 1行16要素で並べるぜ☆（＾～＾）
                 Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),

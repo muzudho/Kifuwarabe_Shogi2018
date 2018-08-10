@@ -85,8 +85,6 @@ pub struct Uchu{
     pub dialogue_mode : bool,
     // 局面ハッシュ種
     pub ky_hash_seed : KyHashSeed,
-    // 手目
-    pub teme : usize,
     // 初期局面ハッシュ
     pub ky0_hash : u64,
     // 現局面ハッシュ
@@ -118,7 +116,6 @@ impl Uchu{
                 // 先後
                 sn : [0;SN_LN],
             },
-            teme : 0,
             ky0_hash : 0,
             ky_hash : [
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -264,18 +261,19 @@ impl Uchu{
      ********/
 
     pub fn set_teme(&mut self, teme:usize){
-        self.teme = teme
+        GAME_RECORD_WRAP.try_write().unwrap().teme = teme
     }
     pub fn get_teme(&self) -> usize {
-        self.teme
+        GAME_RECORD_WRAP.try_read().unwrap().teme
     }
     // 手番
     pub fn get_teban(&self, jiai:&Jiai)->Sengo{
+        let teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
         use kifuwarabe_position::Jiai::*;
         match *jiai {
             Ji=>{
                 // 手番
-                if self.teme%2==0 {
+                if teme%2==0 {
                     Sengo::Sen
                 } else {
                     Sengo::Go
@@ -283,7 +281,7 @@ impl Uchu{
             },
             Ai=>{
                 // 相手番
-                if self.teme%2==0 {
+                if teme%2==0 {
                     Sengo::Go
                 } else {
                     Sengo::Sen
@@ -304,25 +302,29 @@ impl Uchu{
     }
     pub fn set_sasite_src(&mut self, src:umasu){
         let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-        game_record.moves[ self.teme ].source = src
+        game_record.moves[game_record.teme].source = src
     }
     pub fn set_sasite_dst(&mut self, dst:umasu){
         let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-        game_record.moves[ self.teme ].destination = dst
+        game_record.moves[game_record.teme].destination = dst
     }
     pub fn set_sasite_pro(&mut self, pro:bool){
         let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-        game_record.moves[ self.teme ].promotion = pro
+        game_record.moves[game_record.teme].promotion = pro
     }
     pub fn set_sasite_drop(&mut self, kms:KmSyurui){
         let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-        game_record.moves[ self.teme ].drop = kms
+        game_record.moves[game_record.teme].drop = kms
     }
     pub fn set_ky0_hash(&mut self, hash:u64){
         self.ky0_hash = hash
     }
     pub fn set_ky1_hash(&mut self, hash:u64){
-        self.ky_hash[ self.teme ] = hash
+        let teme: usize;
+        {
+            teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
+        }
+        self.ky_hash[teme] = hash
     }
     #[allow(dead_code)]
     pub fn set_cap(&mut self, teme:usize, km:Koma){
@@ -330,11 +332,19 @@ impl Uchu{
     }
     pub fn get_sasite(&self) -> Movement {
         let game_record = GAME_RECORD_WRAP.try_read().unwrap();
-        game_record.moves[ self.teme ]
+        let teme: usize;
+        {
+            teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
+        }
+        game_record.moves[ teme ]
     }
     #[allow(dead_code)]
     pub fn get_ky_hash(&mut self) -> u64 {
-        self.ky_hash[ self.teme ]
+        let teme: usize;
+        {
+            teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
+        }
+        self.ky_hash[teme]
     }
     /**
      * 使い方
@@ -343,13 +353,17 @@ impl Uchu{
      */
     pub fn kaku_kifu(&self)->String{
         let mut s = String::new();
-        for teme in 0..self.teme {
+        let teme: usize;
+        {
+            teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
+        }
+        for i_teme in 0..teme {
             let ss;
             {
                 let game_record = GAME_RECORD_WRAP.try_read().unwrap();
-                ss = game_record.moves[teme];
+                ss = game_record.moves[i_teme];
             }
-            s.push_str(&format!("[{}] {}", teme, movement_to_usi(&ss)));
+            s.push_str(&format!("[{}] {}", i_teme, movement_to_usi(&ss)));
         }
         s
     }
@@ -357,10 +371,14 @@ impl Uchu{
         let mut s = String::new();
         s.push_str(&format!("[ini] {:20}\n", &self.ky0_hash ));
 
-        for teme in 0..self.teme {
-            let hash = &self.ky_hash[teme];
+        let teme: usize;
+        {
+            teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
+        }
+        for i_teme in 0..teme {
+            let hash = &self.ky_hash[i_teme];
             // 64bitは10進数20桁。改行する
-            s.push_str(&format!("[{:3}] {:20}\n", teme, hash));
+            s.push_str(&format!("[{:3}] {:20}\n", i_teme, hash));
         }
         s
     }
@@ -516,30 +534,40 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
             let mut position = CUR_POSITION_WRAP.try_write().unwrap();
             let cap = make_movement(&sn, ss, &mut position);
 
-            let teme = self.teme;
-
+            let teme: usize;
             {
                 let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+                teme = game_record.teme;
                 game_record.moves[teme] = *ss;
             }
 
-            self.set_cap( teme, cap );
+            self.set_cap(teme, cap);
         }
 
         // 局面ハッシュを作り直す
         let ky_hash = self.create_ky1_hash();
         self.set_ky1_hash( ky_hash );
 
-        self.teme += 1;
+        {
+            GAME_RECORD_WRAP.try_write().unwrap().teme += 1;
+        }
     }
 
     pub fn undo_ss(&mut self) -> bool {
-        if 0 < self.teme {
+        let mut teme: usize;
+        {
+            teme = GAME_RECORD_WRAP.try_write().unwrap().teme;
+        }
+
+        if 0 < teme {
             // 棋譜から読取、手目も減る
-            self.teme-=1;
+            {
+                teme -= 1;
+                GAME_RECORD_WRAP.try_write().unwrap().teme = teme;
+            }
             let sn = self.get_teban(&Jiai::Ji);
             let ss = &self.get_sasite();
-            let cap = self.cap[self.teme];
+            let cap = self.cap[teme];
 
             {
                 let mut position = CUR_POSITION_WRAP.try_write().unwrap();
