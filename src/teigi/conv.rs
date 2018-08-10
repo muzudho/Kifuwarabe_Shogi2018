@@ -8,45 +8,6 @@ use kifuwarabe_position::*;
 use teigi::geometries::geo_teigi::*;
 use teigi::shogi_syugo::*;
 
-/**********
- * 論理値 *
- **********/
- /**
-  * false => 0
-  * true => 1
-  *
-  * bool は i32 だが、_to_num 系は usize を返すように合わせるぜ☆（*＾～＾*）
-  */
-#[allow(dead_code)]
-pub fn bool_to_num(b:bool) -> usize {
-    b as usize
-}
-/**
- * 0 なら偽、それ以外は真☆（＾～＾）
- */
-#[allow(dead_code)]
-pub fn num_to_bool(n:usize) -> bool {
-    match n {
-        0 => false,
-        _ => true
-    }
-}
-/**
- * ハッシュ値を作る
- */
-#[allow(dead_code)]
-pub fn push_bool_to_hash(hash:u64, b:bool) -> u64 {
-    // bool は i32 だが、hash は u64 なので u64 に合わせるぜ☆（*＾～＾*）
-    (hash<<7) + b as u64
-}
-/**
- * ハッシュ値から作る
- */
-#[allow(dead_code)]
-pub fn pop_bool_from_hash(hash:u64) -> (u64, bool) {
-    let b_num = num_to_bool( (hash & 0b1) as usize );
-    (hash>>7, b_num)
-}
 
 /*********
  * 4角度 *
