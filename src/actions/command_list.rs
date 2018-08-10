@@ -8,6 +8,7 @@ use consoles;
 use consoles::unit_test::*;
 use consoles::visuals::dumps::*;
 use consoles::visuals::title::*;
+use GAME_RECORD_WRAP;
 use kifuwarabe_position::*;
 use kifuwarabe_usi::*;
 use models::movement::*;
@@ -117,7 +118,11 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
             if successful {
                 // 入っている指し手の通り指すぜ☆（＾～＾）
                 let teme = uchu_w.teme;
-                let ss = uchu_w.kifu[ teme ];
+                let ss;
+                {
+                    let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+                    ss = game_record.moves[ teme ];
+                }
                 uchu_w.do_ss( &ss );                
             }
         }
@@ -193,7 +198,11 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
             if successful {
                 // 入っている指し手の通り指すぜ☆（＾～＾）
                 let teme = uchu_w.teme;
-                let ss = uchu_w.kifu[ teme ];
+                let ss;
+                {
+                    let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+                    ss = game_record.moves[ teme ];
+                }
                 uchu_w.do_ss( &ss );                
             }
         }
@@ -353,7 +362,11 @@ pub fn do_do(row: &String, starts:&mut usize, _res:&mut Response) {
         if successful {
             // 入っている指し手の通り指すぜ☆（＾～＾）
             let teme = uchu_w.teme;
-            let ss = uchu_w.kifu[ teme ];
+            let ss;
+            {
+                let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+                ss = game_record.moves[ teme ];
+            }
             uchu_w.do_ss( &ss );
         }
     }

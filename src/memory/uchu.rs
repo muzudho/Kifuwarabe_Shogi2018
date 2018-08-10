@@ -9,6 +9,7 @@ use rand::Rng;
 
 use CUR_POSITION_WRAP;
 use config::*;
+use GAME_RECORD_WRAP;
 use INI_POSITION_WRAP;
 use kifuwarabe_position::*;
 use memory::number_board::*;
@@ -86,9 +87,6 @@ pub struct Uchu{
     pub ky_hash_seed : KyHashSeed,
     // 手目
     pub teme : usize,
-    // 棋譜
-    //#[derive(Copy, Clone)]
-    pub kifu : [Movement; TEME_LN],
     // 初期局面ハッシュ
     pub ky0_hash : u64,
     // 現局面ハッシュ
@@ -121,26 +119,6 @@ impl Uchu{
                 sn : [0;SN_LN],
             },
             teme : 0,
-            kifu : [
-                // 1行16要素で並べるぜ☆（＾～＾）
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
-                Movement::new()//257要素
-            ],
             ky0_hash : 0,
             ky_hash : [
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -325,16 +303,20 @@ impl Uchu{
         self.set_sasite_pro(mv.promotion);
     }
     pub fn set_sasite_src(&mut self, src:umasu){
-        self.kifu[ self.teme ].source = src
+        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+        game_record.moves[ self.teme ].source = src
     }
     pub fn set_sasite_dst(&mut self, dst:umasu){
-        self.kifu[ self.teme ].destination = dst
+        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+        game_record.moves[ self.teme ].destination = dst
     }
     pub fn set_sasite_pro(&mut self, pro:bool){
-        self.kifu[ self.teme ].promotion = pro
+        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+        game_record.moves[ self.teme ].promotion = pro
     }
     pub fn set_sasite_drop(&mut self, kms:KmSyurui){
-        self.kifu[ self.teme ].drop = kms
+        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+        game_record.moves[ self.teme ].drop = kms
     }
     pub fn set_ky0_hash(&mut self, hash:u64){
         self.ky0_hash = hash
@@ -347,7 +329,8 @@ impl Uchu{
         self.cap[ teme ] = km
     }
     pub fn get_sasite(&self) -> Movement {
-        self.kifu[ self.teme ]
+        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+        game_record.moves[ self.teme ]
     }
     #[allow(dead_code)]
     pub fn get_ky_hash(&mut self) -> u64 {
@@ -361,8 +344,12 @@ impl Uchu{
     pub fn kaku_kifu(&self)->String{
         let mut s = String::new();
         for teme in 0..self.teme {
-            let ss = &self.kifu[teme];
-            s.push_str(&format!("[{}] {}", teme, movement_to_usi(ss)));
+            let ss;
+            {
+                let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+                ss = game_record.moves[teme];
+            }
+            s.push_str(&format!("[{}] {}", teme, movement_to_usi(&ss)));
         }
         s
     }
@@ -530,7 +517,12 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
             let cap = make_movement(&sn, ss, &mut position);
 
             let teme = self.teme;
-            self.kifu[teme] = *ss;
+
+            {
+                let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+                game_record.moves[teme] = *ss;
+            }
+
             self.set_cap( teme, cap );
         }
 

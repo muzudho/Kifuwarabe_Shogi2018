@@ -41,6 +41,7 @@ mod tusin;
 
 use actions::command_list::*;
 use memory::uchu::*;
+use models::movement::*;
 
 
 // グローバル変数
@@ -52,6 +53,8 @@ lazy_static! {
     static ref INI_POSITION_WRAP: RwLock<Kyokumen> = RwLock::new(Kyokumen::new());
     // 計算中の局面
     static ref CUR_POSITION_WRAP: RwLock<Kyokumen> = RwLock::new(Kyokumen::new());
+    // 棋譜
+    static ref GAME_RECORD_WRAP: RwLock<GameRecord> = RwLock::new(GameRecord::new());
 }
 
 fn main() {

@@ -1,4 +1,3 @@
-//use consoles::asserts::*;
 use kifuwarabe_position::*;
 use std::fmt;
 
@@ -45,6 +44,60 @@ pub fn pop_bool_from_hash(hash:u64) -> (u64, bool) {
     (hash>>7, b_num)
 }
 
+
+
+/********
+ * 手目 *
+ ********/
+/**
+ * 手目数。何手目まで指せるか。
+ * 棋譜を残す配列のサイズでもある。
+ * 大会ルールが 256手として、終端子として投了を１個入れておけるようにする。
+ */
+pub const TEME_LN :usize = 257;
+/**
+ * 同一局面何回で千日手
+ */
+pub const SENNTITE_NUM :i8 = 4;
+
+
+
+
+
+
+
+/// 棋譜
+pub struct GameRecord{
+    /// 棋譜
+    //#[derive(Copy, Clone)]
+    pub moves : [Movement; TEME_LN],
+}
+impl GameRecord {
+    pub fn new()->GameRecord{
+        GameRecord{
+            moves : [
+                // 1行16要素で並べるぜ☆（＾～＾）
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),
+                Movement::new()//257要素
+            ],
+        }
+    }
+}
 
 
 
