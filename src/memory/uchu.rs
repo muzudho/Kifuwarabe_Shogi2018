@@ -11,7 +11,6 @@ use CUR_POSITION_WRAP;
 use config::*;
 use INI_POSITION_WRAP;
 use kifuwarabe_position::*;
-use memory::ky2::*;
 use memory::number_board::*;
 use models::movement::*;
 use thinks::visions::vision_tree::*;
@@ -525,10 +524,15 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
     pub fn do_ss(&mut self, ss:&Movement) {
         // もう入っているかも知れないが、棋譜に入れる☆
         let sn = self.get_teban(&Jiai::Ji);
-        let cap = do_sasite(&sn, ss);
-        let teme = self.teme;
-        self.kifu[teme] = *ss;
-        self.set_cap( teme, cap );
+
+        {
+            let mut position = CUR_POSITION_WRAP.try_write().unwrap();
+            let cap = make_movement(&sn, ss, &mut position);
+
+            let teme = self.teme;
+            self.kifu[teme] = *ss;
+            self.set_cap( teme, cap );
+        }
 
         // 局面ハッシュを作り直す
         let ky_hash = self.create_ky1_hash();
@@ -544,7 +548,11 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
             let sn = self.get_teban(&Jiai::Ji);
             let ss = &self.get_sasite();
             let cap = self.cap[self.teme];
-            undo_sasite(&sn, &ss, &cap );
+
+            {
+                let mut position = CUR_POSITION_WRAP.try_write().unwrap();
+                unmake_movement(&sn, &ss, &cap, &mut position);
+            }
             // 棋譜にアンドゥした指し手がまだ残っているが、とりあえず残しとく
             true
         } else {
