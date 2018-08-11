@@ -9,7 +9,7 @@ extern crate rand;
 extern crate lazy_static;
 
 extern crate kifuwarabe_shell;
-use kifuwarabe_shell::TokenMapping;
+use kifuwarabe_shell::Token;
 use kifuwarabe_shell::Shell;
 
 extern crate kifuwarabe_usi;
@@ -44,6 +44,7 @@ mod tusin;
 
 use actions::command_list::*;
 use memory::uchu::*;
+use misc::position_ex::*;
 
 
 // グローバル変数
@@ -55,6 +56,8 @@ lazy_static! {
     static ref INI_POSITION_WRAP: RwLock<Kyokumen> = RwLock::new(Kyokumen::new());
     // 計算中の局面
     pub static ref CUR_POSITION_WRAP: RwLock<Kyokumen> = RwLock::new(Kyokumen::new());
+    // 計算中の局面(拡張)
+    pub static ref CUR_POSITION_EX_WRAP: RwLock<PositionEx> = RwLock::new(PositionEx::new());
     // 棋譜
     static ref GAME_RECORD_WRAP: RwLock<GameRecord> = RwLock::new(GameRecord::new());
 }
@@ -66,29 +69,30 @@ fn main() {
     
     // コマンド リスト。
     let mut shell = Shell::new();
-    shell.push_token_mapping(TokenMapping { token: "do ".to_string(), callback: do_do});
-    shell.push_token_mapping(TokenMapping { token: "go".to_string(), callback: do_go});
-    shell.push_token_mapping(TokenMapping { token: "hash".to_string(), callback: do_hash});
-    shell.push_token_mapping(TokenMapping { token: "hirate".to_string(), callback: do_hirate});
-    shell.push_token_mapping(TokenMapping { token: "isready".to_string(), callback: do_isready});
-    shell.push_token_mapping(TokenMapping { token: "kifu".to_string(), callback: do_kifu});
-    shell.push_token_mapping(TokenMapping { token: "kikisu".to_string(), callback: do_kikisu});
-    shell.push_token_mapping(TokenMapping { token: "kmugokidir".to_string(), callback: do_kmugokidir});
-    shell.push_token_mapping(TokenMapping { token: "kmugoki".to_string(), callback: do_kmugoki});
-    shell.push_token_mapping(TokenMapping { token: "ky0".to_string(), callback: do_ky0});
-    shell.push_token_mapping(TokenMapping { token: "ky".to_string(), callback: do_ky});
-    shell.push_token_mapping(TokenMapping { token: "position".to_string(), callback: do_position});
-    shell.push_token_mapping(TokenMapping { token: "quit".to_string(), callback: do_quit});
-    shell.push_token_mapping(TokenMapping { token: "rand".to_string(), callback: do_rand});
-    shell.push_token_mapping(TokenMapping { token: "rndkms".to_string(), callback: do_rndkms});
-    shell.push_token_mapping(TokenMapping { token: "rndms".to_string(), callback: do_rndms});
-    shell.push_token_mapping(TokenMapping { token: "same".to_string(), callback: do_same});
-    shell.push_token_mapping(TokenMapping { token: "sasite".to_string(), callback: do_sasite});
-    shell.push_token_mapping(TokenMapping { token: "teigi::conv".to_string(), callback: do_teigi_conv});
-    shell.push_token_mapping(TokenMapping { token: "test".to_string(), callback: do_test});
-    shell.push_token_mapping(TokenMapping { token: "usinewgame".to_string(), callback: do_usinewgame});
-    shell.push_token_mapping(TokenMapping { token: "undo".to_string(), callback: do_undo});
-    shell.push_token_mapping(TokenMapping { token: "usi".to_string(), callback: do_usi});
+    shell.push_token(Token { token: "do ".to_string(), callback: do_do});
+    shell.push_token(Token { token: "go".to_string(), callback: do_go});
+    shell.push_token(Token { token: "hash".to_string(), callback: do_hash});
+    shell.push_token(Token { token: "hirate".to_string(), callback: do_hirate});
+    shell.push_token(Token { token: "isready".to_string(), callback: do_isready});
+    shell.push_token(Token { token: "kifu".to_string(), callback: do_kifu});
+    shell.push_token(Token { token: "kikisu".to_string(), callback: do_kikisu});
+    shell.push_token(Token { token: "kmugokidir".to_string(), callback: do_kmugokidir});
+    shell.push_token(Token { token: "kmugoki".to_string(), callback: do_kmugoki});
+    shell.push_token(Token { token: "ky0".to_string(), callback: do_ky0});
+    shell.push_token(Token { token: "ky".to_string(), callback: do_ky});
+    shell.push_token(Token { token: "position".to_string(), callback: do_position});
+    shell.push_token(Token { token: "quit".to_string(), callback: do_quit});
+    shell.push_token(Token { token: "rand".to_string(), callback: do_rand});
+    shell.push_token(Token { token: "rndkms".to_string(), callback: do_rndkms});
+    shell.push_token(Token { token: "rndms".to_string(), callback: do_rndms});
+    shell.push_token(Token { token: "same".to_string(), callback: do_same});
+    shell.push_token(Token { token: "sasite".to_string(), callback: do_sasite});
+    shell.push_token(Token { token: "setoption".to_string(), callback: do_setoption});
+    shell.push_token(Token { token: "teigi::conv".to_string(), callback: do_teigi_conv});
+    shell.push_token(Token { token: "test".to_string(), callback: do_test});
+    shell.push_token(Token { token: "usinewgame".to_string(), callback: do_usinewgame});
+    shell.push_token(Token { token: "undo".to_string(), callback: do_undo});
+    shell.push_token(Token { token: "usi".to_string(), callback: do_usi});
     shell.set_other_callback(do_other);
 
     // [Ctrl]+[C] で強制終了

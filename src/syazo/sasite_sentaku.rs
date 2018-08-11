@@ -10,12 +10,12 @@ use consoles::asserts::*;
 use GAME_RECORD_WRAP;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-use memory::uchu::*;
+// use memory::uchu::*;
 use misc::movement::*;
 use std::collections::HashSet;
 use syazo::sasite_element::*;
 use thinks::results::komatori_result::*;
-use tusin::us_conv::*;
+// use tusin::us_conv::*;
 use UCHU_WRAP;
 
 pub fn choice_1ss_by_hashset( ss_hashset:&HashSet<u64> ) -> Movement {
@@ -45,7 +45,7 @@ pub fn filtering_ss_except_oute(
 ) {
     // 自玉の位置
     let ms_r = UCHU_WRAP.try_read().unwrap().get_ms_r(&Jiai::Ji);
-    g_writeln(&format!("info string My raion {}.", ms_r ));
+    // g_writeln(&format!("info string My raion {}.", ms_r ));
 
     // 王手の一覧を取得
     let sn1;
@@ -57,12 +57,14 @@ pub fn filtering_ss_except_oute(
         // 王手されていれば
 
         // 表示
-        g_writeln(&format!("info string My raion is {} OUTED.", komatori_result_hashset.len() ));
+        /*
+        // g_writeln(&format!("info string My raion is {} OUTED.", komatori_result_hashset.len() ));
         for komatori_result_hash0 in komatori_result_hashset.iter() {
             let komatori_result = KomatoriResult::from_hash( *komatori_result_hash0);
             // どんな王手か、出力
-            g_writeln(&format!("info OUTE: {}.", komatori_result ));
+            // g_writeln(&format!("info string OUTE: {}.", komatori_result ));
         }
+        */
 
         let mut ss_hashset_pickup : HashSet<u64> = HashSet::new();
 
@@ -99,7 +101,7 @@ pub fn filtering_ss_except_oute(
 
     } else {
         // 王手されていなければ
-        g_writeln(&format!("info string My raion is not outed."));
+        // g_writeln(&format!("info string My raion is not outed."));
     }
 }
 
@@ -161,15 +163,17 @@ pub fn filtering_ss_except_jisatusyu(
 
         // 玉が利きに飛び込んでいるか？
         let jisatusyu = 0<attackers.len();
-        g_writeln(&format!("info {} evaluated => {} attackers. offence={}->{}",
+        /*
+        // g_writeln(&format!("info string {} evaluated => {} attackers. offence={}->{}",
             movement_to_usi(&ss_potential),
             attackers.len(),
             sn1,
             ms_r_new
         ));
         for ms_atk in attackers.iter() {
-            g_writeln(&format!("info ms_atk={}.",ms_atk ));
+            // g_writeln(&format!("info string ms_atk={}.",ms_atk ));
         }
+        */
 
         // 手を戻す
         unmake_movement2(|&_cap|{});
@@ -181,11 +185,11 @@ pub fn filtering_ss_except_jisatusyu(
             continue 'idea;
         }
 
-        g_writeln(&format!("info SOLUTED ss={}.", movement_to_usi(&ss_potential) ));
+        //g_writeln(&format!("info string SOLUTED ss={}.", movement_to_usi(&ss_potential) ));
         // 問題を全て解決していれば、入れる
         ss_hashset_pickup.insert( ss_potential.to_hash() );
     }
-    g_writeln(&format!("info {} solutions.", ss_hashset_pickup.len() ));
+    //g_writeln(&format!("info string {} solutions.", ss_hashset_pickup.len() ));
 
     // 空っぽにする
     ss_hashset_input.clear();

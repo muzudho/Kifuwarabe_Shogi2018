@@ -21,7 +21,7 @@ pub fn is_jisatusyu(ss:&Movement)->bool{
     let kikisu = UCHU_WRAP.try_read().unwrap().kiki_su_by_sn[ sn_to_num( &sn_aite) ].get_su_by_ms( ss.destination );
     let result = 0<kikisu;
     // g_writeln(&format!(
-    //     "info is_jisatusyu={} km_src={} sn_teban={} kms={} sn_aite={} ss.destination={} kikisu={}"
+    //     "info string is_jisatusyu={} km_src={} sn_teban={} kms={} sn_aite={} ss.destination={} kikisu={}"
     //     ,result ,km_src ,sn_teban ,kms ,sn_aite ,ss.destination ,kikisu
     // ));
 

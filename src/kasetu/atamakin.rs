@@ -6,7 +6,7 @@
 use CUR_POSITION_WRAP;
 use GAME_RECORD_WRAP;
 use kifuwarabe_position::*;
-use memory::uchu::*;
+// use memory::uchu::*;
 use teigi::conv::*;
 use teigi::shogi_syugo_seki::*;
 use teigi::banjometries::*;
@@ -31,7 +31,7 @@ pub fn is_s()->bool{
     }
     if !match_jiai( &jiai_km, &Jiai::Ji ) { return true; }
 
-    g_writeln(&format!("info string south of My raion {} = {}. jiai_km={}.", ms_r, km, jiai_km ));
+    // g_writeln(&format!("info string south of My raion {} = {}. jiai_km={}.", ms_r, km, jiai_km ));
 
     let kms = km_to_kms( &km );
 

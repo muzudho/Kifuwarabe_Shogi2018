@@ -1,15 +1,11 @@
 /// 探索部だぜ☆（＾～＾）
-extern crate rand;
-use rand::Rng;
-
+use CUR_POSITION_EX_WRAP;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-use memory::uchu::*;
 use misc::movement::*;
 use std::collections::HashSet;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
-use tusin::us_conv::*;
 
 
 /// 探索オブジェクト。思考開始時に作成して使う。
@@ -46,107 +42,75 @@ impl Searcher{
     }
 
     /// 探索。
-    pub fn search(&mut self) -> Movement {
-        // TODO 王手放置漏れ回避　を最優先させたいぜ☆（＾～＾）
+    /// 
+    /// Returns: ベストムーブ, 評価値。
+    pub fn search(&mut self, depth: i16) -> (Movement, i16) {
 
-        // +----------------------+
-        // | 王手放置漏れ回避対策 |
-        // +----------------------+
+        if 0 == depth {
+            // 葉。
+            // 現局面の駒割りを評価値とする。
 
-        // let を 先に記述した変数の方が、後に記述した変数より　寿命が長いので注意☆（＾～＾）
+            // 評価値は駒割り。
+            let komawari;
+            {
+                let position_ex = CUR_POSITION_EX_WRAP.try_read().unwrap();
+                komawari = position_ex.komawari;
+            }
+
+            // まだ次の手ではないので、点数は逆さにしておくと、さかさまにし直すように動く。
+            return (Movement::new(), -komawari);
+        }
+
 
         // 現局面の合法手を取得する。
-        let mut hashset_movement1 : HashSet<u64> = HashSet::new();
-
+        let mut hashset_movement : HashSet<u64> = HashSet::new();
         // 駒の動き方
-        insert_potential_move(&mut hashset_movement1 );
+        insert_potential_move(&mut hashset_movement);
         // g_writeln("テスト ポテンシャルムーブ.");
         // use consoles::visuals::dumps::*;
-        // hyoji_ss_hashset( &hashset_movement1 );
+        // hyoji_ss_hashset( &hashset_movement );
 
+        // 王手されている場合、王手回避の手に絞り込む。
+        filtering_ss_except_oute(&mut hashset_movement);
 
-        // 指せる手から
-        let mut komawari = 0;
-        let mut max_komawari = -30000;
-        let mut hashset_movement2 : HashSet<u64> = HashSet::new();
-        'idea: for hash_mv in hashset_movement1.iter() {
+        // FIXME 負けてても、千日手は除くぜ☆（＾～＾）ただし、千日手を取り除くと手がなくなる場合は取り除かないぜ☆（＾～＾）
+        filtering_ss_except_sennitite(&mut hashset_movement);
+
+        // 自殺手は省くぜ☆（＾～＾）
+        filtering_ss_except_jisatusyu( &mut hashset_movement);
+
+        let mut best_movement = Movement::new();
+        let mut best_evalutation = -30000;
+        'idea: for hash_mv in hashset_movement.iter() {
             let movement = Movement::from_hash( *hash_mv );
 
             // 1手指す。
             make_movement2(&movement, |&cap: &KmSyurui|{
                 // 駒割り
-                komawari += self.get_koma_score(&cap);
+                let mut position_ex = CUR_POSITION_EX_WRAP.try_write().unwrap();
+                position_ex.komawari += self.get_koma_score(&cap);
             });
 
-            if max_komawari < komawari {
-                max_komawari = komawari;
-                hashset_movement2.clear();
-                hashset_movement2.insert(*hash_mv);
-            } else if max_komawari == komawari {
-                hashset_movement2.insert(*hash_mv);
+            // 子を探索へ。
+            let (_child_movement, mut child_evaluation) = self.search(depth-1);
+            // 相手の評価値を逆さにする。
+            child_evaluation = -child_evaluation;
+
+            // 比較して、一番良い手を選ぶ。
+            if best_evalutation < child_evaluation {
+                best_evalutation = child_evaluation;
+                best_movement = movement; // この手。
             }
 
             // 1手戻す。
             unmake_movement2(|&cap|{
                 // 駒割り
-                komawari -= self.get_koma_score(&cap);
+                let mut position_ex = CUR_POSITION_EX_WRAP.try_write().unwrap();
+                position_ex.komawari -= self.get_koma_score(&cap);
             });
         }
 
-
-
-
-        filtering_ss_except_oute(&mut hashset_movement2);
-
-
-
-        /*
-        // 現局面を見て、ビジョンを作り直せだぜ☆（＾～＾）
-        &UCHU_WRAP.try_write().unwrap().remake_visions();
-        */
-
-        /*
-        // 楽観筋
-        for sn in SN_ARRAY.iter() {
-            let ai_sn = hanten_sn( sn );
-            // 相手の　らいおん　の位置を覚える
-            let ai_ms_r = CUR_POSITION_WRAP.try_read().unwrap().ms_r[sn_to_num(&ai_sn)];
-            insert_rakkansuji(&sn, &mut UCHU_WRAP.try_write().unwrap().vision_tree_by_sn[sn_to_num(sn)], ai_ms_r);
-        }
-        // TODO 楽観筋はまだ使ってない☆（＾～＾）
-        */
-
-        // 楽観王手の一覧はできているはず。
-
-        // FIXME 負けてても、千日手は除くぜ☆（＾～＾）ただし、千日手を取り除くと手がなくなる場合は取り除かないぜ☆（＾～＾）
-        filtering_ss_except_sennitite(
-            &mut hashset_movement2
-        );
-
-        // 自殺手は省くぜ☆（＾～＾）
-        filtering_ss_except_jisatusyu( &mut hashset_movement2);
-
-
-
-
-
-        if hashset_movement2.len()==0 {
-            // 投了
-            return Movement::new();
-        } else {
-            // 複数の手があれば、ランダムに1つに絞り込むぜ☆（＾～＾）
-            let index = rand::thread_rng().gen_range(0, hashset_movement2.len());
-            let mut i = 0;
-            for ss_hash in hashset_movement2 {
-                if i==index {
-                    let ss = Movement::from_hash(ss_hash);
-                    g_writeln(&format!("info solution:{}.", movement_to_usi(&ss) ));
-                    return ss;
-                }
-                i+=1;
-            }
-            // 投了
-            return Movement::new();
-        }
+        // 返却。
+        (best_movement, best_evalutation)
     }
 }

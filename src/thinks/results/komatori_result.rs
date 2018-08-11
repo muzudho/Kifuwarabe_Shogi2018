@@ -7,7 +7,7 @@ use std::collections::HashSet;
 use consoles::asserts::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-use memory::uchu::*;
+// use memory::uchu::*;
 use meidai::math_meidai::*;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
@@ -129,12 +129,12 @@ impl KomatoriResult{
                 // スライダーのいる筋の上で動いても、逃げたことにはならないぜ☆（＾～＾）
                 match match_argangle4( &argangle4a, &argangle4b ) {
                     MatchingResult::Unmatched => {
-                        g_writeln(&format!("info ss={} evaluated in slider.", movement_to_usi(ss) ));
+                        // g_writeln(&format!("info string ss={} evaluated in slider.", movement_to_usi(ss) ));
                         // スライダーから逃げても、ひよこの利きに飛び込むことはあるが……☆
                         return KomatoriResultResult::NoneMoved
                     },
                     _ => {
-                        g_writeln(&format!("info ss={} in slider attack.", movement_to_usi(ss) ));                    
+                        // g_writeln(&format!("info string ss={} in slider attack.", movement_to_usi(ss) ));                    
                     },
                 }
             }
