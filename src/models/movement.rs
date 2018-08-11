@@ -70,6 +70,8 @@ pub const SENNTITE_NUM :i8 = 4;
 pub struct GameRecord{
     /// 手目
     pub teme : usize,
+    // 局面ハッシュ種
+    pub ky_hash_seed : KyHashSeed,
     /// 棋譜
     //#[derive(Copy, Clone)]
     pub moves : [Movement; TEME_LN],
@@ -78,6 +80,14 @@ impl GameRecord {
     pub fn new()->GameRecord{
         GameRecord{
             teme : 0,
+            ky_hash_seed : KyHashSeed{
+                // 盤上の駒
+                km : [[0;KM_LN];BAN_SIZE],
+                // 持ち駒
+                mg : [[0;MG_MAX];KM_LN],
+                // 先後
+                sn : [0;SN_LN],
+            },
             moves : [
                 // 1行16要素で並べるぜ☆（＾～＾）
                 Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),

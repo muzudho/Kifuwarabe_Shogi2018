@@ -83,8 +83,6 @@ pub fn g_writeln(s:&str){
 pub struct Uchu{
     // 対話モード
     pub dialogue_mode : bool,
-    // 局面ハッシュ種
-    pub ky_hash_seed : KyHashSeed,
     // 初期局面ハッシュ
     pub ky0_hash : u64,
     // 現局面ハッシュ
@@ -108,14 +106,6 @@ impl Uchu{
     pub fn new()->Uchu{
         Uchu{
             dialogue_mode : false,
-            ky_hash_seed : KyHashSeed{
-                // 盤上の駒
-                km : [[0;KM_LN];BAN_SIZE],
-                // 持ち駒
-                mg : [[0;MG_MAX];KM_LN],
-                // 先後
-                sn : [0;SN_LN],
-            },
             ky0_hash : 0,
             ky_hash : [
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -181,22 +171,24 @@ impl Uchu{
     pub fn big_bang(&mut self) {
         // 局面ハッシュの種をリセット
 
+        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+
         // 盤上の駒
         for i_ms in MASU_0..BAN_SIZE {
             for i_km in 0..KM_LN {
                 // FIXME 18446744073709551615 が含まれないだろ、どうなってるんだぜ☆（＾～＾）！？
-                self.ky_hash_seed.km[i_ms][i_km] = rand::thread_rng().gen_range(0,18446744073709551615);
+                game_record.ky_hash_seed.km[i_ms][i_km] = rand::thread_rng().gen_range(0,18446744073709551615);
             }
         }
         // 持ち駒
         for i_km in 0..KM_LN {
             for i_mg in 0..MG_MAX {
-                self.ky_hash_seed.mg[i_km][i_mg] = rand::thread_rng().gen_range(0,18446744073709551615);
+                game_record.ky_hash_seed.mg[i_km][i_mg] = rand::thread_rng().gen_range(0,18446744073709551615);
             }
         }
         // 先後
         for i_sn in 0..SN_LN {
-            self.ky_hash_seed.sn[i_sn] = rand::thread_rng().gen_range(0,18446744073709551615);
+            game_record.ky_hash_seed.sn[i_sn] = rand::thread_rng().gen_range(0,18446744073709551615);
         }
     }
     /**
@@ -593,16 +585,15 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
      */
     pub fn create_ky0_hash( &self ) -> u64 {
 
-        let ky_hash_seed = &self.ky_hash_seed;
-
+        let hash_seed = &GAME_RECORD_WRAP.try_read().unwrap().ky_hash_seed;
         let mut hash : u64;
         // グローバル変数を使う。
         {
-            hash = INI_POSITION_WRAP.try_read().unwrap().create_hash(&ky_hash_seed);
+            hash = INI_POSITION_WRAP.try_read().unwrap().create_hash(&hash_seed);
         }
 
         // 手番ハッシュ（後手固定）
-        hash ^= self.ky_hash_seed.sn[SN_GO];
+        hash ^= hash_seed.sn[SN_GO];
 
         hash
     }
@@ -611,14 +602,14 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
      * 局面ハッシュを作り直す
      */
     pub fn create_ky1_hash( &self ) -> u64 {
-        let ky_hash_seed = &self.ky_hash_seed;
-        let mut hash = CUR_POSITION_WRAP.try_read().unwrap().create_hash(&ky_hash_seed);
+        let hash_seed = &GAME_RECORD_WRAP.try_read().unwrap().ky_hash_seed;
+        let mut hash = CUR_POSITION_WRAP.try_read().unwrap().create_hash(&hash_seed);
 
         // 手番ハッシュ
         use kifuwarabe_position::Sengo::*;
         match self.get_teban(&Jiai::Ji) {
-            Sen => { hash ^= self.ky_hash_seed.sn[SN_SEN] },
-            Go => { hash ^= self.ky_hash_seed.sn[SN_GO] },
+            Sen => { hash ^= hash_seed.sn[SN_SEN] },
+            Go => { hash ^= hash_seed.sn[SN_GO] },
             _ => {},
         }
 
