@@ -8,6 +8,7 @@ use std::collections::HashSet;
 
 use CUR_POSITION_WRAP;
 use consoles::asserts::*;
+use GAME_RECORD_WRAP;
 use kifuwarabe_position::*;
 use memory::uchu::*;
 use models::movement::*;
@@ -46,7 +47,7 @@ pub fn filtering_ss_except_oute(
     g_writeln(&format!("info string My raion {}.", ms_r ));
 
     // 王手の一覧を取得
-    let komatori_result_hashset : HashSet<u64> = lookup_banjo_catch(&UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ai), ms_r);
+    let komatori_result_hashset : HashSet<u64> = lookup_banjo_catch(&GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ai), ms_r);
     if 0<komatori_result_hashset.len() {
         // 王手されていれば
 
@@ -109,7 +110,7 @@ pub fn filtering_ss_except_jisatusyu(
     let mut ss_hashset_pickup : HashSet<u64> = HashSet::new();
 
     // 自玉の位置
-    let ms_r = CUR_POSITION_WRAP.try_read().unwrap().ms_r[ sn_to_num(&UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji)) ];
+    let ms_r = CUR_POSITION_WRAP.try_read().unwrap().ms_r[ sn_to_num(&GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji)) ];
 
 
     // 王手回避カードを発行する
@@ -136,11 +137,11 @@ pub fn filtering_ss_except_jisatusyu(
         // 有り得る移動元が入る☆（＾～＾）
         let mut attackers : HashSet<umasu> = HashSet::new();
         insert_narazu_src_by_sn_ms(
-            &UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), // 指定の升に駒を動かそうとしている手番
+            &GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), // 指定の升に駒を動かそうとしている手番
             ms_r_new, // 指定の升
             &mut attackers );
         insert_narumae_src_by_sn_ms(
-            &UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), // 指定の升に駒を動かそうとしている手番
+            &GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), // 指定の升に駒を動かそうとしている手番
             ms_r_new, // 指定の升
             &mut attackers );
 
@@ -150,7 +151,7 @@ pub fn filtering_ss_except_jisatusyu(
         g_writeln(&format!("info {} evaluated => {} attackers. offence={}->{}",
             movement_to_usi(&ss_potential),
             attackers.len(),
-            UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), ms_r_new
+            GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), ms_r_new
         ));
         for ms_atk in attackers.iter() {
             g_writeln(&format!("info ms_atk={}.",ms_atk ));

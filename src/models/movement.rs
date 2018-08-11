@@ -1,3 +1,4 @@
+use GAME_RECORD_WRAP;
 use kifuwarabe_position::*;
 use std::fmt;
 
@@ -162,6 +163,29 @@ impl GameRecord {
     }
     pub fn get_teme(&self) -> usize {
         self.teme
+    }
+    /// 手番
+    pub fn get_teban(&self, jiai:&Jiai)->Sengo{
+        use kifuwarabe_position::Jiai::*;
+        match *jiai {
+            Ji=>{
+                // 手番
+                if self.teme%2==0 {
+                    Sengo::Sen
+                } else {
+                    Sengo::Go
+                }
+            },
+            Ai=>{
+                // 相手番
+                if self.teme%2==0 {
+                    Sengo::Go
+                } else {
+                    Sengo::Sen
+                }
+            },
+            _ =>{ Sengo::Owari },
+        }
     }
 }
 

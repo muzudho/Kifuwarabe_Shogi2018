@@ -3,12 +3,12 @@
  */
 
 use CUR_POSITION_WRAP;
+use GAME_RECORD_WRAP;
 use consoles::asserts::*;
 use kifuwarabe_position::*;
 use models::movement::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
-use UCHU_WRAP;
 
 /**
  * 現局面の、任意の移動先升の、
@@ -28,7 +28,7 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64> ) {
             let km_src = CUR_POSITION_WRAP.try_read().unwrap().get_km_by_ms( ms_src );
             let sn = km_to_sn(&km_src);
 
-            if match_sn( &sn, &UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji) ) {
+            if match_sn( &sn, &GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji) ) {
                 // 手番の駒
 
                 let mut dst_hashset : HashSet<umasu> = HashSet::new();
@@ -78,7 +78,7 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64> ) {
 
                     let mut da_kms_hashset = HashSet::new();
                     for kms_motigoma in MGS_ARRAY.iter() {
-                        let km_motigoma = sn_kms_to_km( &UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), kms_motigoma );
+                        let km_motigoma = sn_kms_to_km( &GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), kms_motigoma );
                         if 0<CUR_POSITION_WRAP.try_read().unwrap().get_mg( &km_motigoma ) {
                             // 駒を持っていれば
                             insert_da_kms_by_ms_km     ( ms_dst, &km_motigoma, &mut da_kms_hashset );

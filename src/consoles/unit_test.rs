@@ -5,6 +5,7 @@
  */
 use consoles::visuals::dumps::*;
 use CUR_POSITION_WRAP;
+use GAME_RECORD_WRAP;
 use kifuwarabe_position::*;
 use memory::uchu::*;
 use meidai::math_meidai::*;
@@ -14,7 +15,6 @@ use syazo::sasite_element::*;
 use thinks::randommove;
 use teigi::geometries::geo_teigi::*;
 use tusin::us_conv::*;
-use UCHU_WRAP;
 
 /**
  * test 2
@@ -34,7 +34,7 @@ pub fn test( line:&String, starts:&mut usize, len:usize) {
         // 駒の移動元升
         g_writeln( "駒の移動元升");
         let kms = randommove::rnd_kms();
-        let km = sn_kms_to_km( &UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), kms );
+        let km = sn_kms_to_km( &GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), kms );
         let ms_dst = randommove::rnd_ms();
         g_writeln( &format!("kms={} km={} ms_dst={}",kms,km,ms_dst) );
         let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
@@ -49,7 +49,7 @@ pub fn test( line:&String, starts:&mut usize, len:usize) {
         *starts += 4;
         // 移動後の駒
         let kms = randommove::rnd_kms();
-        let km = sn_kms_to_km( &UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), &kms );
+        let km = sn_kms_to_km( &GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), &kms );
         // 移動先の升、および　不成駒／成駒
         let ms_dst = randommove::rnd_ms();
         let pro_dst = randommove::rnd_bool();

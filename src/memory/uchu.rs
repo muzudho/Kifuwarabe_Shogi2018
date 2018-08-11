@@ -194,37 +194,14 @@ impl Uchu{
     pub fn get_jiai_by_km(&self, km:&Koma ) -> Jiai {
         let (sn,_kms) = km_to_sn_kms( km );
 
-        if match_sn( &sn, &self.get_teban(&Jiai::Ji) ) { Jiai::Ji } else { Jiai::Ai }
+        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+        if match_sn(&sn, &game_record.get_teban(&Jiai::Ji)) { Jiai::Ji } else { Jiai::Ai }
     }
 
     /* ******
      * 棋譜 *
      ********/
 
-    // 手番
-    pub fn get_teban(&self, jiai:&Jiai)->Sengo{
-        let teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
-        use kifuwarabe_position::Jiai::*;
-        match *jiai {
-            Ji=>{
-                // 手番
-                if teme%2==0 {
-                    Sengo::Sen
-                } else {
-                    Sengo::Go
-                }
-            },
-            Ai=>{
-                // 相手番
-                if teme%2==0 {
-                    Sengo::Go
-                } else {
-                    Sengo::Sen
-                }
-            },
-            _ =>{ Sengo::Owari },
-        }
-    }
 
     /**
      * 棋譜の作成
@@ -315,7 +292,8 @@ impl Uchu{
     */
     #[allow(dead_code)]
     pub fn get_ji_jin(&self)->Vec<umasu>{
-        if let Sengo::Sen=self.get_teban(&Jiai::Ji) {
+        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+        if let Sengo::Sen = game_record.get_teban(&Jiai::Ji) {
             SenteJin::to_elm()
         } else {
             GoteJin::to_elm()
@@ -326,7 +304,8 @@ impl Uchu{
     */
     #[allow(dead_code)]
     pub fn get_aite_jin(&self)->Vec<umasu>{
-        if let Sengo::Sen=self.get_teban(&Jiai::Ji) {
+        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+        if let Sengo::Sen = game_record.get_teban(&Jiai::Ji) {
             GoteJin::to_elm()
         } else {
             SenteJin::to_elm()
@@ -390,7 +369,7 @@ impl Uchu{
             ky.mg[Koma::K0 as usize],ky.mg[Koma::Z0 as usize],ky.mg[Koma::I0 as usize],ky.mg[Koma::N0 as usize],ky.mg[Koma::U0 as usize],ky.mg[Koma::S0 as usize],ky.mg[Koma::H0 as usize],
             //                   ▽キ,                     ▽ゾ,                     ▽イ,                     ▽ネ,                     ▽ウ,                     ▽シ,                     ▽ヒ,
             ky.mg[Koma::K1 as usize],ky.mg[Koma::Z1 as usize],ky.mg[Koma::I1 as usize],ky.mg[Koma::N1 as usize],ky.mg[Koma::U1 as usize],ky.mg[Koma::S1 as usize],ky.mg[Koma::H1 as usize],
-            game_record.get_teme(), self.get_teban(&Jiai::Ji), self.count_same_ky()
+            game_record.get_teme(), game_record.get_teban(&Jiai::Ji), self.count_same_ky()
         )
     }
 
@@ -458,15 +437,15 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
     // 入れた指し手の通り指すぜ☆（＾～＾）
     pub fn do_ss(&mut self, ss:&Movement) {
         // もう入っているかも知れないが、棋譜に入れる☆
-        let sn = self.get_teban(&Jiai::Ji);
 
         {
-            let mut position = CUR_POSITION_WRAP.try_write().unwrap();
-            let cap = make_movement(&sn, ss, &mut position);
-
             let teme: usize;
+            let cap;
             {
+                let mut position = CUR_POSITION_WRAP.try_write().unwrap();
                 let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+                let sn = game_record.get_teban(&Jiai::Ji);
+                cap = make_movement(&sn, ss, &mut position);
                 teme = game_record.teme;
                 game_record.moves[teme] = *ss;
             }
@@ -492,13 +471,15 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
         if 0 < teme {
             // 棋譜から読取、手目も減る
             let cap;
+            let sn;
             {
                 teme -= 1;
                 let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
                 game_record.teme = teme;
                 cap = game_record.cap[teme];
+                sn = game_record.get_teban(&Jiai::Ji);
             }
-            let sn = self.get_teban(&Jiai::Ji);
+
             let ss = &self.get_sasite();
 
             {
@@ -542,12 +523,13 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
      * 局面ハッシュを作り直す
      */
     pub fn create_ky1_hash( &self ) -> u64 {
-        let hash_seed = &GAME_RECORD_WRAP.try_read().unwrap().ky_hash_seed;
+        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+        let hash_seed = &game_record.ky_hash_seed;
         let mut hash = CUR_POSITION_WRAP.try_read().unwrap().create_hash(&hash_seed);
 
         // 手番ハッシュ
         use kifuwarabe_position::Sengo::*;
-        match self.get_teban(&Jiai::Ji) {
+        match game_record.get_teban(&Jiai::Ji) {
             Sen => { hash ^= hash_seed.sn[SN_SEN] },
             Go => { hash ^= hash_seed.sn[SN_GO] },
             _ => {},

@@ -4,6 +4,7 @@
  */
 
 use consoles::asserts::*;
+use GAME_RECORD_WRAP;
 use kifuwarabe_position::*;
 use models::movement::*;
 use syazo::sasite_seisei::*;
@@ -11,8 +12,6 @@ use syazo::sasite_sentaku::*;
 use std::collections::HashSet;
 use thinks::randommove;
 use thinks::results::jisatusyu_result::*;
-
-use UCHU_WRAP;
 
 /**
  * ランダム移動
@@ -54,7 +53,7 @@ pub fn get_ss_by_random()->Movement{
         assert_banjo_ms(ms_dst, "Ｇet_ss_by_random");
 
         // 手番の、移動した先の駒
-        let km_dst = sn_kms_to_km( &UCHU_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), randommove::rnd_kms() );
+        let km_dst = sn_kms_to_km( &GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), randommove::rnd_kms() );
 
         ss_hashset.clear();
         insert_ss_by_ms_km_on_banjo (ms_dst, &km_dst, &mut ss_hashset );
