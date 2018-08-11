@@ -13,6 +13,7 @@ use GAME_RECORD_WRAP;
 use INI_POSITION_WRAP;
 use kifuwarabe_position::*;
 use memory::number_board::*;
+use misc::movement::*;
 use thinks::visions::vision_tree::*;
 use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
@@ -189,7 +190,6 @@ impl Uchu{
      * 棋譜 *
      ********/
 
-
     /// # Examples.
     ///
     /// let s = uchu.kaku_kifu();
@@ -308,7 +308,7 @@ impl Uchu{
             ky.mg[Koma::K0 as usize],ky.mg[Koma::Z0 as usize],ky.mg[Koma::I0 as usize],ky.mg[Koma::N0 as usize],ky.mg[Koma::U0 as usize],ky.mg[Koma::S0 as usize],ky.mg[Koma::H0 as usize],
             //                   ▽キ,                     ▽ゾ,                     ▽イ,                     ▽ネ,                     ▽ウ,                     ▽シ,                     ▽ヒ,
             ky.mg[Koma::K1 as usize],ky.mg[Koma::Z1 as usize],ky.mg[Koma::I1 as usize],ky.mg[Koma::N1 as usize],ky.mg[Koma::U1 as usize],ky.mg[Koma::S1 as usize],ky.mg[Koma::H1 as usize],
-            game_record.get_teme(), game_record.get_teban(&Jiai::Ji), self.count_same_ky()
+            game_record.get_teme(), game_record.get_teban(&Jiai::Ji), count_same_ky()
         )
     }
 
@@ -380,35 +380,5 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
             // 全部忘れる☆（＾～＾）
             self.vision_tree_by_sn[sn_to_num(sn)].clear();
         }
-    }
-
-
-    /**
-     * 千日手を調べるために、
-     * 現局面は、同一局面が何回目かを調べるぜ☆（＾～＾）
-     */
-    pub fn count_same_ky(&self) -> i8 {
-        let mut count = 0;
-        {
-            let game_record = &GAME_RECORD_WRAP.try_read().unwrap();
-            if game_record.get_teme() < 1 { return 0; }
-            let last_teme = game_record.get_teme() - 1;
-            let new_teme = game_record.get_teme();
-            // g_writeln( &format!( "Ｃount_same_ky last_teme={} new_teme={}", last_teme ,new_teme ) );
-            for i_teme in 0..new_teme {
-                let t = last_teme - i_teme;
-                // g_writeln( &format!( "i_teme={} t={}", i_teme, t ) );
-                if game_record.ky_hash[t] == game_record.ky_hash[last_teme] {
-                    count+=1;
-                }
-            }
-
-            // 初期局面のハッシュ
-            if game_record.ky0_hash == game_record.ky_hash[last_teme] {
-                count+=1;
-            }
-        }
-
-        count
     }
 }

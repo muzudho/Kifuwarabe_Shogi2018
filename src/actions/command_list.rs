@@ -122,7 +122,7 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
 
             if successful {
                 // 指し手を指すぜ☆（＾～＾）
-                make_movement2(&movement);
+                make_movement2(&movement, |&_cap|{});
             }
         }
     );
@@ -202,7 +202,7 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
 
             if successful {
                 // 入っている指し手の通り指すぜ☆（＾～＾）
-                make_movement2(&movement);
+                make_movement2(&movement, |&_cap|{});
             }
         }
     );
@@ -303,11 +303,7 @@ pub fn do_rand(_row: &String, _starts:&mut usize, _res:&mut Response) {
  * 同一局面回数調べ。
  */
 pub fn do_same(_row: &String, _starts:&mut usize, _res:&mut Response) {
-    // 読取許可モードで、ロック。
-    let uchu_r = UCHU_WRAP.try_read().unwrap();
-
-    let count = uchu_r.count_same_ky();
-    g_writeln( &format!("同一局面調べ count={}", count));
+    g_writeln( &format!("同一局面調べ count={}", count_same_ky()));
 }
 
 /**
@@ -325,7 +321,7 @@ pub fn do_test(row: &String, starts:&mut usize, _res:&mut Response) {
  * 指した手を１手戻す。
  */
 pub fn do_undo(_row: &String, _starts:&mut usize, _res:&mut Response) {
-    if !unmake_movement2() {
+    if !unmake_movement2(|&_cap|{}) {
         let teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
         g_writeln( &format!("teme={} を、これより戻せません", teme));
     }
@@ -351,7 +347,7 @@ pub fn do_do(row: &String, starts:&mut usize, _res:&mut Response) {
 
     if successful {
         // 入っている指し手の通り指すぜ☆（＾～＾）
-        make_movement2(&movement);
+        make_movement2(&movement, |&_cap|{});
     }
 }
 

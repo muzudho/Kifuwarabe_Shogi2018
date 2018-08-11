@@ -130,9 +130,7 @@ pub fn filtering_ss_except_jisatusyu(
         let ss_potential = Movement::from_hash( *hash_ss_potential );
 
         // その手を指してみる
-        {
-            make_movement2(&ss_potential);
-        }
+        make_movement2(&ss_potential, |&_cap|{});
         // // 現局面表示
         // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky( &KyNums::Current );
         // g_writeln( &s1 );            
@@ -174,7 +172,7 @@ pub fn filtering_ss_except_jisatusyu(
         }
 
         // 手を戻す
-        unmake_movement2();
+        unmake_movement2(|&_cap|{});
         // // 現局面表示
         // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky( &KyNums::Current );
         // g_writeln( &s2 );            
@@ -214,20 +212,20 @@ pub fn filtering_ss_except_sennitite(
             //ss_hashset.insert( *hash_ss_potential );
 
         // その手を指してみる
-        make_movement2(&ss);
+        make_movement2(&ss, |&_cap|{});
         // 現局面表示
         // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky( &KyNums::Current );
         // g_writeln( &s1 );            
 
         // 千日手かどうかを判定する☆（＾～＾）
-        if UCHU_WRAP.try_read().unwrap().count_same_ky() < SENNTITE_NUM {
+        if count_same_ky() < SENNTITE_NUM {
             ss_hashset_pickup.insert( *hash_ss_potential );
         } else {
             // 千日手
         }
 
         // 手を戻す FIXME: 打った象が戻ってない？
-        unmake_movement2();
+        unmake_movement2(|&_cap|{});
         // 現局面表示
         // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky( &KyNums::Current );
         // g_writeln( &s2 );
