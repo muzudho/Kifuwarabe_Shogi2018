@@ -131,23 +131,28 @@ pub fn pc_to_km (pc: &Piece) -> Koma {
 }
 
 
+/// USIの指し手表記を、きふわらべの指し手に変換する。
+pub fn usi_to_movement(successful: bool, mv: &UsiMovement) -> Movement {
+    if successful {
+        let source : umasu = match mv.drop {
+            PieceType::Space => suji_dan_to_ms(mv.source_file, mv.source_rank),
+            _ => 0,
+        };
 
-pub fn usi_to_movement(mv: &UsiMovement) -> Movement {
-    let source : umasu = match mv.drop {
-        PieceType::Space => suji_dan_to_ms(mv.source_file, mv.source_rank),
-        _ => 0,
-    };
+        let drop : KmSyurui = match mv.drop {
+            PieceType::Space => KmSyurui::Kara,
+            _ => pt_to_kms(&mv.drop),
+        };
 
-    let drop : KmSyurui = match mv.drop {
-        PieceType::Space => KmSyurui::Kara,
-        _ => pt_to_kms(&mv.drop),
-    };
-
-    Movement {
-        source : source,
-        destination : suji_dan_to_ms(mv.destination_file, mv.destination_rank),
-        promotion : mv.promotion,
-        drop : drop,
+        Movement {
+            source : source,
+            destination : suji_dan_to_ms(mv.destination_file, mv.destination_rank),
+            promotion : mv.promotion,
+            drop : drop,
+        }
+    } else {
+        // 投了。
+        Movement::new()
     }
 }
 

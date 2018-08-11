@@ -34,6 +34,7 @@ mod kasetu;
 mod meidai;
 mod mediators;
 mod memory;
+mod misc;
 mod searchs;
 mod syazo;
 mod thinks;
@@ -53,7 +54,7 @@ lazy_static! {
     // 初期局面
     static ref INI_POSITION_WRAP: RwLock<Kyokumen> = RwLock::new(Kyokumen::new());
     // 計算中の局面
-    static ref CUR_POSITION_WRAP: RwLock<Kyokumen> = RwLock::new(Kyokumen::new());
+    pub static ref CUR_POSITION_WRAP: RwLock<Kyokumen> = RwLock::new(Kyokumen::new());
     // 棋譜
     static ref GAME_RECORD_WRAP: RwLock<GameRecord> = RwLock::new(GameRecord::new());
 }

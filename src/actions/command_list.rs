@@ -6,11 +6,12 @@ use consoles::unit_test::*;
 use consoles::visuals::dumps::*;
 use consoles::visuals::title::*;
 use GAME_RECORD_WRAP;
-use kifuwarabe_movement::*;
+use INI_POSITION_WRAP;
 use kifuwarabe_position::*;
 use kifuwarabe_shell::Response;
 use kifuwarabe_usi::*;
 use memory::uchu::*;
+use misc::movement::*;
 use rand::Rng;
 use std::collections::HashSet;
 use syazo::sasite_seisei::*;
@@ -72,19 +73,20 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
     // 局面をクリアー。手目も 0 に戻します。
     UCHU_WRAP.try_write().unwrap().clear_ky01();
 
-    // positionコマンドの読取を丸投げ
+    // positionコマンド読取。
     parse_position(&row,
+        // 持ち駒数読取。
         |hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|{
-            // 持ち駒数コピー。
             let mut i=0;
             for item in HAND_PIECE_ARRAY.iter() {
                 let km = pc_to_km(item);
-                UCHU_WRAP.try_write().unwrap().set_ky0_mg(km, hand_count_arr[i]);
+
+                INI_POSITION_WRAP.try_write().unwrap().set_mg(km, hand_count_arr[i]);
                 i+=1;
             }
         },
+        // 盤面読取。
         |ban: [Piece;100]|{
-            // 盤面コピー
             for file in SUJI_1..SUJI_10 {
                 for rank in DAN_1..DAN_10 {
                     UCHU_WRAP.try_write().unwrap().set_ky0_ban_km(
@@ -93,12 +95,8 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
                 }
             }
 
-            let ky_hash;
-            {
-                // 初期局面ハッシュを作り直す
-                let uchu = UCHU_WRAP.try_read().unwrap();
-                ky_hash = uchu.create_ky0_hash();
-            }
+            // 初期局面ハッシュを作り直す
+            let ky_hash = create_ky0_hash();
 
             // グローバル変数に内容をセット。
             {
@@ -112,31 +110,20 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
                 uchu_w.copy_ky0_to_ky1();            
             }
         },
+        // 指し手読取。
         |successful, usi_movement|{
-            let movement;
-            if successful {
-                movement = usi_to_movement(&usi_movement);
-            } else {
-                // 投了。
-                movement = Movement::new();
-            }
+            let movement = usi_to_movement(successful, &usi_movement);
 
+            // 棋譜に書き込み。
             {
                 let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
                 game_record.set_movement(movement);
             }
-            if successful {
-                // 入っている指し手の通り指すぜ☆（＾～＾）
-                let ss;
-                {
-                    let game_record = GAME_RECORD_WRAP.try_read().unwrap();
-                    ss = game_record.moves[game_record.teme];
-                }
 
-                {
-                    let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-                    uchu_w.make_movement2(&ss);
-                }
+            if successful {
+                // 指し手を指すぜ☆（＾～＾）
+                let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+                uchu_w.make_movement2(&movement);
             }
         }
     );
@@ -168,16 +155,19 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
     UCHU_WRAP.try_write().unwrap().clear_ky01();
 
     parse_position(&KY1.to_string(),
-            |hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|{
-                // 持ち駒数コピー。
-                let mut i=0;
-                for item in HAND_PIECE_ARRAY.iter() {
-                    let km = pc_to_km(item);
-                    UCHU_WRAP.try_write().unwrap().set_ky0_mg(km, hand_count_arr[i]);
-                    i+=1;
-                }
-            },
-            |ban: [Piece;100]|{
+        |hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|
+        {
+            // 持ち駒数コピー。
+            let mut i=0;
+            for item in HAND_PIECE_ARRAY.iter() {
+                let km = pc_to_km(item);
+
+                INI_POSITION_WRAP.try_write().unwrap().set_mg(km, hand_count_arr[i]);
+                i+=1;
+            }
+        },
+        |ban: [Piece;100]|
+        {
             // 盤面コピー
             for file in SUJI_1..SUJI_10 {
                 for rank in DAN_1..DAN_10 {
@@ -188,11 +178,7 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
             }
 
             // 初期局面ハッシュを作り直す
-            let ky_hash;
-            {
-                let uchu = UCHU_WRAP.try_read().unwrap();
-                ky_hash = uchu.create_ky0_hash();
-            }
+            let ky_hash = create_ky0_hash();
 
             // グローバル変数に内容をセット。
             {
@@ -206,14 +192,9 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
                 uchu_w.copy_ky0_to_ky1();            
             }
         },
-        |successful, usi_movement|{
-            let movement;
-            if successful {
-                movement = usi_to_movement(&usi_movement);
-            } else {
-                // 投了。
-                movement = Movement::new();
-            }
+        |successful, usi_movement|
+        {
+            let movement = usi_to_movement(successful, &usi_movement);
 
             {
                 let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
@@ -222,16 +203,8 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
 
             if successful {
                 // 入っている指し手の通り指すぜ☆（＾～＾）
-                let ss;
-                {
-                    let game_record = GAME_RECORD_WRAP.try_read().unwrap();
-                    ss = game_record.moves[game_record.teme];
-                }
-
-                {
-                    let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-                    uchu_w.make_movement2(&ss);
-                }
+                let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+                uchu_w.make_movement2(&movement);
             }
         }
     );
@@ -371,36 +344,20 @@ pub fn do_do(row: &String, starts:&mut usize, _res:&mut Response) {
     let len = row.chars().count();
 
     // コマンド読取。棋譜に追加され、手目も増える
-    let mov;
     let (successful, umov) = parse_movement(&row, starts, len);
-    if successful {
-        mov = usi_to_movement(&umov);
-    } else {
-        // 読取失敗時、または 指し手読取終了時は successfule の外を通るぜ☆（＾～＾）
-        mov = Movement::new();
-    }
+    let movement = usi_to_movement(successful, &umov);
+
     // グローバル変数に内容をセット。
     {
         // 書込許可モードで、ロック。
         let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-        game_record.set_sasite_src(mov.source);
-        game_record.set_sasite_drop(mov.drop);
-        game_record.set_sasite_dst(mov.destination);
-        game_record.set_sasite_pro(mov.promotion);
+        game_record.set_movement(movement);
     }
 
     if successful {
         // 入っている指し手の通り指すぜ☆（＾～＾）
-        let ss;
-        {
-            let game_record = GAME_RECORD_WRAP.try_read().unwrap();
-            ss = game_record.moves[game_record.teme];
-        }
-
-        {
-            let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-            uchu_w.make_movement2(&ss);
-        }
+        let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+        uchu_w.make_movement2(&movement);
     }
 }
 

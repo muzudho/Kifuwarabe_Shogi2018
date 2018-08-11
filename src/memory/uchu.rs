@@ -14,6 +14,7 @@ use INI_POSITION_WRAP;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use memory::number_board::*;
+use misc::movement::*;
 use thinks::visions::vision_tree::*;
 use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
@@ -183,12 +184,6 @@ impl Uchu{
         // グローバル変数を使う。
         {
             INI_POSITION_WRAP.try_write().unwrap().set_km_by_ms(suji_dan_to_ms(suji, dan), km);
-        }
-    }
-    pub fn set_ky0_mg(&mut self, km:Koma, maisu:i8){
-        // グローバル変数を使う。
-        {
-            INI_POSITION_WRAP.try_write().unwrap().mg[km as usize] = maisu;
         }
     }
 
@@ -380,36 +375,37 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
         }
     }
 
-    // 入れた指し手の通り指すぜ☆（＾～＾）
-    pub fn make_movement2(&mut self, ss:&Movement) {
-        // もう入っているかも知れないが、棋譜に入れる☆
+    /// 入れた指し手の通り指すぜ☆（＾～＾）
+    pub fn make_movement2(
+        &mut self,
+        movement: &Movement
+    ) {
+        // 取った駒を記録するために、棋譜に入れる☆
 
         {
             let teme: usize;
             let cap;
+            let sn;
             {
-                let sn;
-                {
-                    let game_record = GAME_RECORD_WRAP.try_read().unwrap();
-                    sn = game_record.get_teban(&Jiai::Ji);
-                }
+                let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+                sn = game_record.get_teban(&Jiai::Ji);
+            }
 
-                {
-                    let mut position = CUR_POSITION_WRAP.try_write().unwrap();
-                    cap = make_movement(&sn, ss, &mut position);
-                }
+            {
+                let mut position = CUR_POSITION_WRAP.try_write().unwrap();
+                cap = make_movement(&sn, movement, &mut position);
+            }
 
-                {
-                    let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-                    teme = game_record.teme;
-                    game_record.moves[teme] = *ss;
-                    game_record.set_cap(teme, cap);
-                }
+            {
+                let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+                teme = game_record.teme;
+                game_record.moves[teme] = *movement;
+                game_record.set_cap(teme, cap);
             }
         }
 
         // 局面ハッシュを作り直す
-        let ky_hash = self.create_ky1_hash();
+        let ky_hash = create_ky1_hash();
 
         {
             let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
@@ -457,42 +453,6 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
         }
     }
 
-    /**
-     * 初期局面ハッシュを作り直す
-     */
-    pub fn create_ky0_hash( &self ) -> u64 {
-
-        let hash_seed = &GAME_RECORD_WRAP.try_read().unwrap().ky_hash_seed;
-        let mut hash : u64;
-        // グローバル変数を使う。
-        {
-            hash = INI_POSITION_WRAP.try_read().unwrap().create_hash(&hash_seed);
-        }
-
-        // 手番ハッシュ（後手固定）
-        hash ^= hash_seed.sn[SN_GO];
-
-        hash
-    }
-
-    /**
-     * 局面ハッシュを作り直す
-     */
-    pub fn create_ky1_hash( &self ) -> u64 {
-        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
-        let hash_seed = &game_record.ky_hash_seed;
-        let mut hash = CUR_POSITION_WRAP.try_read().unwrap().create_hash(&hash_seed);
-
-        // 手番ハッシュ
-        use kifuwarabe_position::Sengo::*;
-        match game_record.get_teban(&Jiai::Ji) {
-            Sen => { hash ^= hash_seed.sn[SN_SEN] },
-            Go => { hash ^= hash_seed.sn[SN_GO] },
-            _ => {},
-        }
-
-        hash
-    }
 
     /**
      * 千日手を調べるために、
