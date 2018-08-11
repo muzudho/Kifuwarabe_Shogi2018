@@ -72,6 +72,8 @@ pub struct GameRecord{
     pub teme : usize,
     // 局面ハッシュ種
     pub ky_hash_seed : KyHashSeed,
+    // 初期局面ハッシュ
+    pub ky0_hash : u64,
     /// 棋譜
     //#[derive(Copy, Clone)]
     pub moves : [Movement; TEME_LN],
@@ -88,6 +90,7 @@ impl GameRecord {
                 // 先後
                 sn : [0;SN_LN],
             },
+            ky0_hash : 0,
             moves : [
                 // 1行16要素で並べるぜ☆（＾～＾）
                 Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),  Movement::new(),

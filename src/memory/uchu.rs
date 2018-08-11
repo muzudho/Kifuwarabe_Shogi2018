@@ -83,8 +83,6 @@ pub fn g_writeln(s:&str){
 pub struct Uchu{
     // 対話モード
     pub dialogue_mode : bool,
-    // 初期局面ハッシュ
-    pub ky0_hash : u64,
     // 現局面ハッシュ
     pub ky_hash : [u64; TEME_LN],
     /// 取った駒
@@ -106,7 +104,6 @@ impl Uchu{
     pub fn new()->Uchu{
         Uchu{
             dialogue_mode : false,
-            ky0_hash : 0,
             ky_hash : [
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -309,7 +306,8 @@ impl Uchu{
         game_record.moves[game_record.teme].drop = kms
     }
     pub fn set_ky0_hash(&mut self, hash:u64){
-        self.ky0_hash = hash
+        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+        game_record.ky0_hash = hash
     }
     pub fn set_ky1_hash(&mut self, hash:u64){
         let teme: usize;
@@ -361,11 +359,12 @@ impl Uchu{
     }
     pub fn kaku_ky_hash(&self)->String{
         let mut s = String::new();
-        s.push_str(&format!("[ini] {:20}\n", &self.ky0_hash ));
 
         let teme: usize;
         {
-            teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
+            let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+            s.push_str(&format!("[ini] {:20}\n", &game_record.ky0_hash ));
+            teme = game_record.teme;
         }
         for i_teme in 0..teme {
             let hash = &self.ky_hash[i_teme];
@@ -637,7 +636,8 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
         }
 
         // 初期局面のハッシュ
-        if self.ky0_hash == self.ky_hash[last_teme] {
+        let game_record = &GAME_RECORD_WRAP.try_read().unwrap();
+        if game_record.ky0_hash == self.ky_hash[last_teme] {
             count+=1;
         }
 
