@@ -198,53 +198,6 @@ impl Uchu{
 
 
     /**
-     * 棋譜の作成
-     */
-    pub fn set_movement(&mut self, mv: Movement){
-        self.set_sasite_src(mv.source);
-        self.set_sasite_drop(mv.drop);
-        self.set_sasite_dst(mv.destination);
-        self.set_sasite_pro(mv.promotion);
-    }
-    pub fn set_sasite_src(&mut self, src:umasu){
-        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-        game_record.moves[game_record.teme].source = src
-    }
-    pub fn set_sasite_dst(&mut self, dst:umasu){
-        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-        game_record.moves[game_record.teme].destination = dst
-    }
-    pub fn set_sasite_pro(&mut self, pro:bool){
-        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-        game_record.moves[game_record.teme].promotion = pro
-    }
-    pub fn set_sasite_drop(&mut self, kms:KmSyurui){
-        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-        game_record.moves[game_record.teme].drop = kms
-    }
-    pub fn set_ky0_hash(&mut self, hash:u64){
-        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-        game_record.ky0_hash = hash
-    }
-    pub fn set_ky1_hash(&mut self, hash:u64){
-        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-        game_record.ky_hash[game_record.teme] = hash
-    }
-    #[allow(dead_code)]
-    pub fn set_cap(&mut self, teme:usize, km:Koma){
-        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-        game_record.cap[ teme ] = km
-    }
-    pub fn get_sasite(&self) -> Movement {
-        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
-        game_record.moves[game_record.teme]
-    }
-    #[allow(dead_code)]
-    pub fn get_ky_hash(&mut self) -> u64 {
-        let game_record = GAME_RECORD_WRAP.try_write().unwrap();
-        game_record.ky_hash[game_record.teme]
-    }
-    /**
      * 使い方
      * let s = uchu.kaku_kifu();
      * g_writeln( &s );
@@ -447,18 +400,18 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
                     let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
                     teme = game_record.teme;
                     game_record.moves[teme] = *ss;
+                    game_record.set_cap(teme, cap);
                 }
             }
-
-            self.set_cap(teme, cap);
         }
 
         // 局面ハッシュを作り直す
         let ky_hash = self.create_ky1_hash();
-        self.set_ky1_hash( ky_hash );
 
         {
-            GAME_RECORD_WRAP.try_write().unwrap().teme += 1;
+            let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+            game_record.set_ky1_hash( ky_hash );
+            game_record.teme += 1;
         }
     }
 
@@ -472,15 +425,15 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
             // 棋譜から読取、手目も減る
             let cap;
             let sn;
+            let ss;
             {
                 teme -= 1;
                 let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
                 game_record.teme = teme;
                 cap = game_record.cap[teme];
                 sn = game_record.get_teban(&Jiai::Ji);
+                ss = game_record.get_sasite();
             }
-
-            let ss = &self.get_sasite();
 
             {
                 let mut position = CUR_POSITION_WRAP.try_write().unwrap();

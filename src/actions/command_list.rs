@@ -94,14 +94,23 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
                 }
             }
 
-            // グローバル変数に内容をセット。
+            let ky_hash;
             {
                 // 初期局面ハッシュを作り直す
-                let ky_hash = UCHU_WRAP.try_write().unwrap().create_ky0_hash();
-                UCHU_WRAP.try_write().unwrap().set_ky0_hash( ky_hash );
+                let uchu = UCHU_WRAP.try_read().unwrap();
+                ky_hash = uchu.create_ky0_hash();
+            }
 
+            // グローバル変数に内容をセット。
+            {
+                let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+                game_record.set_ky0_hash( ky_hash );
+            }
+
+            {
                 // 初期局面を、現局面にコピーします
-                UCHU_WRAP.try_write().unwrap().copy_ky0_to_ky1();            
+                let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+                uchu_w.copy_ky0_to_ky1();            
             }
         },
         |successful, usi_movement|{
@@ -114,8 +123,8 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
             }
 
             {
-                let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-                uchu_w.set_movement(movement);
+                let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+                game_record.set_movement(movement);
             }
             if successful {
                 // 入っている指し手の通り指すぜ☆（＾～＾）
@@ -179,14 +188,23 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
                 }
             }
 
+            // 初期局面ハッシュを作り直す
+            let ky_hash;
+            {
+                let uchu = UCHU_WRAP.try_read().unwrap();
+                ky_hash = uchu.create_ky0_hash();
+            }
+
             // グローバル変数に内容をセット。
             {
-                // 初期局面ハッシュを作り直す
-                let ky_hash = UCHU_WRAP.try_write().unwrap().create_ky0_hash();
-                UCHU_WRAP.try_write().unwrap().set_ky0_hash( ky_hash );
+                let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+                game_record.set_ky0_hash( ky_hash );
+            }
 
+            {
+                let mut uchu_w = UCHU_WRAP.try_write().unwrap();
                 // 初期局面を、現局面にコピーします
-                UCHU_WRAP.try_write().unwrap().copy_ky0_to_ky1();            
+                uchu_w.copy_ky0_to_ky1();            
             }
         },
         |successful, usi_movement|{
@@ -198,8 +216,11 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
                 movement = Movement::new();
             }
 
-            let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-            uchu_w.set_movement(movement);
+            {
+                let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+                game_record.set_movement(movement);
+            }
+
             if successful {
                 // 入っている指し手の通り指すぜ☆（＾～＾）
                 let ss;
@@ -207,7 +228,11 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
                     let game_record = GAME_RECORD_WRAP.try_read().unwrap();
                     ss = game_record.moves[game_record.teme];
                 }
-                uchu_w.do_ss( &ss );                
+
+                {
+                    let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+                    uchu_w.do_ss( &ss );                
+                }
             }
         }
     );
@@ -358,11 +383,11 @@ pub fn do_do(row: &String, starts:&mut usize, _res:&mut Response) {
     // グローバル変数に内容をセット。
     {
         // 書込許可モードで、ロック。
-        let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-        uchu_w.set_sasite_src(mov.source);
-        uchu_w.set_sasite_drop(mov.drop);
-        uchu_w.set_sasite_dst(mov.destination);
-        uchu_w.set_sasite_pro(mov.promotion);
+        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+        game_record.set_sasite_src(mov.source);
+        game_record.set_sasite_drop(mov.drop);
+        game_record.set_sasite_dst(mov.destination);
+        game_record.set_sasite_pro(mov.promotion);
     }
 
     if successful {

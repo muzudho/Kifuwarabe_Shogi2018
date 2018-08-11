@@ -191,6 +191,42 @@ impl GameRecord {
         let (sn,_kms) = km_to_sn_kms( km );
         if match_sn(&sn, &self.get_teban(&Jiai::Ji)) { Jiai::Ji } else { Jiai::Ai }
     }
+    /// 棋譜の作成
+    pub fn set_movement(&mut self, mv: Movement){
+        self.set_sasite_src(mv.source);
+        self.set_sasite_drop(mv.drop);
+        self.set_sasite_dst(mv.destination);
+        self.set_sasite_pro(mv.promotion);
+    }
+    pub fn set_sasite_src(&mut self, src:umasu){
+        self.moves[self.teme].source = src
+    }
+    pub fn set_sasite_dst(&mut self, dst:umasu){
+        self.moves[self.teme].destination = dst
+    }
+    pub fn set_sasite_pro(&mut self, pro:bool){
+        self.moves[self.teme].promotion = pro
+    }
+    pub fn set_sasite_drop(&mut self, kms:KmSyurui){
+        self.moves[self.teme].drop = kms
+    }
+    pub fn set_ky0_hash(&mut self, hash:u64){
+        self.ky0_hash = hash
+    }
+    pub fn set_ky1_hash(&mut self, hash:u64){
+        self.ky_hash[self.teme] = hash
+    }
+    #[allow(dead_code)]
+    pub fn set_cap(&mut self, teme:usize, km:Koma){
+        self.cap[ teme ] = km
+    }
+    pub fn get_sasite(&self) -> Movement {
+        self.moves[self.teme]
+    }
+    #[allow(dead_code)]
+    pub fn get_ky_hash(&mut self) -> u64 {
+        self.ky_hash[self.teme]
+    }
 }
 
 
