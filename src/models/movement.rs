@@ -157,6 +157,12 @@ impl GameRecord {
             ],
         }
     }
+    pub fn set_teme(&mut self, teme:usize){
+        self.teme = teme
+    }
+    pub fn get_teme(&self) -> usize {
+        self.teme
+    }
 }
 
 

@@ -149,13 +149,9 @@ impl Uchu{
      * 手目も 0 に戻します。
      */
     pub fn clear_ky01(&mut self){
-
-        {
-            INI_POSITION_WRAP.try_write().unwrap().clear();
-            CUR_POSITION_WRAP.try_write().unwrap().clear();
-        }
-
-        self.set_teme(0);
+        INI_POSITION_WRAP.try_write().unwrap().clear();
+        CUR_POSITION_WRAP.try_write().unwrap().clear();
+        GAME_RECORD_WRAP.try_write().unwrap().set_teme(0);
     }
     /**
      * 初期局面を、現局面にコピーします
@@ -205,12 +201,6 @@ impl Uchu{
      * 棋譜 *
      ********/
 
-    pub fn set_teme(&mut self, teme:usize){
-        GAME_RECORD_WRAP.try_write().unwrap().teme = teme
-    }
-    pub fn get_teme(&self) -> usize {
-        GAME_RECORD_WRAP.try_read().unwrap().teme
-    }
     // 手番
     pub fn get_teban(&self, jiai:&Jiai)->Sengo{
         let teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
@@ -359,6 +349,9 @@ impl Uchu{
             KyNums::Start => &ini_position,
         };
 
+        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+
+
         // 局面表示
         format!("\
 表示 {95}手目 {96} 同一局面{97}回目
@@ -397,7 +390,7 @@ impl Uchu{
             ky.mg[Koma::K0 as usize],ky.mg[Koma::Z0 as usize],ky.mg[Koma::I0 as usize],ky.mg[Koma::N0 as usize],ky.mg[Koma::U0 as usize],ky.mg[Koma::S0 as usize],ky.mg[Koma::H0 as usize],
             //                   ▽キ,                     ▽ゾ,                     ▽イ,                     ▽ネ,                     ▽ウ,                     ▽シ,                     ▽ヒ,
             ky.mg[Koma::K1 as usize],ky.mg[Koma::Z1 as usize],ky.mg[Koma::I1 as usize],ky.mg[Koma::N1 as usize],ky.mg[Koma::U1 as usize],ky.mg[Koma::S1 as usize],ky.mg[Koma::H1 as usize],
-            self.get_teme(), self.get_teban(&Jiai::Ji), self.count_same_ky()
+            game_record.get_teme(), self.get_teban(&Jiai::Ji), self.count_same_ky()
         )
     }
 
@@ -568,25 +561,25 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
      * 現局面は、同一局面が何回目かを調べるぜ☆（＾～＾）
      */
     pub fn count_same_ky(&self) -> i8 {
-
-        if self.get_teme() < 1 { return 0; }
-
         let mut count = 0;
-        let last_teme = self.get_teme() - 1;
-        let new_teme = self.get_teme();
-        let game_record = &GAME_RECORD_WRAP.try_read().unwrap();
-        // g_writeln( &format!( "Ｃount_same_ky last_teme={} new_teme={}", last_teme ,new_teme ) );
-        for i_teme in 0..new_teme {
-            let t = last_teme - i_teme;
-            // g_writeln( &format!( "i_teme={} t={}", i_teme, t ) );
-            if game_record.ky_hash[t] == game_record.ky_hash[last_teme] {
+        {
+            let game_record = &GAME_RECORD_WRAP.try_read().unwrap();
+            if game_record.get_teme() < 1 { return 0; }
+            let last_teme = game_record.get_teme() - 1;
+            let new_teme = game_record.get_teme();
+            // g_writeln( &format!( "Ｃount_same_ky last_teme={} new_teme={}", last_teme ,new_teme ) );
+            for i_teme in 0..new_teme {
+                let t = last_teme - i_teme;
+                // g_writeln( &format!( "i_teme={} t={}", i_teme, t ) );
+                if game_record.ky_hash[t] == game_record.ky_hash[last_teme] {
+                    count+=1;
+                }
+            }
+
+            // 初期局面のハッシュ
+            if game_record.ky0_hash == game_record.ky_hash[last_teme] {
                 count+=1;
             }
-        }
-
-        // 初期局面のハッシュ
-        if game_record.ky0_hash == game_record.ky_hash[last_teme] {
-            count+=1;
         }
 
         count
