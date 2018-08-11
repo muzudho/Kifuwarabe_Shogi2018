@@ -197,11 +197,10 @@ impl Uchu{
      ********/
 
 
-    /**
-     * 使い方
-     * let s = uchu.kaku_kifu();
-     * g_writeln( &s );
-     */
+    /// # Examples.
+    ///
+    /// let s = uchu.kaku_kifu();
+    /// g_writeln( &s );
     pub fn kaku_kifu(&self)->String{
         let mut s = String::new();
         let teme: usize;
@@ -382,20 +381,24 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
     }
 
     // 入れた指し手の通り指すぜ☆（＾～＾）
-    pub fn do_ss(&mut self, ss:&Movement) {
+    pub fn make_movement2(&mut self, ss:&Movement) {
         // もう入っているかも知れないが、棋譜に入れる☆
 
         {
             let teme: usize;
             let cap;
             {
-                let mut position = CUR_POSITION_WRAP.try_write().unwrap();
                 let sn;
                 {
                     let game_record = GAME_RECORD_WRAP.try_read().unwrap();
                     sn = game_record.get_teban(&Jiai::Ji);
                 }
-                cap = make_movement(&sn, ss, &mut position);
+
+                {
+                    let mut position = CUR_POSITION_WRAP.try_write().unwrap();
+                    cap = make_movement(&sn, ss, &mut position);
+                }
+
                 {
                     let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
                     teme = game_record.teme;
@@ -415,7 +418,7 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
         }
     }
 
-    pub fn undo_ss(&mut self) -> bool {
+    pub fn unmake_movement2(&mut self) -> bool {
         let mut teme: usize;
         {
             teme = GAME_RECORD_WRAP.try_write().unwrap().teme;

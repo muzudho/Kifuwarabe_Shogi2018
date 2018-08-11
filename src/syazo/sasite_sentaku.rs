@@ -4,7 +4,6 @@
 
 extern crate rand;
 use rand::Rng;
-use std::collections::HashSet;
 
 use CUR_POSITION_WRAP;
 use consoles::asserts::*;
@@ -12,8 +11,9 @@ use GAME_RECORD_WRAP;
 use kifuwarabe_position::*;
 use memory::uchu::*;
 use models::movement::*;
-use thinks::results::komatori_result::*;
+use std::collections::HashSet;
 use syazo::sasite_element::*;
+use thinks::results::komatori_result::*;
 use tusin::us_conv::*;
 use UCHU_WRAP;
 
@@ -129,7 +129,10 @@ pub fn filtering_ss_except_jisatusyu(
         let ss_potential = Movement::from_hash( *hash_ss_potential );
 
         // その手を指してみる
-        UCHU_WRAP.try_write().unwrap().do_ss( &ss_potential );
+        {
+            let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+            uchu_w.make_movement2(&ss_potential);
+        }
         // // 現局面表示
         // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky( &KyNums::Current );
         // g_writeln( &s1 );            
@@ -171,7 +174,7 @@ pub fn filtering_ss_except_jisatusyu(
         }
 
         // 手を戻す
-        UCHU_WRAP.try_write().unwrap().undo_ss();
+        UCHU_WRAP.try_write().unwrap().unmake_movement2();
         // // 現局面表示
         // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky( &KyNums::Current );
         // g_writeln( &s2 );            
@@ -211,7 +214,10 @@ pub fn filtering_ss_except_sennitite(
             //ss_hashset.insert( *hash_ss_potential );
 
         // その手を指してみる
-        UCHU_WRAP.try_write().unwrap().do_ss( &ss );
+        {
+            let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+            uchu_w.make_movement2(&ss);
+        }
         // 現局面表示
         // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky( &KyNums::Current );
         // g_writeln( &s1 );            
@@ -224,7 +230,7 @@ pub fn filtering_ss_except_sennitite(
         }
 
         // 手を戻す FIXME: 打った象が戻ってない？
-        UCHU_WRAP.try_write().unwrap().undo_ss();
+        UCHU_WRAP.try_write().unwrap().unmake_movement2();
         // 現局面表示
         // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky( &KyNums::Current );
         // g_writeln( &s2 );

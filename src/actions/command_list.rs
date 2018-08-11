@@ -1,8 +1,5 @@
 extern crate rand;
 
-use kifuwarabe_shell::Response;
-
-use std::collections::HashSet;
 use config::*;
 use consoles;
 use consoles::unit_test::*;
@@ -10,13 +7,15 @@ use consoles::visuals::dumps::*;
 use consoles::visuals::title::*;
 use GAME_RECORD_WRAP;
 use kifuwarabe_position::*;
+use kifuwarabe_shell::Response;
 use kifuwarabe_usi::*;
 use models::movement::*;
 use memory::uchu::*;
 use rand::Rng;
+use std::collections::HashSet;
+use syazo::sasite_seisei::*;
 use thinks;
 use thinks::think::*;
-use syazo::sasite_seisei::*;
 use teigi::constants::*;
 use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
@@ -136,7 +135,7 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
 
                 {
                     let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-                    uchu_w.do_ss( &ss );
+                    uchu_w.make_movement2(&ss);
                 }
             }
         }
@@ -231,7 +230,7 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
 
                 {
                     let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-                    uchu_w.do_ss( &ss );                
+                    uchu_w.make_movement2(&ss);
                 }
             }
         }
@@ -358,7 +357,7 @@ pub fn do_undo(_row: &String, _starts:&mut usize, _res:&mut Response) {
     // 書込許可モードで、ロック。
     let mut uchu_w = UCHU_WRAP.try_write().unwrap();
 
-    if !uchu_w.undo_ss() {
+    if !uchu_w.unmake_movement2() {
         let teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
         g_writeln( &format!("teme={} を、これより戻せません", teme));
     }
@@ -400,7 +399,7 @@ pub fn do_do(row: &String, starts:&mut usize, _res:&mut Response) {
 
         {
             let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-            uchu_w.do_ss( &ss );
+            uchu_w.make_movement2(&ss);
         }
     }
 }
