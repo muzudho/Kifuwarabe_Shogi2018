@@ -83,8 +83,6 @@ pub fn g_writeln(s:&str){
 pub struct Uchu{
     // 対話モード
     pub dialogue_mode : bool,
-    // 現局面ハッシュ
-    pub ky_hash : [u64; TEME_LN],
     /// 取った駒
     pub cap : [Koma; TEME_LN],
     // 利きの数（先後別）
@@ -104,25 +102,6 @@ impl Uchu{
     pub fn new()->Uchu{
         Uchu{
             dialogue_mode : false,
-            ky_hash : [
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                0,//257要素
-            ],
             /// 取った駒
             cap : [
                 // 1行16要素で並べるぜ☆（＾～＾）
@@ -310,11 +289,8 @@ impl Uchu{
         game_record.ky0_hash = hash
     }
     pub fn set_ky1_hash(&mut self, hash:u64){
-        let teme: usize;
-        {
-            teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
-        }
-        self.ky_hash[teme] = hash
+        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+        game_record.ky_hash[game_record.teme] = hash
     }
     #[allow(dead_code)]
     pub fn set_cap(&mut self, teme:usize, km:Koma){
@@ -322,19 +298,12 @@ impl Uchu{
     }
     pub fn get_sasite(&self) -> Movement {
         let game_record = GAME_RECORD_WRAP.try_read().unwrap();
-        let teme: usize;
-        {
-            teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
-        }
-        game_record.moves[ teme ]
+        game_record.moves[game_record.teme]
     }
     #[allow(dead_code)]
     pub fn get_ky_hash(&mut self) -> u64 {
-        let teme: usize;
-        {
-            teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
-        }
-        self.ky_hash[teme]
+        let game_record = GAME_RECORD_WRAP.try_write().unwrap();
+        game_record.ky_hash[game_record.teme]
     }
     /**
      * 使い方
@@ -358,16 +327,15 @@ impl Uchu{
         s
     }
     pub fn kaku_ky_hash(&self)->String{
+        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
         let mut s = String::new();
-
         let teme: usize;
         {
-            let game_record = GAME_RECORD_WRAP.try_read().unwrap();
             s.push_str(&format!("[ini] {:20}\n", &game_record.ky0_hash ));
             teme = game_record.teme;
         }
         for i_teme in 0..teme {
-            let hash = &self.ky_hash[i_teme];
+            let hash = &game_record.ky_hash[i_teme];
             // 64bitは10進数20桁。改行する
             s.push_str(&format!("[{:3}] {:20}\n", i_teme, hash));
         }
@@ -626,18 +594,18 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
         let mut count = 0;
         let last_teme = self.get_teme() - 1;
         let new_teme = self.get_teme();
+        let game_record = &GAME_RECORD_WRAP.try_read().unwrap();
         // g_writeln( &format!( "Ｃount_same_ky last_teme={} new_teme={}", last_teme ,new_teme ) );
         for i_teme in 0..new_teme {
             let t = last_teme - i_teme;
             // g_writeln( &format!( "i_teme={} t={}", i_teme, t ) );
-            if self.ky_hash[t] == self.ky_hash[last_teme] {
+            if game_record.ky_hash[t] == game_record.ky_hash[last_teme] {
                 count+=1;
             }
         }
 
         // 初期局面のハッシュ
-        let game_record = &GAME_RECORD_WRAP.try_read().unwrap();
-        if game_record.ky0_hash == self.ky_hash[last_teme] {
+        if game_record.ky0_hash == game_record.ky_hash[last_teme] {
             count+=1;
         }
 
