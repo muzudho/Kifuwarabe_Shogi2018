@@ -122,8 +122,7 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
 
             if successful {
                 // 指し手を指すぜ☆（＾～＾）
-                let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-                uchu_w.make_movement2(&movement);
+                make_movement2(&movement);
             }
         }
     );
@@ -203,8 +202,7 @@ pub fn do_hirate(_row: &String, _starts:&mut usize, _res:&mut Response) {
 
             if successful {
                 // 入っている指し手の通り指すぜ☆（＾～＾）
-                let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-                uchu_w.make_movement2(&movement);
+                make_movement2(&movement);
             }
         }
     );
@@ -327,10 +325,7 @@ pub fn do_test(row: &String, starts:&mut usize, _res:&mut Response) {
  * 指した手を１手戻す。
  */
 pub fn do_undo(_row: &String, _starts:&mut usize, _res:&mut Response) {
-    // 書込許可モードで、ロック。
-    let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-
-    if !uchu_w.unmake_movement2() {
+    if !unmake_movement2() {
         let teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
         g_writeln( &format!("teme={} を、これより戻せません", teme));
     }
@@ -356,8 +351,7 @@ pub fn do_do(row: &String, starts:&mut usize, _res:&mut Response) {
 
     if successful {
         // 入っている指し手の通り指すぜ☆（＾～＾）
-        let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-        uchu_w.make_movement2(&movement);
+        make_movement2(&movement);
     }
 }
 

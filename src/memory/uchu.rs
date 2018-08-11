@@ -11,10 +11,8 @@ use CUR_POSITION_WRAP;
 use config::*;
 use GAME_RECORD_WRAP;
 use INI_POSITION_WRAP;
-use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use memory::number_board::*;
-use misc::movement::*;
 use thinks::visions::vision_tree::*;
 use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
@@ -375,75 +373,6 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
         }
     }
 
-    /// 入れた指し手の通り指すぜ☆（＾～＾）
-    pub fn make_movement2(
-        &mut self,
-        movement: &Movement
-    ) {
-        // 取った駒を記録するために、棋譜に入れる☆
-
-        {
-            let teme: usize;
-            let cap;
-            let sn;
-            {
-                let game_record = GAME_RECORD_WRAP.try_read().unwrap();
-                sn = game_record.get_teban(&Jiai::Ji);
-            }
-
-            {
-                let mut position = CUR_POSITION_WRAP.try_write().unwrap();
-                cap = make_movement(&sn, movement, &mut position);
-            }
-
-            {
-                let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-                teme = game_record.teme;
-                game_record.moves[teme] = *movement;
-                game_record.set_cap(teme, cap);
-            }
-        }
-
-        // 局面ハッシュを作り直す
-        let ky_hash = create_ky1_hash();
-
-        {
-            let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-            game_record.set_ky1_hash( ky_hash );
-            game_record.teme += 1;
-        }
-    }
-
-    pub fn unmake_movement2(&mut self) -> bool {
-        let mut teme: usize;
-        {
-            teme = GAME_RECORD_WRAP.try_write().unwrap().teme;
-        }
-
-        if 0 < teme {
-            // 棋譜から読取、手目も減る
-            let cap;
-            let sn;
-            let ss;
-            {
-                teme -= 1;
-                let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-                game_record.teme = teme;
-                cap = game_record.cap[teme];
-                sn = game_record.get_teban(&Jiai::Ji);
-                ss = game_record.get_sasite();
-            }
-
-            {
-                let mut position = CUR_POSITION_WRAP.try_write().unwrap();
-                unmake_movement(&sn, &ss, &cap, &mut position);
-            }
-            // 棋譜にアンドゥした指し手がまだ残っているが、とりあえず残しとく
-            true
-        } else {
-            false
-        }
-    }
 
     #[allow(dead_code)]
     pub fn remake_visions(&mut self) {
