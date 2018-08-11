@@ -2,7 +2,7 @@
 /**
  * USIプロトコル Rustフレームワーク
  */
-use models::movement::*;
+use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use kifuwarabe_position::Koma::*;
 use kifuwarabe_usi::*;

@@ -5,8 +5,8 @@
 use CUR_POSITION_WRAP;
 use GAME_RECORD_WRAP;
 use consoles::asserts::*;
+use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-use models::movement::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
 

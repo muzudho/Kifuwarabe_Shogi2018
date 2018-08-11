@@ -2,9 +2,9 @@
 /**
  * コレクションの内容をダンプ（全部見る）とかだぜ☆（＾～＾）
  */
+use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use memory::uchu::*;
-use models::movement::*;
 use std::collections::HashSet;
 use tusin::us_conv::*;
 

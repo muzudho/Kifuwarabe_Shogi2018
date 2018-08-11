@@ -6,10 +6,10 @@
 use consoles::visuals::dumps::*;
 use CUR_POSITION_WRAP;
 use GAME_RECORD_WRAP;
+use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use memory::uchu::*;
 use meidai::math_meidai::*;
-use models::movement::*;
 use std::collections::HashSet;
 use syazo::sasite_element::*;
 use thinks::randommove;

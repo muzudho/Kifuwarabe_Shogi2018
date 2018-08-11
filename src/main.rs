@@ -17,6 +17,9 @@ extern crate kifuwarabe_usi;
 extern crate kifuwarabe_position;
 use kifuwarabe_position::*;
 
+extern crate kifuwarabe_movement;
+use kifuwarabe_movement::*;
+
 ///
 /// Rust言語の mod や ソース置き場の説明
 ///      「Rust のモジュールシステム」
@@ -31,7 +34,6 @@ mod kasetu;
 mod meidai;
 mod mediators;
 mod memory;
-mod models;
 mod searchs;
 mod syazo;
 mod thinks;
@@ -41,7 +43,6 @@ mod tusin;
 
 use actions::command_list::*;
 use memory::uchu::*;
-use models::movement::*;
 
 
 // グローバル変数

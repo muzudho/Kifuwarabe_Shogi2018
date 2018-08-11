@@ -5,10 +5,10 @@ use std::fmt;
 use std::collections::HashSet;
 
 use consoles::asserts::*;
+use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use memory::uchu::*;
 use meidai::math_meidai::*;
-use models::movement::*;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
 use teigi::conv::*;

@@ -4,8 +4,8 @@
  */
 
 use CUR_POSITION_WRAP;
+use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-use models::movement::*;
 use UCHU_WRAP;
 
 /// 動かした先が、敵の利きに飛び込んでいれば、自殺手

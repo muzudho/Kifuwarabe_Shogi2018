@@ -4,11 +4,11 @@
 
 extern crate rand;
 use rand::Rng;
-use std::collections::HashSet;
 
+use kifuwarabe_movement::*;
 use memory::uchu::*;
-use models::movement::*;
 use searchs::searcher::*;
+use std::collections::HashSet;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
 use tusin::us_conv::*;
