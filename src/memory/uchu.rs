@@ -83,8 +83,6 @@ pub fn g_writeln(s:&str){
 pub struct Uchu{
     // 対話モード
     pub dialogue_mode : bool,
-    /// 取った駒
-    pub cap : [Koma; TEME_LN],
     // 利きの数（先後別）
     pub kiki_su_by_sn : [NumberBoard; SN_LN],
     // 利きの数（先後付き駒別）
@@ -102,27 +100,6 @@ impl Uchu{
     pub fn new()->Uchu{
         Uchu{
             dialogue_mode : false,
-            /// 取った駒
-            cap : [
-                // 1行16要素で並べるぜ☆（＾～＾）
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
-                Koma::Kara//257要素
-            ],
             // 利き数（先後別）
             kiki_su_by_sn : [
                 NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
@@ -294,7 +271,8 @@ impl Uchu{
     }
     #[allow(dead_code)]
     pub fn set_cap(&mut self, teme:usize, km:Koma){
-        self.cap[ teme ] = km
+        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+        game_record.cap[ teme ] = km
     }
     pub fn get_sasite(&self) -> Movement {
         let game_record = GAME_RECORD_WRAP.try_read().unwrap();
@@ -520,13 +498,15 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
 
         if 0 < teme {
             // 棋譜から読取、手目も減る
+            let cap;
             {
                 teme -= 1;
-                GAME_RECORD_WRAP.try_write().unwrap().teme = teme;
+                let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+                game_record.teme = teme;
+                cap = game_record.cap[teme];
             }
             let sn = self.get_teban(&Jiai::Ji);
             let ss = &self.get_sasite();
-            let cap = self.cap[teme];
 
             {
                 let mut position = CUR_POSITION_WRAP.try_write().unwrap();

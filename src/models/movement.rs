@@ -70,12 +70,14 @@ pub const SENNTITE_NUM :i8 = 4;
 pub struct GameRecord{
     /// 手目
     pub teme : usize,
-    // 局面ハッシュ種
+    /// 局面ハッシュ種
     pub ky_hash_seed : KyHashSeed,
-    // 現局面ハッシュ
+    /// 現局面ハッシュ
     pub ky_hash : [u64; TEME_LN],
-    // 初期局面ハッシュ
+    /// 初期局面ハッシュ
     pub ky0_hash : u64,
+    /// 取った駒
+    pub cap : [Koma; TEME_LN],
     /// 棋譜
     //#[derive(Copy, Clone)]
     pub moves : [Movement; TEME_LN],
@@ -111,6 +113,27 @@ impl GameRecord {
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
                 0,//257要素
+            ],
+            /// 取った駒
+            cap : [
+                // 1行16要素で並べるぜ☆（＾～＾）
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,  Koma::Kara,
+                Koma::Kara//257要素
             ],
             moves : [
                 // 1行16要素で並べるぜ☆（＾～＾）
