@@ -113,8 +113,10 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
                 movement = Movement::new();
             }
 
-            let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-            uchu_w.set_movement(movement);
+            {
+                let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+                uchu_w.set_movement(movement);
+            }
             if successful {
                 // 入っている指し手の通り指すぜ☆（＾～＾）
                 let ss;
@@ -122,7 +124,11 @@ pub fn do_position(row: &String, _starts:&mut usize, _res:&mut Response) {
                     let game_record = GAME_RECORD_WRAP.try_read().unwrap();
                     ss = game_record.moves[game_record.teme];
                 }
-                uchu_w.do_ss( &ss );                
+
+                {
+                    let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+                    uchu_w.do_ss( &ss );
+                }
             }
         }
     );
@@ -357,14 +363,18 @@ pub fn do_do(row: &String, starts:&mut usize, _res:&mut Response) {
         uchu_w.set_sasite_drop(mov.drop);
         uchu_w.set_sasite_dst(mov.destination);
         uchu_w.set_sasite_pro(mov.promotion);
+    }
 
-        if successful {
-            // 入っている指し手の通り指すぜ☆（＾～＾）
-            let ss;
-            {
-                let game_record = GAME_RECORD_WRAP.try_read().unwrap();
-                ss = game_record.moves[game_record.teme];
-            }
+    if successful {
+        // 入っている指し手の通り指すぜ☆（＾～＾）
+        let ss;
+        {
+            let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+            ss = game_record.moves[game_record.teme];
+        }
+
+        {
+            let mut uchu_w = UCHU_WRAP.try_write().unwrap();
             uchu_w.do_ss( &ss );
         }
     }

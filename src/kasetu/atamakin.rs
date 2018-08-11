@@ -25,7 +25,10 @@ pub fn is_s()->bool{
 
     let ms_south_r = p_to_ms( &p_south_r );
     let km = CUR_POSITION_WRAP.try_read().unwrap().get_km_by_ms( ms_south_r );
-    let jiai_km = GAME_RECORD_WRAP.try_read().unwrap().get_jiai_by_km( &km );
+    let jiai_km;
+    {
+        jiai_km = GAME_RECORD_WRAP.try_read().unwrap().get_jiai_by_km( &km );
+    }
     if !match_jiai( &jiai_km, &Jiai::Ji ) { return true; }
 
     g_writeln(&format!("info string south of My raion {} = {}. jiai_km={}.", ms_r, km, jiai_km ));

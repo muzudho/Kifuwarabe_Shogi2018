@@ -53,7 +53,11 @@ pub fn get_ss_by_random()->Movement{
         assert_banjo_ms(ms_dst, "Ｇet_ss_by_random");
 
         // 手番の、移動した先の駒
-        let km_dst = sn_kms_to_km( &GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji), randommove::rnd_kms() );
+        let sn1;
+        {
+            sn1 = GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji);
+        }
+        let km_dst = sn_kms_to_km( &sn1, randommove::rnd_kms() );
 
         ss_hashset.clear();
         insert_ss_by_ms_km_on_banjo (ms_dst, &km_dst, &mut ss_hashset );

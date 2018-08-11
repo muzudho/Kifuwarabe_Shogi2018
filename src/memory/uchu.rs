@@ -437,11 +437,17 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
             let cap;
             {
                 let mut position = CUR_POSITION_WRAP.try_write().unwrap();
-                let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-                let sn = game_record.get_teban(&Jiai::Ji);
+                let sn;
+                {
+                    let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+                    sn = game_record.get_teban(&Jiai::Ji);
+                }
                 cap = make_movement(&sn, ss, &mut position);
-                teme = game_record.teme;
-                game_record.moves[teme] = *ss;
+                {
+                    let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+                    teme = game_record.teme;
+                    game_record.moves[teme] = *ss;
+                }
             }
 
             self.set_cap(teme, cap);
