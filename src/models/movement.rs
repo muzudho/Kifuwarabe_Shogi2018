@@ -1,4 +1,3 @@
-use GAME_RECORD_WRAP;
 use kifuwarabe_position::*;
 use std::fmt;
 
@@ -186,6 +185,11 @@ impl GameRecord {
             },
             _ =>{ Sengo::Owari },
         }
+    }
+    /// 自分相手
+    pub fn get_jiai_by_km(&self, km:&Koma ) -> Jiai {
+        let (sn,_kms) = km_to_sn_kms( km );
+        if match_sn(&sn, &self.get_teban(&Jiai::Ji)) { Jiai::Ji } else { Jiai::Ai }
     }
 }
 

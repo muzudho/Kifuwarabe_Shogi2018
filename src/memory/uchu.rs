@@ -191,12 +191,6 @@ impl Uchu{
             INI_POSITION_WRAP.try_write().unwrap().mg[km as usize] = maisu;
         }
     }
-    pub fn get_jiai_by_km(&self, km:&Koma ) -> Jiai {
-        let (sn,_kms) = km_to_sn_kms( km );
-
-        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
-        if match_sn(&sn, &game_record.get_teban(&Jiai::Ji)) { Jiai::Ji } else { Jiai::Ai }
-    }
 
     /* ******
      * 棋譜 *
