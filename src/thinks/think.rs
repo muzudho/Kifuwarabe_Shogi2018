@@ -3,6 +3,7 @@ extern crate rand;
 
 use CUR_POSITION_WRAP;
 use CUR_POSITION_EX_WRAP;
+use ENGINE_SETTINGS_WRAP;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use mediators::med_kikisu::*;
@@ -47,7 +48,15 @@ pub fn think()->Movement{
 
     // 探索を開始する。
     // どの深さまで潜るか。
-    let depth = 3;
+    let mut depth = 3;
+    {
+        let eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
+        if eng.contains(&"depth".to_string()) {
+            depth = eng.get(&"depth".to_string()).parse::<i16>().unwrap();
+        }
+    }
+    g_writeln(&format!("info string Depth:{}.", depth));
+
     // 指し手を返す。
     let (best_movement, _best_evaluation) = searcher.search(depth, depth);
 

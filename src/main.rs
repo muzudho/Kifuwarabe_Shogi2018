@@ -87,18 +87,6 @@ fn main() {
     shell.insert_node("ND_ky0", "ky0", do_ky0);
     shell.insert_node("ND_ky", "ky", do_ky);
 
-    shell.insert_node("ND_option", "option", do_option);
-    shell.insert_node("ND_option_name", "name", do_option_name);
-    shell.insert_node_re("ND_option_namevar", r"(\w+)", do_option_namevar);
-    shell.insert_node("ND_option_type", "type", do_option_type);
-    shell.insert_node_re("ND_option_typevar", r"(\w+)", do_option_typevar);
-    shell.insert_node("ND_option_default", "default", do_option_default);
-    shell.insert_node_re("ND_option_defaultvar", r"(\d+)", do_option_defaultvar);
-    shell.insert_node("ND_option_min", "min", do_option_min);
-    shell.insert_node_re("ND_option_minvar", r"(\d+)", do_option_minvar);
-    shell.insert_node("ND_option_max", "max", do_option_max);
-    shell.insert_node_re("ND_option_maxvar", r"(\d+)", do_option_maxvar);
-
     shell.insert_node("ND_position", "position", do_position);
     shell.insert_node("ND_quit", "quit", do_quit);
     shell.insert_node("ND_rand", "rand", do_rand);
@@ -106,6 +94,12 @@ fn main() {
     shell.insert_node("ND_rndms", "rndms", do_rndms);
     shell.insert_node("ND_same", "same", do_same);
     shell.insert_node("ND_sasite", "sasite", do_sasite);
+
+    shell.insert_node("ND_setoption", "setoption", do_setoption);
+    shell.insert_node("ND_setoption_name", "name", do_setoption_name);
+    shell.insert_node_re("ND_setoption_namevar", r"(\w+)", do_setoption_namevar);
+    shell.insert_node("ND_setoption_value", "value", do_setoption_value);
+    shell.insert_node_re("ND_setoption_valuevar", r"(\w+)", do_setoption_valuevar);
 
     shell.insert_node("ND_teigi_conv", "teigi::conv", do_teigi_conv);
     shell.insert_node("ND_test", "test", do_test);
@@ -116,7 +110,10 @@ fn main() {
     // 開始ノードを選択する。
     shell.set_next("ND_do,ND_go,ND_hash,ND_hirate,ND_isready,
     ND_kifu,ND_kikisu,ND_kmugokidir,ND_kmugoki,ND_ky0,ND_ky,
-    ND_option,ND_position,ND_quit,
+
+    ND_setoption, ND_setoption_name, ND_setoption_namevar, ND_setoption_value, ND_setoption_valuevar,
+
+    ND_position,ND_quit,
     ND_rand,ND_rndkms,ND_rndms,ND_same,ND_sasite,ND_teigi_conv,
     ND_test,ND_usinewgame,ND_undo,ND_usi");
 

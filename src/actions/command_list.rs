@@ -1,5 +1,8 @@
 extern crate rand;
 
+// デバッグ出力。
+const VERBOSE : bool = false;
+
 use config::*;
 use consoles;
 use consoles::unit_test::*;
@@ -206,82 +209,6 @@ pub fn do_ky(_line: &Commandline, _caret:&mut Caret) {
  * O *
  *****/
 
-/// USI
-pub fn do_option(_line: &Commandline, caret:&mut Caret) {
-    println!("[option]");
-    caret.next = "ND_option_name";
-}
-pub fn do_option_name(_line: &Commandline, caret:&mut Caret) {
-    println!("[name]");
-    caret.next = "ND_option_namevar";
-}
-pub fn do_option_namevar(_line: &Commandline, caret:&mut Caret) {
-    let name = &caret.groups[0];
-    println!("[{}]", name);
-
-    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
-    eng.register_name(name.to_string());
-
-    //println!("[namevar]");
-    caret.next = "ND_option_type";
-}
-pub fn do_option_type(_line: &Commandline, caret:&mut Caret) {
-    println!("[type]");
-    caret.next = "ND_option_typevar";
-}
-pub fn do_option_typevar(_line: &Commandline, caret:&mut Caret) {
-    let type_val = &caret.groups[0];
-    println!("[{}]", type_val);
-
-    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
-    eng.register_type(type_val.to_string());
-
-    //println!("[typevar]");
-    caret.next = "ND_option_default";
-}
-pub fn do_option_default(_line: &Commandline, caret:&mut Caret) {
-    println!("[default]");
-    caret.next = "ND_option_defaultvar";
-}
-pub fn do_option_defaultvar(_line: &Commandline, caret:&mut Caret) {
-    let default = &caret.groups[0];
-    println!("[{}]", default);
-
-    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
-    eng.buffer_default = default.to_string();
-
-    //println!("[defaultvar]");
-    caret.next = "ND_option_min";
-}
-pub fn do_option_min(_line: &Commandline, caret:&mut Caret) {
-    println!("[min]");
-    caret.next = "ND_option_minvar";
-}
-pub fn do_option_minvar(_line: &Commandline, caret:&mut Caret) {
-    let min = &caret.groups[0];
-    println!("[{}]", min);
-
-    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
-    eng.buffer_min = min.parse::<i64>().unwrap();
-
-    //println!("[minvar]");
-    caret.next = "ND_option_max";
-}
-pub fn do_option_max(_line: &Commandline, caret:&mut Caret) {
-    println!("[max]");
-    caret.next = "ND_option_maxvar";
-}
-pub fn do_option_maxvar(_line: &Commandline, caret:&mut Caret) {
-    let max = &caret.groups[0];
-    println!("[{}]", max);
-
-    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
-    eng.buffer_max = max.parse::<i64>().unwrap();
-
-    //println!("[maxvar]");
-    caret.done_line = true;
-}
-
 pub fn do_other(_line: &Commandline, _caret:&mut Caret){
     // 書込許可モードで、ロック。
     let mut uchu_w = UCHU_WRAP.try_write().unwrap();
@@ -298,6 +225,8 @@ pub fn do_other(_line: &Commandline, _caret:&mut Caret){
         g_writeln( &s );
     }
 }
+
+
 
 /*****
  * P *
@@ -416,6 +345,50 @@ pub fn do_sasite(_line: &Commandline, _caret:&mut Caret) {
     hyoji_ss_hashset( &ss_potential_hashset );
     g_writeln("----指し手生成 ここまで----");
 }
+
+
+
+
+/// USI
+pub fn do_setoption(_line: &Commandline, caret:&mut Caret) {
+    if VERBOSE { println!("Setoption begin."); }
+    caret.next = "ND_setoption_name";
+    caret.set_line_end_controller(do_setoption_lineend);
+    if VERBOSE { println!("Setoption end."); }
+}
+pub fn do_setoption_name(_line: &Commandline, caret:&mut Caret) {
+    if VERBOSE { println!("Name."); }
+    caret.next = "ND_setoption_namevar";
+}
+pub fn do_setoption_namevar(_line: &Commandline, caret:&mut Caret) {
+    let name = &caret.groups[0];
+    if VERBOSE { println!("Namevar begin. [{}]", name); }
+
+    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
+    eng.buffer_name = name.to_string();
+    caret.next = "ND_setoption_value";
+    if VERBOSE { println!("Namevar end."); }
+}
+pub fn do_setoption_value(_line: &Commandline, caret:&mut Caret) {
+    if VERBOSE { println!("Value."); }
+    caret.next = "ND_setoption_valuevar";
+}
+pub fn do_setoption_valuevar(_line: &Commandline, caret:&mut Caret) {
+    let value = &caret.groups[0];
+    if VERBOSE { println!("Valuevar begin. [{}]", value); }
+
+    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
+    eng.buffer_value = value.to_string();
+    caret.done_line = true;
+    if VERBOSE { println!("Valuevar end."); }
+}
+pub fn do_setoption_lineend(_line: &Commandline, _caret:&mut Caret) {
+    if VERBOSE { println!("Lineend begin."); }
+    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
+    eng.flush();
+    if VERBOSE { println!("Lineend end."); }
+}
+
 
 
 

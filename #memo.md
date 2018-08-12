@@ -6,3 +6,5 @@ position startpos moves 5i5h 5a6b 7i6h 6b7b 1i1h 3c3d 3i4h 5c5d 6h7i 3a4b 3g3f 4
 
 # 設定。
 option name depth type spin default 1 min 1 max 3
+setoption name depth value 2
+setoption name depth value 3
