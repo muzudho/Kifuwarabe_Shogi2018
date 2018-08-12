@@ -9,8 +9,7 @@ extern crate rand;
 extern crate lazy_static;
 
 extern crate kifuwarabe_shell;
-use kifuwarabe_shell::Token;
-use kifuwarabe_shell::Shell;
+use kifuwarabe_shell::*;
 
 extern crate kifuwarabe_usi;
 
@@ -67,33 +66,67 @@ fn main() {
     // 宇宙爆誕。
     UCHU_WRAP.try_write().unwrap().big_bang();
     
-    // コマンド リスト。
     let mut shell = Shell::new();
-    shell.push_token(Token { token: "do ".to_string(), callback: do_do});
-    shell.push_token(Token { token: "go".to_string(), callback: do_go});
-    shell.push_token(Token { token: "hash".to_string(), callback: do_hash});
-    shell.push_token(Token { token: "hirate".to_string(), callback: do_hirate});
-    shell.push_token(Token { token: "isready".to_string(), callback: do_isready});
-    shell.push_token(Token { token: "kifu".to_string(), callback: do_kifu});
-    shell.push_token(Token { token: "kikisu".to_string(), callback: do_kikisu});
-    shell.push_token(Token { token: "kmugokidir".to_string(), callback: do_kmugokidir});
-    shell.push_token(Token { token: "kmugoki".to_string(), callback: do_kmugoki});
-    shell.push_token(Token { token: "ky0".to_string(), callback: do_ky0});
-    shell.push_token(Token { token: "ky".to_string(), callback: do_ky});
-    shell.push_token(Token { token: "position".to_string(), callback: do_position});
-    shell.push_token(Token { token: "quit".to_string(), callback: do_quit});
-    shell.push_token(Token { token: "rand".to_string(), callback: do_rand});
-    shell.push_token(Token { token: "rndkms".to_string(), callback: do_rndkms});
-    shell.push_token(Token { token: "rndms".to_string(), callback: do_rndms});
-    shell.push_token(Token { token: "same".to_string(), callback: do_same});
-    shell.push_token(Token { token: "sasite".to_string(), callback: do_sasite});
-    shell.push_token(Token { token: "setoption".to_string(), callback: do_setoption});
-    shell.push_token(Token { token: "teigi::conv".to_string(), callback: do_teigi_conv});
-    shell.push_token(Token { token: "test".to_string(), callback: do_test});
-    shell.push_token(Token { token: "usinewgame".to_string(), callback: do_usinewgame});
-    shell.push_token(Token { token: "undo".to_string(), callback: do_undo});
-    shell.push_token(Token { token: "usi".to_string(), callback: do_usi});
-    shell.set_other_callback(do_other);
+    // コールバック関数を登録する。
+    shell.insert_callback("CB_do", do_do);
+    shell.insert_callback("CB_go", do_go);
+    shell.insert_callback("CB_hash", do_hash);
+    shell.insert_callback("CB_hirate", do_hirate);
+    shell.insert_callback("CB_isready", do_isready);
+    shell.insert_callback("CB_kifu", do_kifu);
+    shell.insert_callback("CB_kikisu", do_kikisu);
+    shell.insert_callback("CB_kmugokidir", do_kmugokidir);
+    shell.insert_callback("CB_kmugoki", do_kmugoki);
+    shell.insert_callback("CB_ky0", do_ky0);
+    shell.insert_callback("CB_ky", do_ky);
+    shell.insert_callback("CB_other", do_other);
+    shell.insert_callback("CB_position", do_position);
+    shell.insert_callback("CB_quit", do_quit);
+    shell.insert_callback("CB_rand", do_rand);
+    shell.insert_callback("CB_rndkms", do_rndkms);
+    shell.insert_callback("CB_rndms", do_rndms);
+    shell.insert_callback("CB_same", do_same);
+    shell.insert_callback("CB_sasite", do_sasite);
+    shell.insert_callback("CB_setoption", do_setoption);
+    shell.insert_callback("CB_teigi_conv", do_teigi_conv);
+    shell.insert_callback("CB_test", do_test);
+    shell.insert_callback("CB_usinewgame", do_usinewgame);
+    shell.insert_callback("CB_undo", do_undo);
+    shell.insert_callback("CB_usi", do_usi);
+    // 該当なしのときに実行されるコールバック関数を選択。
+    shell.set_complementary_callback("CB_other");
+
+    // コマンド トークン構成。
+    shell.insert_node("ND_do", "do ", "CB_do", "");
+    shell.insert_node("ND_go", "go", "CB_go", "");
+    shell.insert_node("ND_hash", "hash", "CB_hash", "");
+    shell.insert_node("ND_hirate", "hirate", "CB_hirate", "");
+    shell.insert_node("ND_isready", "isready", "CB_isready", "");
+    shell.insert_node("ND_kifu", "kifu", "CB_kifu", "");
+    shell.insert_node("ND_kikisu", "kikisu", "CB_kikisu", "");
+    shell.insert_node("ND_kmugokidir", "kmugokidir", "CB_kmugokidir", "");
+    shell.insert_node("ND_kmugoki", "kmugoki", "CB_kmugoki", "");
+    shell.insert_node("ND_ky0", "ky0", "CB_ky0", "");
+    shell.insert_node("ND_ky", "ky", "CB_ky", "");
+    shell.insert_node("ND_position", "position", "CB_position", "");
+    shell.insert_node("ND_quit", "quit", "CB_quit", "");
+    shell.insert_node("ND_rand", "rand", "CB_rand", "");
+    shell.insert_node("ND_rndkms", "rndkms", "CB_rndkms", "");
+    shell.insert_node("ND_rndms", "rndms", "CB_rndms", "");
+    shell.insert_node("ND_same", "same", "CB_same", "");
+    shell.insert_node("ND_sasite", "sasite", "CB_sasite", "");
+    shell.insert_node("ND_setoption", "setoption", "CB_setoption", "");
+    shell.insert_node("ND_teigi_conv", "teigi::conv", "CB_teigi_conv", "");
+    shell.insert_node("ND_test", "test", "CB_test", "");
+    shell.insert_node("ND_usinewgame", "usinewgame", "CB_usinewgame", "");
+    shell.insert_node("ND_undo", "undo", "CB_undo", "");
+    shell.insert_node("ND_usi", "usi", "CB_usi", "");
+
+    // 開始ノードを選択する。
+    shell.set_next("ND_do,ND_go,ND_hash,ND_hirate,ND_isready,
+    ND_kifu,ND_kikisu,ND_kmugokidir,ND_kmugoki,ND_ky0,ND_ky,ND_position,ND_quit,
+    ND_rand,ND_rndkms,ND_rndms,ND_same,ND_sasite,ND_setoption,ND_teigi_conv,
+    ND_test,ND_usinewgame,ND_undo,ND_usi");
 
     // [Ctrl]+[C] で強制終了
     shell.run();

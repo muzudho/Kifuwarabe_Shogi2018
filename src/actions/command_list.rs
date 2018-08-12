@@ -227,7 +227,7 @@ pub fn do_other(_line: &Commandline, _caret:&mut Caret){
  *****/
 
 /// USIプロトコル参照。
-pub fn do_position(line: &Commandline, _caret:&mut Caret) {
+pub fn do_position(line: &Commandline, caret:&mut Caret) {
     // 局面をクリアー。手目も 0 に戻します。
     UCHU_WRAP.try_write().unwrap().clear_ky01();
 
@@ -284,6 +284,8 @@ pub fn do_position(line: &Commandline, _caret:&mut Caret) {
             }
         }
     );
+
+    caret.done_line = true;
 }
 
 
@@ -341,6 +343,18 @@ pub fn do_sasite(_line: &Commandline, _caret:&mut Caret) {
 /// USI
 pub fn do_setoption(_line: &Commandline, _caret:&mut Caret) {
     // TODO
+    /*
+    let name = Token {token: "name".to_string()};
+    let depth = Token {token: "depth".to_string()};
+    let type = Token {token: "type".to_string()};
+    let spin = Token {token: "spin".to_string()};
+    let default = Token {token: "default".to_string()};
+    // 数
+    let min = Token {token: "min".to_string()};
+    // 数
+    let value = Token {token: "value".to_string()};
+    // 数
+    */
 }
 
 

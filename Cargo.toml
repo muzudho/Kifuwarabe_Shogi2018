@@ -5,11 +5,11 @@ authors = ["muzudho <muzudho1@gmail.com>"]
 
 [dependencies]
 rand="0.3.0"
-lazy_static = "1.0"
+lazy_static = "1.1.0"
 
 [dependencies.kifuwarabe_shell]
 git = "https://github.com/muzudho/rust_kifuwarabe_shell.git"
-rev = "f7b023135fb535ad9133a06909d39d184ea738b2"
+rev = "828e29679d30a4305361a9a275becb9036b607ba"
 
 [dependencies.kifuwarabe_usi]
 git = "https://github.com/muzudho/rust_kifuwarabe_usi.git"
