@@ -49,7 +49,7 @@ pub fn think()->Movement{
     // どの深さまで潜るか。
     let depth = 3;
     // 指し手を返す。
-    let (best_movement, _best_evaluation) = searcher.search(depth);
+    let (best_movement, _best_evaluation) = searcher.search(depth, depth);
 
     // これはテスト
     {

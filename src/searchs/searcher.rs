@@ -44,9 +44,9 @@ impl Searcher{
     /// 探索。
     /// 
     /// Returns: ベストムーブ, 評価値。
-    pub fn search(&mut self, depth: i16) -> (Movement, i16) {
+    pub fn search(&mut self, max_depth: i16, cur_depth: i16) -> (Movement, i16) {
 
-        if 0 == depth {
+        if 0 == cur_depth {
             // 葉。
             // 現局面の駒割りを評価値とする。
 
@@ -70,14 +70,16 @@ impl Searcher{
         // use consoles::visuals::dumps::*;
         // hyoji_ss_hashset( &hashset_movement );
 
-        // 王手されている場合、王手回避の手に絞り込む。
-        filtering_ss_except_oute(&mut hashset_movement);
+        if max_depth == cur_depth {
+            // 王手されている場合、王手回避の手に絞り込む。
+            filtering_ss_except_oute(&mut hashset_movement);
 
-        // FIXME 負けてても、千日手は除くぜ☆（＾～＾）ただし、千日手を取り除くと手がなくなる場合は取り除かないぜ☆（＾～＾）
-        filtering_ss_except_sennitite(&mut hashset_movement);
+            // FIXME 負けてても、千日手は除くぜ☆（＾～＾）ただし、千日手を取り除くと手がなくなる場合は取り除かないぜ☆（＾～＾）
+            filtering_ss_except_sennitite(&mut hashset_movement);
 
-        // 自殺手は省くぜ☆（＾～＾）
-        filtering_ss_except_jisatusyu( &mut hashset_movement);
+            // 自殺手は省くぜ☆（＾～＾）
+            filtering_ss_except_jisatusyu( &mut hashset_movement);
+        }
 
         let mut best_movement = Movement::new();
         let mut best_evalutation = -30000;
@@ -92,7 +94,7 @@ impl Searcher{
             });
 
             // 子を探索へ。
-            let (_child_movement, mut child_evaluation) = self.search(depth-1);
+            let (_child_movement, mut child_evaluation) = self.search(max_depth, cur_depth-1);
             // 相手の評価値を逆さにする。
             child_evaluation = -child_evaluation;
 

@@ -3,4 +3,5 @@
  */
 
 pub mod movement;
+pub mod option;
 pub mod position_ex;

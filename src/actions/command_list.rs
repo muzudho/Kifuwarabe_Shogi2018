@@ -5,6 +5,7 @@ use consoles;
 use consoles::unit_test::*;
 use consoles::visuals::dumps::*;
 use consoles::visuals::title::*;
+use ENGINE_SETTINGS_WRAP;
 use GAME_RECORD_WRAP;
 use INI_POSITION_WRAP;
 use kifuwarabe_position::*;
@@ -205,6 +206,82 @@ pub fn do_ky(_line: &Commandline, _caret:&mut Caret) {
  * O *
  *****/
 
+/// USI
+pub fn do_option(_line: &Commandline, caret:&mut Caret) {
+    println!("[option]");
+    caret.next = "ND_option_name";
+}
+pub fn do_option_name(_line: &Commandline, caret:&mut Caret) {
+    println!("[name]");
+    caret.next = "ND_option_namevar";
+}
+pub fn do_option_namevar(_line: &Commandline, caret:&mut Caret) {
+    let name = &caret.groups[0];
+    println!("[{}]", name);
+
+    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
+    eng.register_name(name.to_string());
+
+    //println!("[namevar]");
+    caret.next = "ND_option_type";
+}
+pub fn do_option_type(_line: &Commandline, caret:&mut Caret) {
+    println!("[type]");
+    caret.next = "ND_option_typevar";
+}
+pub fn do_option_typevar(_line: &Commandline, caret:&mut Caret) {
+    let type_val = &caret.groups[0];
+    println!("[{}]", type_val);
+
+    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
+    eng.register_type(type_val.to_string());
+
+    //println!("[typevar]");
+    caret.next = "ND_option_default";
+}
+pub fn do_option_default(_line: &Commandline, caret:&mut Caret) {
+    println!("[default]");
+    caret.next = "ND_option_defaultvar";
+}
+pub fn do_option_defaultvar(_line: &Commandline, caret:&mut Caret) {
+    let default = &caret.groups[0];
+    println!("[{}]", default);
+
+    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
+    eng.buffer_default = default.to_string();
+
+    //println!("[defaultvar]");
+    caret.next = "ND_option_min";
+}
+pub fn do_option_min(_line: &Commandline, caret:&mut Caret) {
+    println!("[min]");
+    caret.next = "ND_option_minvar";
+}
+pub fn do_option_minvar(_line: &Commandline, caret:&mut Caret) {
+    let min = &caret.groups[0];
+    println!("[{}]", min);
+
+    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
+    eng.buffer_min = min.parse::<i64>().unwrap();
+
+    //println!("[minvar]");
+    caret.next = "ND_option_max";
+}
+pub fn do_option_max(_line: &Commandline, caret:&mut Caret) {
+    println!("[max]");
+    caret.next = "ND_option_maxvar";
+}
+pub fn do_option_maxvar(_line: &Commandline, caret:&mut Caret) {
+    let max = &caret.groups[0];
+    println!("[{}]", max);
+
+    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
+    eng.buffer_max = max.parse::<i64>().unwrap();
+
+    //println!("[maxvar]");
+    caret.done_line = true;
+}
+
 pub fn do_other(_line: &Commandline, _caret:&mut Caret){
     // 書込許可モードで、ロック。
     let mut uchu_w = UCHU_WRAP.try_write().unwrap();
@@ -340,22 +417,6 @@ pub fn do_sasite(_line: &Commandline, _caret:&mut Caret) {
     g_writeln("----指し手生成 ここまで----");
 }
 
-/// USI
-pub fn do_setoption(_line: &Commandline, _caret:&mut Caret) {
-    // TODO
-    /*
-    let name = Token {token: "name".to_string()};
-    let depth = Token {token: "depth".to_string()};
-    let type = Token {token: "type".to_string()};
-    let spin = Token {token: "spin".to_string()};
-    let default = Token {token: "default".to_string()};
-    // 数
-    let min = Token {token: "min".to_string()};
-    // 数
-    let value = Token {token: "value".to_string()};
-    // 数
-    */
-}
 
 
 /*****
