@@ -33,10 +33,10 @@ use UCHU_WRAP;
  *****/
 
 /// 指し手を入れる。
-pub fn do_do(line: &Commandline, caret:&mut Caret) {
+pub fn do_do(request: &Request, response:&mut Response) {
 
     // コマンド読取。棋譜に追加され、手目も増える
-    let (successful, umov) = parse_movement(&line.contents, &mut caret.starts, line.len);
+    let (successful, umov) = parse_movement(&request.line, &mut response.caret, request.line_len);
     let movement = usi_to_movement(successful, &umov);
 
     // グローバル変数に内容をセット。
@@ -58,7 +58,7 @@ pub fn do_do(line: &Commandline, caret:&mut Caret) {
  *****/
 
 /// 思考を開始する。bestmoveコマンドを返却する。
-pub fn do_go(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_go(_request: &Request, _response:&mut Response) {
     // go btime 40000 wtime 50000 binc 10000 winc 10000
     let bestmove = think();
     // 例： bestmove 7g7f
@@ -70,7 +70,7 @@ pub fn do_go(_line: &Commandline, _caret:&mut Caret) {
  *****/
 
 /// 局面ハッシュ表示。
-pub fn do_hash(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_hash(_request: &Request, _response:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
@@ -79,7 +79,7 @@ pub fn do_hash(_line: &Commandline, _caret:&mut Caret) {
 }
 
 /// 平手初期局面にする。
-pub fn do_hirate(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_hirate(_request: &Request, _response:&mut Response) {
     // 局面をクリアー。手目も 0 に戻します。
     UCHU_WRAP.try_write().unwrap().clear_ky01();
 
@@ -143,7 +143,7 @@ pub fn do_hirate(_line: &Commandline, _caret:&mut Caret) {
  *****/
 
 /// USIプロトコル参照。
-pub fn do_isready(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_isready(_request: &Request, _response:&mut Response) {
     g_writeln("readyok");
 }
 
@@ -152,7 +152,7 @@ pub fn do_isready(_line: &Commandline, _caret:&mut Caret) {
  *****/
 
 /// 棋譜表示。
-pub fn do_kifu(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_kifu(_request: &Request, _response:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
@@ -161,12 +161,12 @@ pub fn do_kifu(_line: &Commandline, _caret:&mut Caret) {
 }
 
 /// 利き数表示。
-pub fn do_kikisu(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_kikisu(_request: &Request, _response:&mut Response) {
     consoles::commands::cmd_kikisu();
 }
 
 /// 駒の動きの確認。
-pub fn do_kmugokidir(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_kmugokidir(_request: &Request, _response:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
@@ -178,7 +178,7 @@ pub fn do_kmugokidir(_line: &Commandline, _caret:&mut Caret) {
 }
 
 /// 駒の動き確認用。
-pub fn do_kmugoki(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_kmugoki(_request: &Request, _response:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
@@ -187,7 +187,7 @@ pub fn do_kmugoki(_line: &Commandline, _caret:&mut Caret) {
 }
 
 /// 初期局面表示。
-pub fn do_ky0(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_ky0(_request: &Request, _response:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
@@ -196,7 +196,7 @@ pub fn do_ky0(_line: &Commandline, _caret:&mut Caret) {
 }
 
 /// 現局面表示。
-pub fn do_ky(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_ky(_request: &Request, _response:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
@@ -209,7 +209,7 @@ pub fn do_ky(_line: &Commandline, _caret:&mut Caret) {
  * O *
  *****/
 
-pub fn do_other(_line: &Commandline, _caret:&mut Caret){
+pub fn do_other(_request: &Request, _response:&mut Response){
     // 書込許可モードで、ロック。
     let mut uchu_w = UCHU_WRAP.try_write().unwrap();
     if !&uchu_w.dialogue_mode {
@@ -233,12 +233,12 @@ pub fn do_other(_line: &Commandline, _caret:&mut Caret){
  *****/
 
 /// USIプロトコル参照。
-pub fn do_position(line: &Commandline, caret:&mut Caret) {
+pub fn do_position(request: &Request, response:&mut Response) {
     // 局面をクリアー。手目も 0 に戻します。
     UCHU_WRAP.try_write().unwrap().clear_ky01();
 
     // positionコマンド読取。
-    parse_position(&line.contents,
+    parse_position(&request.line,
         // 持ち駒数読取。
         |hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|{
             let mut i=0;
@@ -291,7 +291,7 @@ pub fn do_position(line: &Commandline, caret:&mut Caret) {
         }
     );
 
-    caret.done_line = true;
+    response.done_line = true;
 }
 
 
@@ -300,8 +300,8 @@ pub fn do_position(line: &Commandline, caret:&mut Caret) {
  *****/
 
 /// 終了。
-pub fn do_quit(_line: &Commandline, caret:&mut Caret){
-    caret.quits = true;
+pub fn do_quit(_request: &Request, response:&mut Response){
+    response.quits = true;
 }
 
 /*****
@@ -309,19 +309,19 @@ pub fn do_quit(_line: &Commandline, caret:&mut Caret){
  *****/
 
 /// 乱数の試し確認。
-pub fn do_rand(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_rand(_request: &Request, _response:&mut Response) {
     let secret_number = rand::thread_rng().gen_range(1, 101);//1~100
     g_writeln( &format!( "乱数={}", secret_number ) );
 }
 
 /// 駒種類をランダムで出す。
-pub fn do_rndkms(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_rndkms(_request: &Request, _response:&mut Response) {
     let kms = thinks::randommove::rnd_kms();
     g_writeln( &format!("乱駒種類={}", &kms) );
 }
 
 /// マスをランダムで返す。
-pub fn do_rndms(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_rndms(_request: &Request, _response:&mut Response) {
     let ms = thinks::randommove::rnd_ms();
     g_writeln( &format!( "乱升={}", ms) );
 }
@@ -331,13 +331,13 @@ pub fn do_rndms(_line: &Commandline, _caret:&mut Caret) {
  *****/
 
 /// 同一局面回数調べ。
-pub fn do_same(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_same(_request: &Request, _response:&mut Response) {
     g_writeln( &format!("同一局面調べ count={}", count_same_ky()));
 }
 
 
 /// 合法手を確認する。
-pub fn do_sasite(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_sasite(_request: &Request, _response:&mut Response) {
     // FIXME 合法手とは限らない
     let mut ss_potential_hashset = HashSet::new();
     insert_potential_move(&mut ss_potential_hashset );
@@ -350,39 +350,39 @@ pub fn do_sasite(_line: &Commandline, _caret:&mut Caret) {
 
 
 /// USI
-pub fn do_setoption(_line: &Commandline, caret:&mut Caret) {
+pub fn do_setoption(_request: &Request, response:&mut Response) {
     if VERBOSE { println!("Setoption begin."); }
-    caret.next = "ND_setoption_name";
-    caret.set_line_end_controller(do_setoption_lineend);
+    response.next = "ND_setoption_name";
+    response.set_linebreak_controller(do_setoption_lineend);
     if VERBOSE { println!("Setoption end."); }
 }
-pub fn do_setoption_name(_line: &Commandline, caret:&mut Caret) {
+pub fn do_setoption_name(_request: &Request, response:&mut Response) {
     if VERBOSE { println!("Name."); }
-    caret.next = "ND_setoption_namevar";
+    response.next = "ND_setoption_namevar";
 }
-pub fn do_setoption_namevar(_line: &Commandline, caret:&mut Caret) {
-    let name = &caret.groups[0];
+pub fn do_setoption_namevar(_request: &Request, response:&mut Response) {
+    let name = &response.groups[0];
     if VERBOSE { println!("Namevar begin. [{}]", name); }
 
     let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
     eng.buffer_name = name.to_string();
-    caret.next = "ND_setoption_value";
+    response.next = "ND_setoption_value";
     if VERBOSE { println!("Namevar end."); }
 }
-pub fn do_setoption_value(_line: &Commandline, caret:&mut Caret) {
+pub fn do_setoption_value(_request: &Request, response:&mut Response) {
     if VERBOSE { println!("Value."); }
-    caret.next = "ND_setoption_valuevar";
+    response.next = "ND_setoption_valuevar";
 }
-pub fn do_setoption_valuevar(_line: &Commandline, caret:&mut Caret) {
-    let value = &caret.groups[0];
+pub fn do_setoption_valuevar(_request: &Request, response:&mut Response) {
+    let value = &response.groups[0];
     if VERBOSE { println!("Valuevar begin. [{}]", value); }
 
     let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
     eng.buffer_value = value.to_string();
-    caret.done_line = true;
+    response.done_line = true;
     if VERBOSE { println!("Valuevar end."); }
 }
-pub fn do_setoption_lineend(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_setoption_lineend(_request: &Request, _response:&mut Response) {
     if VERBOSE { println!("Lineend begin."); }
     let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
     eng.flush();
@@ -397,7 +397,7 @@ pub fn do_setoption_lineend(_line: &Commandline, _caret:&mut Caret) {
  *****/
 
 /// convのテスト。
-pub fn do_teigi_conv(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_teigi_conv(_request: &Request, _response:&mut Response) {
     for ms in 11..19 {
         for hash in 0..10 {
             let next = push_ms_to_hash(hash,ms);
@@ -414,9 +414,9 @@ pub fn do_teigi_conv(_line: &Commandline, _caret:&mut Caret) {
 }
 
 /// いろいろな動作テストをしたいときに汎用的に使う。
-pub fn do_test(line: &Commandline, caret:&mut Caret) {
-    g_writeln( &format!("test starts={} len={}", caret.starts, line.len));
-    test( &line.contents, &mut caret.starts, line.len);
+pub fn do_test(request: &Request, response:&mut Response) {
+    g_writeln( &format!("test caret={} len={}", request.caret, request.line_len));
+    test( &request.line, &mut response.caret, request.line_len);
 }
 
 
@@ -425,7 +425,7 @@ pub fn do_test(line: &Commandline, caret:&mut Caret) {
  *****/
 
 /// 指した手を１手戻す。
-pub fn do_undo(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_undo(_request: &Request, _response:&mut Response) {
     if !unmake_movement2(|&_cap|{}) {
         let teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
         g_writeln( &format!("teme={} を、これより戻せません", teme));
@@ -433,7 +433,7 @@ pub fn do_undo(_line: &Commandline, _caret:&mut Caret) {
 }
 
 /// USIプロトコル参照。
-pub fn do_usinewgame(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_usinewgame(_request: &Request, _response:&mut Response) {
     // 書込許可モードで、ロック。
     let mut uchu_w = UCHU_WRAP.try_write().unwrap();
     
@@ -441,7 +441,7 @@ pub fn do_usinewgame(_line: &Commandline, _caret:&mut Caret) {
 }
 
 /// USIプロトコル参照。
-pub fn do_usi(_line: &Commandline, _caret:&mut Caret) {
+pub fn do_usi(_request: &Request, _response:&mut Response) {
     g_writeln( &format!("id name {}", ENGINE_NAME) );
     g_writeln( &format!("id author {}", ENGINE_AUTHOR) );
     g_writeln("option name depth type spin default 1 min 1 max 3");
