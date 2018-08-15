@@ -3,8 +3,6 @@ use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use misc::movement::*;
 use std::collections::HashSet;
-use syazo::sasite_seisei::*;
-use syazo::sasite_sentaku::*;
 
 fn empty_leaf_callback() -> (Movement, i16) {
     (Movement::new(), 0)
@@ -16,12 +14,16 @@ fn empty_makemove_callback(_cap: &KmSyurui) {
 fn empty_unmakemove_callback(_cap: &KmSyurui) {
 }
 
+fn empty_pick_movements_callback(_max_depth: i16, _cur_depth: i16) -> HashSet<u64> {
+    HashSet::new()
+}
 
 /// 探索オブジェクト。思考開始時に作成して使う。
 pub struct Searcher{
     pub leaf_callback: fn() -> (Movement, i16),
     pub makemove_callback: fn(&KmSyurui),
     pub unmakemove_callback: fn(&KmSyurui),
+    pub pick_movements_callback: fn(max_depth: i16, cur_depth: i16) -> HashSet<u64>,
 }
 
 impl Searcher{
@@ -30,8 +32,10 @@ impl Searcher{
             leaf_callback: empty_leaf_callback,
             makemove_callback: empty_makemove_callback,
             unmakemove_callback: empty_unmakemove_callback,
+            pick_movements_callback: empty_pick_movements_callback,
         }
     }
+
 
     /// 探索。
     /// 
@@ -45,23 +49,8 @@ impl Searcher{
 
 
         // 現局面の合法手を取得する。
-        let mut hashset_movement : HashSet<u64> = HashSet::new();
-        // 駒の動き方
-        insert_potential_move(&mut hashset_movement);
-        // g_writeln("テスト ポテンシャルムーブ.");
-        // use consoles::visuals::dumps::*;
-        // hyoji_ss_hashset( &hashset_movement );
+        let hashset_movement = (self.pick_movements_callback)(max_depth, cur_depth);
 
-        if max_depth == cur_depth {
-            // 王手されている場合、王手回避の手に絞り込む。
-            filtering_ss_except_oute(&mut hashset_movement);
-
-            // FIXME 負けてても、千日手は除くぜ☆（＾～＾）ただし、千日手を取り除くと手がなくなる場合は取り除かないぜ☆（＾～＾）
-            filtering_ss_except_sennitite(&mut hashset_movement);
-
-            // 自殺手は省くぜ☆（＾～＾）
-            filtering_ss_except_jisatusyu( &mut hashset_movement);
-        }
 
         let mut best_movement = Movement::new();
         let mut best_evalutation = -30000;

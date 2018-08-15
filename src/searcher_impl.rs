@@ -1,6 +1,9 @@
 use CUR_POSITION_EX_WRAP;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
+use std::collections::HashSet;
+use syazo::sasite_seisei::*;
+use syazo::sasite_sentaku::*;
 
 pub fn default_leaf_callback() -> (Movement, i16) {
     // 現局面の駒割りを評価値とする。
@@ -48,4 +51,26 @@ pub fn default_unmakemove_callback(cap: &KmSyurui) {
     // 駒割り
     let mut position_ex = CUR_POSITION_EX_WRAP.try_write().unwrap();
     position_ex.komawari -= get_koma_score(&cap);
+}
+
+pub fn default_pick_movements_callback(max_depth: i16, cur_depth: i16) -> HashSet<u64> {
+    let mut hashset_movement : HashSet<u64> = HashSet::new();
+    // 駒の動き方
+    insert_potential_move(&mut hashset_movement);
+    // g_writeln("テスト ポテンシャルムーブ.");
+    // use consoles::visuals::dumps::*;
+    // hyoji_ss_hashset( &hashset_movement );
+
+    if max_depth == cur_depth {
+        // 王手されている場合、王手回避の手に絞り込む。
+        filtering_ss_except_oute(&mut hashset_movement);
+
+        // FIXME 負けてても、千日手は除くぜ☆（＾～＾）ただし、千日手を取り除くと手がなくなる場合は取り除かないぜ☆（＾～＾）
+        filtering_ss_except_sennitite(&mut hashset_movement);
+
+        // 自殺手は省くぜ☆（＾～＾）
+        filtering_ss_except_jisatusyu( &mut hashset_movement);
+    };
+
+    hashset_movement
 }
