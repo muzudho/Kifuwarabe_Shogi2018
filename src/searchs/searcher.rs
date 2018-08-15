@@ -1,5 +1,4 @@
 /// 探索部だぜ☆（＾～＾）
-use CUR_POSITION_EX_WRAP;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use misc::movement::*;
@@ -7,37 +6,30 @@ use std::collections::HashSet;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
 
+fn empty_leaf_callback() -> (Movement, i16) {
+    (Movement::new(), 0)
+}
+
+fn empty_makemove_callback(_cap: &KmSyurui) {
+}
+
+fn empty_unmakemove_callback(_cap: &KmSyurui) {
+}
+
 
 /// 探索オブジェクト。思考開始時に作成して使う。
 pub struct Searcher{
+    pub leaf_callback: fn() -> (Movement, i16),
+    pub makemove_callback: fn(&KmSyurui),
+    pub unmakemove_callback: fn(&KmSyurui),
 }
 
 impl Searcher{
     pub fn new()->Searcher{
         Searcher{
-        
-        }
-    }
-
-    /// 駒割り。
-    pub fn get_koma_score(&self, km: &KmSyurui) -> i16 {
-        use kifuwarabe_position::KmSyurui;
-        match *km {
-            KmSyurui::R => {15000},
-            KmSyurui::Z => {  800},
-            KmSyurui::K => { 1100},
-            KmSyurui::I => {  600},
-            KmSyurui::N => {  500},
-            KmSyurui::U => {  300},
-            KmSyurui::S => {  200},
-            KmSyurui::H => {  100},
-            KmSyurui::PZ => {  800},
-            KmSyurui::PK => { 1100},
-            KmSyurui::PN => {  500},
-            KmSyurui::PU => {  300},
-            KmSyurui::PS => {  200},
-            KmSyurui::PH => {  100},
-            _ => { 0},
+            leaf_callback: empty_leaf_callback,
+            makemove_callback: empty_makemove_callback,
+            unmakemove_callback: empty_unmakemove_callback,
         }
     }
 
@@ -48,17 +40,7 @@ impl Searcher{
 
         if 0 == cur_depth {
             // 葉。
-            // 現局面の駒割りを評価値とする。
-
-            // 評価値は駒割り。
-            let komawari;
-            {
-                let position_ex = CUR_POSITION_EX_WRAP.try_read().unwrap();
-                komawari = position_ex.komawari;
-            }
-
-            // まだ次の手ではないので、点数は逆さにしておくと、さかさまにし直すように動く。
-            return (Movement::new(), -komawari);
+            return (self.leaf_callback)();
         }
 
 
@@ -87,11 +69,7 @@ impl Searcher{
             let movement = Movement::from_hash( *hash_mv );
 
             // 1手指す。
-            make_movement2(&movement, |&cap: &KmSyurui|{
-                // 駒割り
-                let mut position_ex = CUR_POSITION_EX_WRAP.try_write().unwrap();
-                position_ex.komawari += self.get_koma_score(&cap);
-            });
+            make_movement2(&movement, self.makemove_callback);
 
             // 子を探索へ。
             let (_child_movement, mut child_evaluation) = self.search(max_depth, cur_depth-1);
@@ -105,11 +83,7 @@ impl Searcher{
             }
 
             // 1手戻す。
-            unmake_movement2(|&cap|{
-                // 駒割り
-                let mut position_ex = CUR_POSITION_EX_WRAP.try_write().unwrap();
-                position_ex.komawari -= self.get_koma_score(&cap);
-            });
+            unmake_movement2(self.unmakemove_callback);
         }
 
         // 返却。

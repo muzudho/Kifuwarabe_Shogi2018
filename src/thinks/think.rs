@@ -8,6 +8,7 @@ use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use mediators::med_kikisu::*;
 use memory::uchu::*;
+use searcher_impl::*;
 use searchs::searcher::*;
 use UCHU_WRAP;
 
@@ -45,6 +46,9 @@ pub fn think()->Movement{
     }
 
     let mut searcher = Searcher::new();
+    searcher.leaf_callback = default_leaf_callback;
+    searcher.makemove_callback = default_makemove_callback;
+    searcher.unmakemove_callback = default_unmakemove_callback;
 
     // 探索を開始する。
     // どの深さまで潜るか。

@@ -26,7 +26,6 @@ use kifuwarabe_movement::*;
 ///
 /// use したい モジュールは、最初に読み取られる　この main.rs ファイルに並べる
 
-mod actions;
 mod config;
 mod consoles;
 mod kasetu;
@@ -34,17 +33,19 @@ mod meidai;
 mod mediators;
 mod memory;
 mod misc;
+mod searcher_impl;
 mod searchs;
+mod shell_impl;
 mod syazo;
 mod thinks;
 mod teigi;
 //mod teiri;
 mod tusin;
 
-use actions::command_list::*;
 use memory::uchu::*;
 use misc::option::*;
 use misc::position_ex::*;
+use shell_impl::*;
 
 
 // グローバル変数。
