@@ -18,12 +18,16 @@ fn empty_pick_movements_callback(_max_depth: i16, _cur_depth: i16) -> HashSet<u6
     HashSet::new()
 }
 
+fn empty_compare_best_callback(_best_movement: &mut Movement, _best_evaluation: &mut i16, _movement: Movement, _child_evaluation: i16) {
+}
+
 /// 探索オブジェクト。思考開始時に作成して使う。
 pub struct Searcher{
     pub leaf_callback: fn() -> (Movement, i16),
     pub makemove_callback: fn(&KmSyurui),
     pub unmakemove_callback: fn(&KmSyurui),
     pub pick_movements_callback: fn(max_depth: i16, cur_depth: i16) -> HashSet<u64>,
+    pub compare_best_callback: fn(&mut Movement, &mut i16, Movement, i16),
 }
 
 impl Searcher{
@@ -33,6 +37,7 @@ impl Searcher{
             makemove_callback: empty_makemove_callback,
             unmakemove_callback: empty_unmakemove_callback,
             pick_movements_callback: empty_pick_movements_callback,
+            compare_best_callback: empty_compare_best_callback,
         }
     }
 
@@ -53,7 +58,7 @@ impl Searcher{
 
 
         let mut best_movement = Movement::new();
-        let mut best_evalutation = -30000;
+        let mut best_evaluation = -30000;
         'idea: for hash_mv in hashset_movement.iter() {
             let movement = Movement::from_hash( *hash_mv );
 
@@ -66,16 +71,13 @@ impl Searcher{
             child_evaluation = -child_evaluation;
 
             // 比較して、一番良い手を選ぶ。
-            if best_evalutation < child_evaluation {
-                best_evalutation = child_evaluation;
-                best_movement = movement; // この手。
-            }
+            (self.compare_best_callback)(&mut best_movement, &mut best_evaluation, movement, child_evaluation);
 
             // 1手戻す。
             unmake_movement2(self.unmakemove_callback);
         }
 
         // 返却。
-        (best_movement, best_evalutation)
+        (best_movement, best_evaluation)
     }
 }

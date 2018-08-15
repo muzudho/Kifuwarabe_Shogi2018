@@ -74,3 +74,11 @@ pub fn default_pick_movements_callback(max_depth: i16, cur_depth: i16) -> HashSe
 
     hashset_movement
 }
+
+pub fn default_compare_best_callback(best_movement: &mut Movement, best_evaluation: &mut i16, movement: Movement, child_evaluation: i16) {
+    // 比較して、一番良い手を選ぶ。
+    if *best_evaluation < child_evaluation {
+        *best_evaluation = child_evaluation;
+        *best_movement = movement; // この手。
+    }
+}

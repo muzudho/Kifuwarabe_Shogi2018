@@ -50,6 +50,7 @@ pub fn think()->Movement{
     searcher.makemove_callback = default_makemove_callback;
     searcher.unmakemove_callback = default_unmakemove_callback;
     searcher.pick_movements_callback = default_pick_movements_callback;
+    searcher.compare_best_callback = default_compare_best_callback;
 
     // 探索を開始する。
     // どの深さまで潜るか。
