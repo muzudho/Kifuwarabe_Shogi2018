@@ -15,7 +15,6 @@ use kifuwarabe_position::*;
 use kifuwarabe_shell::*;
 use kifuwarabe_usi::*;
 use memory::uchu::*;
-use misc::movement::*;
 use rand::Rng;
 use std::collections::HashSet;
 use syazo::sasite_seisei::*;
@@ -44,11 +43,10 @@ pub fn do_do(request: &Request, response:&mut Response) {
         // 書込許可モードで、ロック。
         let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
         game_record.set_movement(movement);
-    }
-
-    if successful {
-        // 入っている指し手の通り指すぜ☆（＾～＾）
-        make_movement2(&movement, |&_cap|{});
+        if successful {
+            // 入っている指し手の通り指すぜ☆（＾～＾）
+            game_record.make_movement2(&movement, |&_cap|{});
+        }
     }
 }
 
@@ -107,7 +105,10 @@ pub fn do_hirate(_request: &Request, _response:&mut Response) {
             }
 
             // 初期局面ハッシュを作り直す
-            let ky_hash = create_ky0_hash();
+            let ky_hash;
+            {
+                ky_hash = GAME_RECORD_WRAP.try_read().unwrap().create_ky0_hash();
+            }
 
             // グローバル変数に内容をセット。
             {
@@ -125,14 +126,14 @@ pub fn do_hirate(_request: &Request, _response:&mut Response) {
         {
             let movement = usi_to_movement(successful, &usi_movement);
 
+            // グローバル変数を使う。
             {
                 let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
                 game_record.set_movement(movement);
-            }
-
-            if successful {
-                // 入っている指し手の通り指すぜ☆（＾～＾）
-                make_movement2(&movement, |&_cap|{});
+                if successful {
+                    // 入っている指し手の通り指すぜ☆（＾～＾）
+                    game_record.make_movement2(&movement, |&_cap|{});
+                }
             }
         }
     );
@@ -260,7 +261,10 @@ pub fn do_position(request: &Request, response:&mut Response) {
             }
 
             // 初期局面ハッシュを作り直す
-            let ky_hash = create_ky0_hash();
+            let ky_hash;
+            {
+                ky_hash = GAME_RECORD_WRAP.try_read().unwrap().create_ky0_hash();
+            }
 
             // グローバル変数に内容をセット。
             {
@@ -282,11 +286,10 @@ pub fn do_position(request: &Request, response:&mut Response) {
             {
                 let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
                 game_record.set_movement(movement);
-            }
-
-            if successful {
-                // 指し手を指すぜ☆（＾～＾）
-                make_movement2(&movement, |&_cap|{});
+                if successful {
+                    // 指し手を指すぜ☆（＾～＾）
+                    game_record.make_movement2(&movement, |&_cap|{});
+                }
             }
         }
     );
@@ -332,7 +335,7 @@ pub fn do_rndms(_request: &Request, _response:&mut Response) {
 
 /// 同一局面回数調べ。
 pub fn do_same(_request: &Request, _response:&mut Response) {
-    g_writeln( &format!("同一局面調べ count={}", count_same_ky()));
+    g_writeln( &format!("同一局面調べ count={}", GAME_RECORD_WRAP.try_read().unwrap().count_same_ky()));
 }
 
 
@@ -426,8 +429,9 @@ pub fn do_test(request: &Request, response:&mut Response) {
 
 /// 指した手を１手戻す。
 pub fn do_undo(_request: &Request, _response:&mut Response) {
-    if !unmake_movement2(|&_cap|{}) {
-        let teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
+    let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
+    if !game_record.unmake_movement2(|&_cap|{}) {
+        let teme = game_record.teme;
         g_writeln( &format!("teme={} を、これより戻せません", teme));
     }
 }

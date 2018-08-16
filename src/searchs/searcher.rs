@@ -1,8 +1,9 @@
 /// 探索部だぜ☆（＾～＾）
+use GAME_RECORD_WRAP;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-use misc::movement::*;
 use std::collections::HashSet;
+
 
 fn empty_leaf_callback() -> (Movement, i16) {
     (Movement::new(), 0)
@@ -63,7 +64,9 @@ impl Searcher{
             let movement = Movement::from_hash( *hash_mv );
 
             // 1手指す。
-            make_movement2(&movement, self.makemove_callback);
+            {
+                GAME_RECORD_WRAP.try_write().unwrap().make_movement2(&movement, self.makemove_callback);
+            }
 
             // 子を探索へ。
             let (_child_movement, mut child_evaluation) = self.search(max_depth, cur_depth-1);
@@ -74,7 +77,9 @@ impl Searcher{
             (self.compare_best_callback)(&mut best_movement, &mut best_evaluation, movement, child_evaluation);
 
             // 1手戻す。
-            unmake_movement2(self.unmakemove_callback);
+            {
+                GAME_RECORD_WRAP.try_write().unwrap().unmake_movement2(self.unmakemove_callback);
+            }
         }
 
         // 返却。

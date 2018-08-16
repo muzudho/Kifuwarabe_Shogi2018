@@ -17,8 +17,8 @@ rev = "f0be3fabdcc0eafc525101048e55b91b516052b6"
 
 [dependencies.kifuwarabe_position]
 git = "https://github.com/muzudho/rust_kifuwarabe_position.git"
-rev = "c2837186b16658c4bb178adc42b0e9b0b85a7fc8"
+rev = "8956e8b019be11e85ac4fee4d75b7602d5e7fc21"
 
 [dependencies.kifuwarabe_movement]
 git = "https://github.com/muzudho/rust_kifuwarabe_movement.git"
-rev = "9d53f7548b3a57ddd8b4d1e4003b9f55ac5bdcbf"
+rev = "83cd4adec44675600a075401a1d0b6f3297044c2"

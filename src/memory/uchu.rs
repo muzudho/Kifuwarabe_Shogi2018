@@ -13,15 +13,14 @@ use GAME_RECORD_WRAP;
 use INI_POSITION_WRAP;
 use kifuwarabe_position::*;
 use memory::number_board::*;
-use misc::movement::*;
-use thinks::visions::vision_tree::*;
-use teigi::shogi_syugo::*;
-use tusin::us_conv::*;
-
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 use std::sync::Mutex;
+use thinks::visions::vision_tree::*;
+use teigi::shogi_syugo::*;
+use tusin::us_conv::*;
+
 
 /**
  * グローバル定数
@@ -308,7 +307,7 @@ impl Uchu{
             ky.mg[Koma::K0 as usize],ky.mg[Koma::Z0 as usize],ky.mg[Koma::I0 as usize],ky.mg[Koma::N0 as usize],ky.mg[Koma::U0 as usize],ky.mg[Koma::S0 as usize],ky.mg[Koma::H0 as usize],
             //                   ▽キ,                     ▽ゾ,                     ▽イ,                     ▽ネ,                     ▽ウ,                     ▽シ,                     ▽ヒ,
             ky.mg[Koma::K1 as usize],ky.mg[Koma::Z1 as usize],ky.mg[Koma::I1 as usize],ky.mg[Koma::N1 as usize],ky.mg[Koma::U1 as usize],ky.mg[Koma::S1 as usize],ky.mg[Koma::H1 as usize],
-            game_record.get_teme(), game_record.get_teban(&Jiai::Ji), count_same_ky()
+            game_record.get_teme(), game_record.get_teban(&Jiai::Ji), game_record.count_same_ky()
         )
     }
 
