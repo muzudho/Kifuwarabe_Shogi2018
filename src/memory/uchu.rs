@@ -256,7 +256,7 @@ impl Uchu{
      * 後手から見た盤を表示するぜ☆（＾～＾）
      * デカルト座標の第一象限と x,y 方向が一致するメリットがあるぜ☆（＾～＾）
      */
-    pub fn kaku_ky(&self, num:&KyNums)->String{
+    pub fn kaku_ky(&self, num:&KyNums, visible_record: bool)->String{
         // グローバル変数を使う場合がある。
         let cur_position = CUR_POSITION_WRAP.try_read().unwrap();
         let ini_position = INI_POSITION_WRAP.try_read().unwrap();
@@ -266,7 +266,15 @@ impl Uchu{
             KyNums::Start => &ini_position,
         };
 
-        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+        let mut teme = 0;
+        let mut teban = Sengo::Sen;
+        let mut same = 0;
+        if visible_record {
+            let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+            teme = game_record.get_teme();
+            teban = game_record.get_teban(&Jiai::Ji);
+            same = game_record.count_same_ky();
+        }
 
 
         // 局面表示
@@ -307,9 +315,12 @@ impl Uchu{
             ky.mg[Koma::K0 as usize],ky.mg[Koma::Z0 as usize],ky.mg[Koma::I0 as usize],ky.mg[Koma::N0 as usize],ky.mg[Koma::U0 as usize],ky.mg[Koma::S0 as usize],ky.mg[Koma::H0 as usize],
             //                   ▽キ,                     ▽ゾ,                     ▽イ,                     ▽ネ,                     ▽ウ,                     ▽シ,                     ▽ヒ,
             ky.mg[Koma::K1 as usize],ky.mg[Koma::Z1 as usize],ky.mg[Koma::I1 as usize],ky.mg[Koma::N1 as usize],ky.mg[Koma::U1 as usize],ky.mg[Koma::S1 as usize],ky.mg[Koma::H1 as usize],
-            game_record.get_teme(), game_record.get_teban(&Jiai::Ji), game_record.count_same_ky()
+            teme, teban, same
         )
     }
+
+
+
 
     /**
      * 表示

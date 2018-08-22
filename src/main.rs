@@ -19,6 +19,8 @@ use kifuwarabe_position::*;
 extern crate kifuwarabe_movement;
 use kifuwarabe_movement::*;
 
+extern crate kifuwarabe_alpha_beta_search;
+
 ///
 /// Rust言語の mod や ソース置き場の説明
 ///      「Rust のモジュールシステム」
@@ -34,7 +36,6 @@ mod mediators;
 mod memory;
 mod misc;
 mod searcher_impl;
-mod searchs;
 mod shell_impl;
 mod syazo;
 mod thinks;
@@ -45,6 +46,7 @@ mod tusin;
 use memory::uchu::*;
 use misc::option::*;
 use misc::position_ex::*;
+use searcher_impl::*;
 use shell_impl::*;
 
 
@@ -57,6 +59,8 @@ lazy_static! {
     static ref ENGINE_SETTINGS_WRAP: RwLock<EngineSettings> = RwLock::new(EngineSettings::new());
     // 計算中の局面(拡張)。
     pub static ref CUR_POSITION_EX_WRAP: RwLock<PositionEx> = RwLock::new(PositionEx::new());
+    // 探索中に覚えておくもの。
+    pub static ref SEARCHER_VAR_WRAP: RwLock<SearcherVariable> = RwLock::new(SearcherVariable::new());
 }
 
 fn main() {

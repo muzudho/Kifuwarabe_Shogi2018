@@ -4,16 +4,26 @@ extern crate rand;
 use CUR_POSITION_WRAP;
 use CUR_POSITION_EX_WRAP;
 use ENGINE_SETTINGS_WRAP;
+use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use mediators::med_kikisu::*;
 use memory::uchu::*;
 use searcher_impl::*;
-use searchs::searcher::*;
+use SEARCHER_VAR_WRAP;
+use std::time::{Duration, Instant};
 use UCHU_WRAP;
 
+
+
+
 /// 現局面での最善手を返すぜ☆（*＾～＾*）
-pub fn think()->Movement{
+pub fn think() -> Movement{
+
+    // 時間計測。
+    {
+        SEARCHER_VAR_WRAP.try_write().unwrap().stopwatch = Instant::now();
+    }
 
     // 現局面まで、状態に進める。（差分更新できない部分）
     // グローバル変数を使う。
@@ -45,26 +55,48 @@ pub fn think()->Movement{
         uchu.set_kiki_su_by_sn( local_kiki_su_by_sn);
     }
 
-    let mut searcher = Searcher::new();
-    searcher.leaf_callback = default_leaf_callback;
-    searcher.makemove_callback = default_makemove_callback;
-    searcher.unmakemove_callback = default_unmakemove_callback;
-    searcher.pick_movements_callback = default_pick_movements_callback;
-    searcher.compare_best_callback = default_compare_best_callback;
+
+    let mut alphaBetaSearcher = AlphaBetaSearcher::new();
+    alphaBetaSearcher.leaf_callback = default_leaf_callback;
+    alphaBetaSearcher.makemove_callback = default_makemove_callback;
+    alphaBetaSearcher.unmakemove_callback = default_unmakemove_callback;
+    alphaBetaSearcher.pick_movements_callback = default_pick_movements_callback;
+    alphaBetaSearcher.compare_best_callback = default_compare_best_callback;
+
 
     // 探索を開始する。
     // どの深さまで潜るか。
-    let mut depth = 3;
+    let mut max_depth = 3;
     {
         let eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
-        if eng.contains(&"depth".to_string()) {
-            depth = eng.get(&"depth".to_string()).parse::<i16>().unwrap();
+        if eng.contains(&"max_depth".to_string()) {
+            max_depth = eng.get(&"max_depth".to_string()).parse::<i16>().unwrap();
         }
     }
-    g_writeln(&format!("info string Depth:{}.", depth));
+    g_writeln(&format!("info string max_depth:{}.", max_depth));
 
-    // 指し手を返す。
-    let (best_movement, _best_evaluation) = searcher.search(depth, depth);
+    // TODO: 反復深化探索
+    let mut best_movement = Movement::new();
+    for id_depth in 1..max_depth+1 {
+        // 指し手を選ぶ。
+        let (id_best_movement, _best_evaluation) = alphaBetaSearcher.search(id_depth, id_depth,
+        -<i16>::max_value(), // min_value (負値) を - にすると正数があふれてしまうので、正の最大数に - を付ける。
+        <i16>::max_value());
+
+        // 反復深化探索の打ち切り。
+        let end; // 計測時間。
+        {
+            end = SEARCHER_VAR_WRAP.try_read().unwrap().stopwatch.elapsed();
+        }
+        if 30 < end.as_secs() {
+            // TODO: 30秒以上考えていたら、すべての探索打切り。
+            break;
+        }
+
+        // 更新
+        best_movement = id_best_movement;
+    }
+
 
     // これはテスト
     {
@@ -91,7 +123,12 @@ pub fn think()->Movement{
 
         // 楽観王手の一覧はできているはず。
 
-
+    // 計測時間。
+    let end;
+    {
+        end = SEARCHER_VAR_WRAP.try_write().unwrap().stopwatch.elapsed();
+    }
+    g_writeln(&format!("info string {}.{:03}秒経過しました。", end.as_secs(), end.subsec_nanos() / 1_000_000));
 
     // 返却
     best_movement

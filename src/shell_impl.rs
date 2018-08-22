@@ -192,7 +192,7 @@ pub fn do_ky0(_request: &Request, _response:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
-    let s = uchu_r.kaku_ky( &KyNums::Start );
+    let s = uchu_r.kaku_ky(&KyNums::Start, true);
     g_writeln( &s );
 }
 
@@ -201,7 +201,7 @@ pub fn do_ky(_request: &Request, _response:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
-    let s = uchu_r.kaku_ky( &KyNums::Current );
+    let s = uchu_r.kaku_ky(&KyNums::Current, true);
     g_writeln( &s );            
 }
 
@@ -222,7 +222,7 @@ pub fn do_other(_request: &Request, _response:&mut Response){
         hyoji_title();
     }else{
         // 局面表示
-        let s = &uchu_w.kaku_ky( &KyNums::Current );
+        let s = &uchu_w.kaku_ky(&KyNums::Current, true);
         g_writeln( &s );
     }
 }
@@ -448,7 +448,7 @@ pub fn do_usinewgame(_request: &Request, _response:&mut Response) {
 pub fn do_usi(_request: &Request, _response:&mut Response) {
     g_writeln( &format!("id name {}", ENGINE_NAME) );
     g_writeln( &format!("id author {}", ENGINE_AUTHOR) );
-    g_writeln("option name depth type spin default 1 min 1 max 3");
+    g_writeln("option name depth type spin default 1 min 1 max 999");
     g_writeln("usiok");
 }
 

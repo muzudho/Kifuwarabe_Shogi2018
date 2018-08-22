@@ -139,7 +139,7 @@ pub fn filtering_ss_except_jisatusyu(
             game_record.make_movement2(&ss_potential, |&_cap|{});
         }
         // // 現局面表示
-        // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky( &KyNums::Current );
+        // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
         // g_writeln( &s1 );            
 
         // 狙われている方の玉の位置
@@ -185,7 +185,7 @@ pub fn filtering_ss_except_jisatusyu(
             GAME_RECORD_WRAP.try_write().unwrap().unmake_movement2(|&_cap|{});
         }
         // // 現局面表示
-        // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky( &KyNums::Current );
+        // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
         // g_writeln( &s2 );            
 
         if jisatusyu {
@@ -228,7 +228,7 @@ pub fn filtering_ss_except_sennitite(
         }
         
         // 現局面表示
-        // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky( &KyNums::Current );
+        // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
         // g_writeln( &s1 );            
 
         // 千日手かどうかを判定する☆（＾～＾）
@@ -245,7 +245,7 @@ pub fn filtering_ss_except_sennitite(
             GAME_RECORD_WRAP.try_write().unwrap().unmake_movement2(|&_cap|{});
         }
         // 現局面表示
-        // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky( &KyNums::Current );
+        // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
         // g_writeln( &s2 );
     }
 
