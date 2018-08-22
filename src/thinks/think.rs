@@ -11,7 +11,7 @@ use mediators::med_kikisu::*;
 use memory::uchu::*;
 use searcher_impl::*;
 use SEARCHER_VAR_WRAP;
-use std::time::{Duration, Instant};
+use std::time::{Instant};
 use UCHU_WRAP;
 
 
@@ -56,12 +56,12 @@ pub fn think() -> Movement{
     }
 
 
-    let mut alphaBetaSearcher = AlphaBetaSearcher::new();
-    alphaBetaSearcher.leaf_callback = default_leaf_callback;
-    alphaBetaSearcher.makemove_callback = default_makemove_callback;
-    alphaBetaSearcher.unmakemove_callback = default_unmakemove_callback;
-    alphaBetaSearcher.pick_movements_callback = default_pick_movements_callback;
-    alphaBetaSearcher.compare_best_callback = default_compare_best_callback;
+    let mut alpha_beta_searcher = AlphaBetaSearcher::new();
+    alpha_beta_searcher.leaf_callback = default_leaf_callback;
+    alpha_beta_searcher.makemove_callback = default_makemove_callback;
+    alpha_beta_searcher.unmakemove_callback = default_unmakemove_callback;
+    alpha_beta_searcher.pick_movements_callback = default_pick_movements_callback;
+    alpha_beta_searcher.compare_best_callback = default_compare_best_callback;
 
 
     // 探索を開始する。
@@ -79,7 +79,7 @@ pub fn think() -> Movement{
     let mut best_movement = Movement::new();
     for id_depth in 1..max_depth+1 {
         // 指し手を選ぶ。
-        let (id_best_movement, _best_evaluation) = alphaBetaSearcher.search(id_depth, id_depth,
+        let (id_best_movement, _best_evaluation) = alpha_beta_searcher.search(id_depth, id_depth,
         -<i16>::max_value(), // min_value (負値) を - にすると正数があふれてしまうので、正の最大数に - を付ける。
         <i16>::max_value());
 
@@ -128,7 +128,7 @@ pub fn think() -> Movement{
     {
         end = SEARCHER_VAR_WRAP.try_write().unwrap().stopwatch.elapsed();
     }
-    g_writeln(&format!("info string {}.{:03}秒経過しました。", end.as_secs(), end.subsec_nanos() / 1_000_000));
+    g_writeln(&format!("info string {}.{:03}sec.", end.as_secs(), end.subsec_nanos() / 1_000_000));
 
     // 返却
     best_movement

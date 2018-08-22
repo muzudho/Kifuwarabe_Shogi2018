@@ -1,5 +1,4 @@
 use CUR_POSITION_EX_WRAP;
-use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use SEARCHER_VAR_WRAP;
@@ -7,10 +6,6 @@ use std::collections::HashSet;
 use std::time::{Instant};
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
-
-use memory::uchu::*;
-use UCHU_WRAP;
-use teigi::shogi_syugo::*;
 
 
 pub struct SearcherVariable {
