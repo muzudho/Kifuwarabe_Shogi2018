@@ -112,8 +112,10 @@ pub fn think(milliseconds: i32) -> Movement{
     }
 
     // 手を決めたときにも情報表示。
-    g_writeln(&format!("info score cp {} pv", searcher.id_evaluation));
-    g_writeln(&format!("info string incremental_komawari: {}", searcher.incremental_komawari));
+    g_writeln(&format!("info score cp {}", searcher.id_evaluation));
+    // VERBOSE
+    g_writeln(&format!("info string score: {}, bestmove: {},  incremental_komawari: {}",
+        searcher.id_evaluation, Movement::from_hash(best_movement_hash), searcher.incremental_komawari));
 
 
         /*

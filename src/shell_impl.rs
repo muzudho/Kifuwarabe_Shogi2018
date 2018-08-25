@@ -191,79 +191,63 @@ pub fn do_hirate(_request: &Request, _response:&mut Response) {
     UCHU_WRAP.try_write().unwrap().clear_ky01();
 
     let mut searcher = Searcher::new();
+    {
+        searcher.ini_position = INI_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.cur_position = CUR_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.game_record = GAME_RECORD_WRAP.try_read().unwrap().clone();
+    }
 
     parse_position(
         &mut searcher,
         &KY1.to_string(),
-        |hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|
+        #[allow(unused_mut)]
+        |mut searcher, hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|
         {
             // 持ち駒数コピー。
             let mut i=0;
             for item in HAND_PIECE_ARRAY.iter() {
                 let km = pc_to_km(item);
 
-                INI_POSITION_WRAP.try_write().unwrap().set_mg(km, hand_count_arr[i]);
-                i+=1;
+                searcher.ini_position.set_mg(km, hand_count_arr[i]);
+                i += 1;
             }
         },
-        |ban: [Piece;100]|
+        |searcher, ban: [Piece;100]|
         {
-            // 局面のクローンを作成。
-            let mut position0;
-            {
-                position0 = INI_POSITION_WRAP.try_write().unwrap().clone();
-            }
-
             // 盤面コピー
             for file in SUJI_1..SUJI_10 {
                 for rank in DAN_1..DAN_10 {
-                    position0.set_km_by_ms(suji_dan_to_ms(file, rank), pc_to_km(&ban[file_rank_to_cell(file,rank)]));
+                    searcher.ini_position.set_km_by_ms(suji_dan_to_ms(file, rank), pc_to_km(&ban[file_rank_to_cell(file,rank)]));
                 }
             }
 
-            {
-                INI_POSITION_WRAP.try_write().unwrap().set_all(&position0);
-            }
-
             // 初期局面ハッシュを作り直す
-            let ky_hash;
-            {
+            let ky_hash = searcher.game_record.create_ky0_hash(&searcher.ini_position);
 
-                ky_hash = GAME_RECORD_WRAP.try_read().unwrap().create_ky0_hash(&position0);
-            }
+            searcher.game_record.set_ky0_hash( ky_hash );
 
-            // グローバル変数に内容をセット。
-            {
-                let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-                game_record.set_ky0_hash( ky_hash );
-            }
-
-            // 初期局面を、現局面にコピーします。
-            {
-                CUR_POSITION_WRAP.try_write().unwrap().set_all(&INI_POSITION_WRAP.try_read().unwrap());
-            }
+            // 初期局面を、現局面に写す。
+            searcher.cur_position.set_all(&searcher.ini_position);
         },
-        |successful, usi_movement, mut searcher|
+        |mut searcher, successful, usi_movement|
         {
             let movement = usi_to_movement(successful, &usi_movement);
 
-            // グローバル変数を使う。
-            {
-                let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-                game_record.set_movement(movement);
-            }
+            searcher.game_record.set_movement(movement);
 
             if successful {
                 // 入っている指し手の通り指すぜ☆（＾～＾）
                 makemove(&mut searcher, movement.to_hash());
-
-                // 局面のクローンで上書き。
-                {
-                    CUR_POSITION_WRAP.try_write().unwrap().set_all(&searcher.cur_position);
-                }
             }
         }
     );
+
+    // クローンからオリジナルへ還元する。
+    {
+        INI_POSITION_WRAP.try_write().unwrap().set_all(&searcher.ini_position);
+        CUR_POSITION_WRAP.try_write().unwrap().set_all(&searcher.cur_position);
+        GAME_RECORD_WRAP.try_write().unwrap().set_all(&searcher.game_record);
+    }
 }
 
 /*****
@@ -320,10 +304,7 @@ pub fn do_ky0(_request: &Request, _response:&mut Response) {
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
     // 局面のクローンを作成。
-    let position0;
-    {
-        position0 = INI_POSITION_WRAP.try_read().unwrap().clone();
-    }
+    let position0 = INI_POSITION_WRAP.try_read().unwrap().clone();
 
     let s = uchu_r.kaku_ky(&position0, true);
     g_writeln( &s );
@@ -335,10 +316,7 @@ pub fn do_ky(_request: &Request, _response:&mut Response) {
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
     // 局面のクローンを作成。
-    let position1;
-    {
-        position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
-    }
+    let position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
 
     let s = uchu_r.kaku_ky(&position1, true);
     g_writeln( &s );            
@@ -361,10 +339,7 @@ pub fn do_other(_request: &Request, _response:&mut Response){
         hyoji_title();
     }else{
         // 局面のクローンを作成。
-        let position1;
-        {
-            position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
-        }
+        let position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
 
         // 局面表示
         let s = &uchu_w.kaku_ky(&position1, true);
@@ -384,78 +359,63 @@ pub fn do_position(request: &Request, response:&mut Response) {
     UCHU_WRAP.try_write().unwrap().clear_ky01();
 
     let mut searcher = Searcher::new();
+    {
+        searcher.ini_position = INI_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.cur_position = CUR_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.game_record = GAME_RECORD_WRAP.try_read().unwrap().clone();
+    }
 
     // positionコマンド読取。
     parse_position(
         &mut searcher,
         &request.line,
         // 持ち駒数読取。
-        |hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|{
+        |searcher, hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|{
             let mut i=0;
             for item in HAND_PIECE_ARRAY.iter() {
                 let km = pc_to_km(item);
 
-                INI_POSITION_WRAP.try_write().unwrap().set_mg(km, hand_count_arr[i]);
+                searcher.ini_position.set_mg(km, hand_count_arr[i]);
                 i+=1;
             }
         },
         // 盤面読取。
-        |ban: [Piece;100]|{
+        |searcher, ban: [Piece;100]|{
             // 局面のクローンを作成。
-            let mut position0;
-            {
-                position0 = INI_POSITION_WRAP.try_write().unwrap().clone();
-            }
-
             for file in SUJI_1..SUJI_10 {
                 for rank in DAN_1..DAN_10 {
-                    position0.set_km_by_ms(suji_dan_to_ms(file, rank), pc_to_km(&ban[file_rank_to_cell(file,rank)]));
+                    searcher.ini_position.set_km_by_ms(suji_dan_to_ms(file, rank), pc_to_km(&ban[file_rank_to_cell(file,rank)]));
                 }
-            }
-
-            {
-                INI_POSITION_WRAP.try_write().unwrap().set_all(&position0);
             }
 
             // 初期局面ハッシュを作り直す
-            let ky_hash;
-            {
+            let ky_hash = searcher.game_record.create_ky0_hash(&searcher.ini_position);
 
-                ky_hash = GAME_RECORD_WRAP.try_read().unwrap().create_ky0_hash(&position0);
-            }
+            searcher.game_record.set_ky0_hash(ky_hash);
 
-            // グローバル変数に内容をセット。
-            {
-                let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-                game_record.set_ky0_hash( ky_hash );
-            }
-
-            // 初期局面を、現局面にコピーします。
-            {
-                CUR_POSITION_WRAP.try_write().unwrap().set_all(&INI_POSITION_WRAP.try_read().unwrap());
-            }
+            // 初期局面を、現局面に写す。
+            searcher.cur_position.set_all(&searcher.ini_position);
         },
         // 指し手読取。
-        |successful, usi_movement, mut searcher|{
+        |mut searcher, successful, usi_movement|{
             let movement = usi_to_movement(successful, &usi_movement);
 
             // 棋譜に書き込み。
-            {
-                let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-                game_record.set_movement(movement);
-            }
+            searcher.game_record.set_movement(movement);
 
             if successful {
-                // 指し手を指すぜ☆（＾～＾）
+                // 指し手が付いていれば、指し手を指すぜ☆（＾～＾）
                 makemove(&mut searcher, movement.to_hash());
-
-                // 局面のクローンで上書き。
-                {
-                    CUR_POSITION_WRAP.try_write().unwrap().set_all(&searcher.cur_position);
-                }
             }
         }
     );
+
+    // クローンからオリジナルへ還元する。
+    {
+        INI_POSITION_WRAP.try_write().unwrap().set_all(&searcher.ini_position);
+        CUR_POSITION_WRAP.try_write().unwrap().set_all(&searcher.cur_position);
+        GAME_RECORD_WRAP.try_write().unwrap().set_all(&searcher.game_record);
+    }
 
     response.done_line = true;
 }

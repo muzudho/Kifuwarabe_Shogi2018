@@ -127,13 +127,8 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
 /// * `movement_hash` - 指し手のハッシュ値。
 pub fn makemove(searcher: &mut Searcher, movement_hash: u64) {
 
-    let cap_kms;
-    {
-        let movement = Movement::from_hash(movement_hash);
-        {
-            cap_kms = searcher.game_record.make_movement2(&movement, &mut searcher.cur_position);
-        }
-    }
+    let movement = Movement::from_hash(movement_hash);
+    let cap_kms = searcher.game_record.make_movement2(&movement, &mut searcher.cur_position);
 
     // 駒割の差分更新。
     searcher.incremental_komawari += get_koma_score(&cap_kms);
@@ -149,13 +144,7 @@ pub fn makemove(searcher: &mut Searcher, movement_hash: u64) {
 
 pub fn unmakemove(searcher: &mut Searcher) -> (bool, KmSyurui) {
 
-    let successful;
-    let cap_kms;
-    {
-        let (successful2, cap_kms2) = searcher.game_record.unmake_movement2(&mut searcher.cur_position);
-        successful = successful2;
-        cap_kms = cap_kms2;
-    }
+    let (successful, cap_kms) = searcher.game_record.unmake_movement2(&mut searcher.cur_position);
 
     if successful {
         // 駒割り
