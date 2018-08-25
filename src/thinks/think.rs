@@ -1,7 +1,6 @@
 /// 深い考えだぜ☆（＾～＾）
 extern crate rand;
 
-use CUR_POSITION_WRAP;
 use ENGINE_SETTINGS_WRAP;
 use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
@@ -51,10 +50,7 @@ pub fn think(milliseconds: i32, position1: &mut Position) -> Movement{
         }
 
         // 相手の利き升調べ（自殺手防止のため）
-        let (local_kiki_su_by_sn, local_kiki_su_by_km) = refresh_kikisu(
-            // 現局面を読取専用で取得し、ロック。
-            &CUR_POSITION_WRAP.try_read().unwrap()
-            );
+        let (local_kiki_su_by_sn, local_kiki_su_by_km) = refresh_kikisu(position1);
         // g_writeln( &format!("info string test is_s={}", kasetu::atamakin::is_s() ) );
 
         // 駒別

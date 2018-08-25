@@ -223,23 +223,26 @@ pub fn do_hirate(_request: &Request, _response:&mut Response) {
         },
         |ban: [Piece;100]|
         {
+            // 局面のクローンを作成。
+            let mut position0;
+            {
+                position0 = INI_POSITION_WRAP.try_write().unwrap().clone();
+            }
+
             // 盤面コピー
             for file in SUJI_1..SUJI_10 {
                 for rank in DAN_1..DAN_10 {
-                    UCHU_WRAP.try_write().unwrap().set_ky0_ban_km(
-                        file,rank,pc_to_km(&ban[file_rank_to_cell(file,rank)])
-                    );
+                    position0.set_km_by_ms(suji_dan_to_ms(file, rank), pc_to_km(&ban[file_rank_to_cell(file,rank)]));
                 }
+            }
+
+            {
+                INI_POSITION_WRAP.try_write().unwrap().set_all(&position0);
             }
 
             // 初期局面ハッシュを作り直す
             let ky_hash;
             {
-                // 局面のクローンを作成。
-                let position0;
-                {
-                    position0 = INI_POSITION_WRAP.try_read().unwrap().clone();
-                }
 
                 ky_hash = GAME_RECORD_WRAP.try_read().unwrap().create_ky0_hash(&position0);
             }
@@ -420,22 +423,25 @@ pub fn do_position(request: &Request, response:&mut Response) {
         },
         // 盤面読取。
         |ban: [Piece;100]|{
+            // 局面のクローンを作成。
+            let mut position0;
+            {
+                position0 = INI_POSITION_WRAP.try_write().unwrap().clone();
+            }
+
             for file in SUJI_1..SUJI_10 {
                 for rank in DAN_1..DAN_10 {
-                    UCHU_WRAP.try_write().unwrap().set_ky0_ban_km(
-                        file,rank,pc_to_km(&ban[file_rank_to_cell(file,rank)])
-                    );
+                    position0.set_km_by_ms(suji_dan_to_ms(file, rank), pc_to_km(&ban[file_rank_to_cell(file,rank)]));
                 }
+            }
+
+            {
+                INI_POSITION_WRAP.try_write().unwrap().set_all(&position0);
             }
 
             // 初期局面ハッシュを作り直す
             let ky_hash;
             {
-                // 局面のクローンを作成。
-                let position0;
-                {
-                    position0 = INI_POSITION_WRAP.try_read().unwrap().clone();
-                }
 
                 ky_hash = GAME_RECORD_WRAP.try_read().unwrap().create_ky0_hash(&position0);
             }
@@ -526,9 +532,15 @@ pub fn do_same(_request: &Request, _response:&mut Response) {
 
 /// 合法手を確認する。
 pub fn do_sasite(_request: &Request, _response:&mut Response) {
+    // 局面のクローンを作成。
+    let position1;
+    {
+        position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+    }
+
     // FIXME 合法手とは限らない
     let mut ss_potential_hashset = HashSet::new();
-    insert_potential_move(&mut ss_potential_hashset );
+    insert_potential_move(&mut ss_potential_hashset, &position1);
     g_writeln("----指し手生成 ここから----");
     hyoji_ss_hashset( &ss_potential_hashset );
     g_writeln("----指し手生成 ここまで----");
@@ -603,8 +615,14 @@ pub fn do_teigi_conv(_request: &Request, _response:&mut Response) {
 
 /// いろいろな動作テストをしたいときに汎用的に使う。
 pub fn do_test(request: &Request, response:&mut Response) {
+    // 局面のクローンを作成。
+    let position1;
+    {
+        position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+    }
+
     g_writeln( &format!("test caret={} len={}", request.caret, request.line_len));
-    test( &request.line, &mut response.caret, request.line_len);
+    test(&request.line, &mut response.caret, request.line_len, &position1);
 }
 
 

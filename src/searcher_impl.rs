@@ -48,6 +48,7 @@ pub fn visit_leaf_callback(searcher: &mut Searcher, _position1: &mut Position, d
 
     // 評価値は駒割り。
     let komawari = searcher.incremental_komawari;
+    g_writeln(&format!("info string DEBUG komawari {}", komawari));
 
     // 読み筋表示。
     {
@@ -98,14 +99,14 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
 
 
     // 駒の動き方
-    insert_potential_move(&mut hashset_movement);
+    insert_potential_move(&mut hashset_movement, &position1);
     // g_writeln("テスト ポテンシャルムーブ.");
     // use consoles::visuals::dumps::*;
     // hyoji_ss_hashset( &hashset_movement );
 
     if max_depth == cur_depth {
         // 王手されている場合、王手回避の手に絞り込む。
-        filtering_ss_except_oute(&mut hashset_movement);
+        filtering_ss_except_oute(&mut hashset_movement, &position1);
 
         // FIXME 負けてても、千日手は除くぜ☆（＾～＾）ただし、千日手を取り除くと手がなくなる場合は取り除かないぜ☆（＾～＾）
         filtering_ss_except_sennitite(searcher, &mut hashset_movement, position1);

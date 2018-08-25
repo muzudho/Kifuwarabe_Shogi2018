@@ -18,7 +18,7 @@ use thinks::results::jisatusyu_result::*;
  *
  * km_dst : 移動した先の駒
  */
-pub fn get_ido_ss_by_km_random(km_dst:&Koma)->Movement{
+pub fn get_ido_ss_by_km_random(km_dst:&Koma, position1: &Position) -> Movement {
     
     let mut ss_hashset = HashSet::new();
 
@@ -29,8 +29,8 @@ pub fn get_ido_ss_by_km_random(km_dst:&Koma)->Movement{
         assert_banjo_ms(ms_dst, "get_ido_ss_by_km_random");
 
         ss_hashset.clear();
-        insert_ss_by_ms_km_on_banjo (ms_dst, &km_dst, &mut ss_hashset );
-        insert_ss_by_ms_km_on_da    (ms_dst, &km_dst, &mut ss_hashset );
+        insert_ss_by_ms_km_on_banjo (ms_dst, &km_dst, &mut ss_hashset, position1);
+        insert_ss_by_ms_km_on_da    (ms_dst, &km_dst, &mut ss_hashset, position1);
         let ss = choice_1ss_by_hashset( &ss_hashset );
 
         if ss.exists(){ return ss;}
@@ -42,7 +42,7 @@ pub fn get_ido_ss_by_km_random(km_dst:&Koma)->Movement{
 /**
  * 指し手１つをランダム選出
  */
-pub fn get_ss_by_random()->Movement{
+pub fn get_ss_by_random(position1: &Position)->Movement{
     
     let mut ss_hashset = HashSet::new();
 
@@ -60,12 +60,12 @@ pub fn get_ss_by_random()->Movement{
         let km_dst = sn_kms_to_km( &sn1, randommove::rnd_kms() );
 
         ss_hashset.clear();
-        insert_ss_by_ms_km_on_banjo (ms_dst, &km_dst, &mut ss_hashset );
-        insert_ss_by_ms_km_on_da    (ms_dst, &km_dst, &mut ss_hashset );
+        insert_ss_by_ms_km_on_banjo (ms_dst, &km_dst, &mut ss_hashset, &position1);
+        insert_ss_by_ms_km_on_da    (ms_dst, &km_dst, &mut ss_hashset, &position1);
         let ss = choice_1ss_by_hashset( &ss_hashset );
 
         // 移動後は、玉が利きに飛び込まないか？
-        if is_jisatusyu(&ss) {
+        if is_jisatusyu(&ss, &position1) {
             continue 'random;
         }
 

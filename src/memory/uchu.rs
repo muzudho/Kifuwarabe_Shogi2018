@@ -172,20 +172,6 @@ impl Uchu{
      */
 
     /* ******
-     * 盤上 *
-     ********/
-
-    /**
-     * 初期局面の盤上に駒の位置を設定するもの
-     */
-    pub fn set_ky0_ban_km(&mut self, suji:i8, dan:i8, km:Koma){
-        // グローバル変数を使う。
-        {
-            INI_POSITION_WRAP.try_write().unwrap().set_km_by_ms(suji_dan_to_ms(suji, dan), km);
-        }
-    }
-
-    /* ******
      * 棋譜 *
      ********/
 

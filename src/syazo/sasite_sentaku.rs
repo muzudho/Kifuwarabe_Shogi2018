@@ -5,7 +5,6 @@
 extern crate rand;
 use rand::Rng;
 
-use CUR_POSITION_WRAP;
 use consoles::asserts::*;
 use GAME_RECORD_WRAP;
 use kifuwarabe_movement::*;
@@ -39,10 +38,11 @@ pub fn choice_1ss_by_hashset( ss_hashset:&HashSet<u64> ) -> Movement {
  * 王が取られる局面を除く手を選ぶぜ☆（＾～＾）
  */
 pub fn filtering_ss_except_oute(
-    ss_hashset_input:&mut HashSet<u64>
+    ss_hashset_input:&mut HashSet<u64>,
+    position1: &Position
 ) {
     // 自玉の位置
-    let ms_r = UCHU_WRAP.try_read().unwrap().get_ms_r(&Jiai::Ji);
+    let ms_r = UCHU_WRAP.try_read().unwrap().get_ms_r(&Jiai::Ji, &position1);
     // g_writeln(&format!("info string My raion {}.", ms_r ));
 
     // 王手の一覧を取得
@@ -50,7 +50,7 @@ pub fn filtering_ss_except_oute(
     {
         sn1 = GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ai);
     }
-    let komatori_result_hashset : HashSet<u64> = lookup_banjo_catch(&sn1, ms_r);
+    let komatori_result_hashset : HashSet<u64> = lookup_banjo_catch(&sn1, ms_r, &position1);
     if 0<komatori_result_hashset.len() {
         // 王手されていれば
 
@@ -123,7 +123,7 @@ pub fn filtering_ss_except_jisatusyu(
     }
     let ms_r;
     {
-        ms_r = CUR_POSITION_WRAP.try_read().unwrap().ms_r[ sn_to_num(&sn1) ];
+        ms_r = position1.ms_r[ sn_to_num(&sn1) ];
     }
 
 
@@ -157,11 +157,13 @@ pub fn filtering_ss_except_jisatusyu(
         insert_narazu_src_by_sn_ms(
             &sn1,
             ms_r_new, // 指定の升
-            &mut attackers );
+            &mut attackers,
+            &position1);
         insert_narumae_src_by_sn_ms(
             &sn1,
             ms_r_new, // 指定の升
-            &mut attackers );
+            &mut attackers,
+            &position1);
 
 
         // 玉が利きに飛び込んでいるか？
