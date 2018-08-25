@@ -4,9 +4,10 @@
 
 use consoles::asserts::*;
 use kifuwarabe_position::*;
+use searcher_impl::*;
+use std::collections::HashSet;
 use teigi::shogi_syugo::*;
 use teigi::conv::*;
-use std::collections::HashSet;
 
 /**
  * 成る前を含めない、移動元升生成
@@ -593,7 +594,7 @@ pub fn insert_narumae_src_by_ms_km(
  *
  * そこに打てる駒種類を返す。
  */
-pub fn insert_da_kms_by_ms_km(ms_dst:umasu, km_dst:&Koma, result_kms:&mut HashSet<usize>, position1: &Position){
+pub fn insert_da_kms_by_ms_km(searcher: &Searcher, ms_dst:umasu, km_dst:&Koma, result_kms:&mut HashSet<usize>){
     assert_banjo_ms(ms_dst,"Ｉnsert_da_kms_by_ms_km");
 
     let kms_dst = km_to_kms(&km_dst);
@@ -604,7 +605,7 @@ pub fn insert_da_kms_by_ms_km(ms_dst:umasu, km_dst:&Koma, result_kms:&mut HashSe
     // +------------------------+
     // | 打ちたいところは空升か |
     // +------------------------+
-    let km_banjo = position1.get_km_by_ms( ms_dst );
+    let km_banjo = searcher.cur_position.get_km_by_ms( ms_dst );
     match km_banjo {
         Koma::Kara => {},
         _ => { return; },// 駒があるところに打つ手は終了
@@ -614,7 +615,7 @@ pub fn insert_da_kms_by_ms_km(ms_dst:umasu, km_dst:&Koma, result_kms:&mut HashSe
     // +------------------+
     // | 持っている駒か？ |
     // +------------------+
-    if position1.get_mg( &km_dst ) < 1 {
+    if searcher.cur_position.get_mg( &km_dst ) < 1 {
         return; // 持っていない駒は打てない
     }
 
@@ -649,7 +650,7 @@ pub fn insert_da_kms_by_ms_km(ms_dst:umasu, km_dst:&Koma, result_kms:&mut HashSe
         },
         H0 => {
             // ▼ひよこ　は２歩できない
-            if dy < DAN_2 || position1.exists_fu_by_sn_suji( &sn, suji ) {return;}
+            if dy < DAN_2 || searcher.cur_position.exists_fu_by_sn_suji( &sn, suji ) {return;}
         },
         U1 => {
             // △うさぎ　は８、９段目には進めない
@@ -659,7 +660,7 @@ pub fn insert_da_kms_by_ms_km(ms_dst:umasu, km_dst:&Koma, result_kms:&mut HashSe
         S1 => { if DAN_8 < dy {return;} },
         H1 => {
             // △ひよこ　は２歩できない
-            if DAN_8 < dy || position1.exists_fu_by_sn_suji( &sn, suji ) {return;}
+            if DAN_8 < dy || searcher.cur_position.exists_fu_by_sn_suji( &sn, suji ) {return;}
         },
         _ => {}
     }

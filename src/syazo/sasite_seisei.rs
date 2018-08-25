@@ -2,10 +2,10 @@
  * 現局面を使った指し手生成
  */
 
-use GAME_RECORD_WRAP;
 use consoles::asserts::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
+use searcher_impl::*;
 use syazo::sasite_element::*;
 use std::collections::HashSet;
 
@@ -17,20 +17,17 @@ use std::collections::HashSet;
  *
  * 王手回避漏れや、千日手などのチェックは行っていない
  */
-pub fn insert_potential_move(ss_hashset:&mut HashSet<u64>, position1: &Position) {
+pub fn insert_potential_move(searcher: &Searcher, ss_hashset:&mut HashSet<u64>) {
     // +----------------+
     // | 盤上の駒の移動 |
     // +----------------+
     for dan_src in 1..10 {
         for suji_src in 1..10 {
             let ms_src = suji_dan_to_ms( suji_src, dan_src );
-            let km_src = position1.get_km_by_ms( ms_src );
+            let km_src = searcher.cur_position.get_km_by_ms( ms_src );
             let sn = km_to_sn(&km_src);
 
-            let sn1;
-            {
-                sn1 = GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji);
-            }
+            let sn1 = searcher.game_record.get_teban(&Jiai::Ji);
 
             if match_sn( &sn, &sn1) {
                 // 手番の駒
@@ -39,7 +36,7 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64>, position1: &Position)
                 insert_dst_by_ms_km(ms_src, &km_src,
                     false, // 成らず
                     &mut dst_hashset,
-                    &position1);
+                    &searcher.cur_position);
 
                 // g_writeln("テスト ポテンシャルムーブ insert_dst_by_ms_km(成らず).");
                 // use consoles::visuals::dumps::*;
@@ -58,7 +55,7 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64>, position1: &Position)
                 insert_dst_by_ms_km(ms_src, &km_src,
                     true, // 成り
                     &mut dst_hashset,
-                    &position1);
+                    &searcher.cur_position);
                 for ms_dst in &dst_hashset {
                     ss_hashset.insert( Movement{
                         source: ms_src,
@@ -77,7 +74,7 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64>, position1: &Position)
     for dan_dst in 1..10 {
         for suji_dst in 1..10 {
             let ms_dst = suji_dan_to_ms( suji_dst, dan_dst );
-            let km_dst = position1.get_km_by_ms( ms_dst );
+            let km_dst = searcher.cur_position.get_km_by_ms( ms_dst );
             match km_dst {
                 Koma::Kara => {
                     // 駒が無いところに打つ
@@ -85,15 +82,12 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64>, position1: &Position)
                     let mut da_kms_hashset = HashSet::new();
                     for kms_motigoma in MGS_ARRAY.iter() {
 
-                        let sn1;
-                        {
-                            sn1 = GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji);
-                        }
+                        let sn1 = searcher.game_record.get_teban(&Jiai::Ji);
                         let km_motigoma = sn_kms_to_km( &sn1, kms_motigoma );
 
-                        if 0<position1.get_mg( &km_motigoma ) {
+                        if 0<searcher.cur_position.get_mg( &km_motigoma ) {
                             // 駒を持っていれば
-                            insert_da_kms_by_ms_km(ms_dst, &km_motigoma, &mut da_kms_hashset, &position1);
+                            insert_da_kms_by_ms_km(&searcher, ms_dst, &km_motigoma, &mut da_kms_hashset);
                         }
                     }
                     for num_kms_da in da_kms_hashset {
@@ -118,14 +112,14 @@ pub fn insert_potential_move(ss_hashset:&mut HashSet<u64>, position1: &Position)
  *
  * 盤上の駒の移動の最初の１つ。打を除く
  */
-pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut HashSet<u64>, position1: &Position) {
+pub fn insert_ss_by_ms_km_on_banjo(searcher: &Searcher, ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut HashSet<u64>) {
     assert_banjo_ms(ms_dst,"Ｉnsert_ss_by_ms_km_on_banjo");
 
     // 手番の先後、駒種類
     let (sn,_kms_dst) = km_to_sn_kms( &km_dst );
 
     // 移動先に自駒があれば、指し手は何もない。終わり。
-    if match_sn(&position1.get_sn_by_ms(ms_dst), &sn) {
+    if match_sn(&searcher.cur_position.get_sn_by_ms(ms_dst), &sn) {
         return;
     }
 
@@ -141,7 +135,7 @@ pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut H
     // | 盤上（成らず） |
     // +----------------+
     // 現局面を読取専用で取得し、ロック。
-    insert_narazu_src_by_ms_km  (&position1, ms_dst, &km_dst, &mut mv_src_hashset);
+    insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, &km_dst, &mut mv_src_hashset);
     for ms_src in &mv_src_hashset{
         assert_banjo_ms(
             *ms_src,
@@ -160,7 +154,7 @@ pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut H
     // +--------------+
     mv_src_hashset.clear();
 
-    insert_narumae_src_by_ms_km (&position1, ms_dst, &km_dst, &mut mv_src_hashset );
+    insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, &km_dst, &mut mv_src_hashset );
 
     for ms_src in &mv_src_hashset{
         assert_banjo_ms(
@@ -181,14 +175,14 @@ pub fn insert_ss_by_ms_km_on_banjo(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut H
  * 1. 移動先升指定  ms_dst
  * 2. 移動先駒指定  km_dst
  */
-pub fn insert_ss_by_ms_km_on_da(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut HashSet<u64>, position1: &Position) {
+pub fn insert_ss_by_ms_km_on_da(searcher: &Searcher, ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut HashSet<u64>) {
     assert_banjo_ms(ms_dst,"Ｉnsert_ss_by_ms_km_on_da");
 
     // 手番の先後、駒種類
     let (sn,_kms_dst) = km_to_sn_kms( &km_dst );
 
     // 移動先に自駒があれば、指し手は何もない。終わり。
-    if match_sn( &position1.get_sn_by_ms(ms_dst), &sn ) {
+    if match_sn( &searcher.cur_position.get_sn_by_ms(ms_dst), &sn ) {
         return;
     }
 
@@ -205,7 +199,7 @@ pub fn insert_ss_by_ms_km_on_da(ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut Hash
     // +----+
 
     let mut da_kms_hashset : HashSet<usize> = HashSet::new();
-    insert_da_kms_by_ms_km(ms_dst, &km_dst, &mut da_kms_hashset, &position1);
+    insert_da_kms_by_ms_km(&searcher, ms_dst, &km_dst, &mut da_kms_hashset);
     // 打
     for num_kms_da in da_kms_hashset.iter() {
         let kms_da = num_to_kms( *num_kms_da );

@@ -2,13 +2,13 @@
  * 盤上いろいろ☆（＾～＾）
  */
 
-use GAME_RECORD_WRAP;
 use kifuwarabe_position::*;
+use searcher_impl::*;
 
-pub fn is_ji_km_by_ms(ms:umasu, position1: &Position) -> bool {
-    let km = position1.get_km_by_ms( ms );
+pub fn is_ji_km_by_ms(searcher: &Searcher, ms:umasu) -> bool {
+    let km = searcher.cur_position.get_km_by_ms( ms );
     let (sn,_kms) = km_to_sn_kms( &km );
-    match_sn( &sn, &GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji) )
+    match_sn( &sn, &searcher.game_record.get_teban(&Jiai::Ji) )
 }
 
 // TODO

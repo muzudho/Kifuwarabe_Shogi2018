@@ -52,34 +52,30 @@ impl ShellVariable {
 /// 指し手を入れる。
 pub fn do_do(request: &Request, response:&mut Response) {
 
-    // 局面のクローンを作成。
-    let mut position1;
+    // 任意の構造体を作成する。
+    let mut searcher = Searcher::new();
     {
-        position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.ini_position = INI_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.cur_position = CUR_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.game_record = GAME_RECORD_WRAP.try_read().unwrap().clone();
     }
 
     // コマンド読取。棋譜に追加され、手目も増える
     let (successful, umov) = parse_movement(&request.line, &mut response.caret, request.line_len);
     let movement = usi_to_movement(successful, &umov);
 
-    // グローバル変数に内容をセット。
-    {
-        // 書込許可モードで、ロック。
-        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-        game_record.set_movement(movement);
-    }
+    searcher.game_record.set_movement(movement);
 
     if successful {
-        // 任意の構造体を作成する。
-        let mut searcher = Searcher::new();
-
         // 入っている指し手の通り指すぜ☆（＾～＾）
-        makemove(&mut searcher, movement.to_hash(), &mut position1);
-    }
+        makemove(&mut searcher, movement.to_hash());
 
-    // 局面のクローンで上書き。
-    {
-        CUR_POSITION_WRAP.try_write().unwrap().set_all(&position1);
+        // クローンからオリジナルへ還元する。
+        {
+            INI_POSITION_WRAP.try_write().unwrap().set_all(&searcher.ini_position);
+            CUR_POSITION_WRAP.try_write().unwrap().set_all(&searcher.cur_position);
+            GAME_RECORD_WRAP.try_write().unwrap().set_all(&searcher.game_record);
+        }
     }
 }
 
@@ -169,19 +165,8 @@ pub fn do_go_linebreak(_request: &Request, _response:&mut Response) {
         milliseconds = SHELL.try_read().unwrap().player_milliseconds_array[turn_num];
     }
 
-    // 局面のクローンを作成。
-    let mut position1;
-    {
-        position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
-    }
-
     // 思考する。
-    let bestmove = think(milliseconds, &mut position1);
-
-    // 局面のクローンで上書き。
-    {
-        CUR_POSITION_WRAP.try_write().unwrap().set_all(&position1);
-    }
+    let bestmove = think(milliseconds);
 
     // 例： bestmove 7g7f
     g_writeln(&format!("bestmove {}", movement_to_usi(&bestmove)));
@@ -269,19 +254,12 @@ pub fn do_hirate(_request: &Request, _response:&mut Response) {
             }
 
             if successful {
-
-                // 局面のクローンを作成。
-                let mut position1;
-                {
-                    position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
-                }
-
                 // 入っている指し手の通り指すぜ☆（＾～＾）
-                makemove(&mut searcher, movement.to_hash(), &mut position1);
+                makemove(&mut searcher, movement.to_hash());
 
                 // 局面のクローンで上書き。
                 {
-                    CUR_POSITION_WRAP.try_write().unwrap().set_all(&position1);
+                    CUR_POSITION_WRAP.try_write().unwrap().set_all(&searcher.cur_position);
                 }
             }
         }
@@ -468,18 +446,12 @@ pub fn do_position(request: &Request, response:&mut Response) {
             }
 
             if successful {
-                // 局面のクローンを作成。
-                let mut position1;
-                {
-                    position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
-                }
-
                 // 指し手を指すぜ☆（＾～＾）
-                makemove(&mut searcher, movement.to_hash(), &mut position1);
+                makemove(&mut searcher, movement.to_hash());
 
                 // 局面のクローンで上書き。
                 {
-                    CUR_POSITION_WRAP.try_write().unwrap().set_all(&position1);
+                    CUR_POSITION_WRAP.try_write().unwrap().set_all(&searcher.cur_position);
                 }
             }
         }
@@ -532,15 +504,17 @@ pub fn do_same(_request: &Request, _response:&mut Response) {
 
 /// 合法手を確認する。
 pub fn do_sasite(_request: &Request, _response:&mut Response) {
-    // 局面のクローンを作成。
-    let position1;
+    // 任意の構造体を作成する。
+    let mut searcher = Searcher::new();
     {
-        position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.ini_position = INI_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.cur_position = CUR_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.game_record = GAME_RECORD_WRAP.try_read().unwrap().clone();
     }
 
     // FIXME 合法手とは限らない
     let mut ss_potential_hashset = HashSet::new();
-    insert_potential_move(&mut ss_potential_hashset, &position1);
+    insert_potential_move(&searcher, &mut ss_potential_hashset);
     g_writeln("----指し手生成 ここから----");
     hyoji_ss_hashset( &ss_potential_hashset );
     g_writeln("----指し手生成 ここまで----");
@@ -615,14 +589,16 @@ pub fn do_teigi_conv(_request: &Request, _response:&mut Response) {
 
 /// いろいろな動作テストをしたいときに汎用的に使う。
 pub fn do_test(request: &Request, response:&mut Response) {
-    // 局面のクローンを作成。
-    let position1;
+    // 任意の構造体を作成する。
+    let mut searcher = Searcher::new();
     {
-        position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.ini_position = INI_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.cur_position = CUR_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.game_record = GAME_RECORD_WRAP.try_read().unwrap().clone();
     }
 
     g_writeln( &format!("test caret={} len={}", request.caret, request.line_len));
-    test(&request.line, &mut response.caret, request.line_len, &position1);
+    test(&searcher, &request.line, &mut response.caret, request.line_len);
 }
 
 
@@ -635,24 +611,26 @@ pub fn do_undo(_request: &Request, _response:&mut Response) {
 
     // 任意の構造体を作成する。
     let mut searcher = Searcher::new();
-
-    // 局面のクローンを作成。
-    let mut position1;
     {
-        position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.ini_position = INI_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.cur_position = CUR_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.game_record = GAME_RECORD_WRAP.try_read().unwrap().clone();
     }
 
-    let (successful, _cap_kms) = unmakemove(&mut searcher, &mut position1);
+    let (successful, _cap_kms) = unmakemove(&mut searcher);
 
-    // 局面のクローンで上書き。
-    {
-        CUR_POSITION_WRAP.try_write().unwrap().set_all(&position1);
-    }
+    if successful {
+        // クローンからオリジナルへ還元する。
+        {
+            INI_POSITION_WRAP.try_write().unwrap().set_all(&searcher.ini_position);
+            CUR_POSITION_WRAP.try_write().unwrap().set_all(&searcher.cur_position);
+            GAME_RECORD_WRAP.try_write().unwrap().set_all(&searcher.game_record);
+        }
 
-    if !successful {
-        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
-        let teme = game_record.teme;
+    } else {
+        let teme = searcher.game_record.teme;
         g_writeln( &format!("teme={} を、これより戻せません", teme));
+
     }
 }
 

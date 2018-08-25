@@ -7,4 +7,3 @@
 pub mod ky2;
 pub mod number_board;
 pub mod uchu;
-pub mod uchu_impl;

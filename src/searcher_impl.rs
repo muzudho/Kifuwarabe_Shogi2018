@@ -27,6 +27,8 @@ pub struct Searcher {
     pub ini_position: Position,
     // 現局面のコピー。
     pub cur_position: Position,
+    // 棋譜のコピー。
+    pub game_record: GameRecord,
 }
 impl Searcher {
     pub fn new() -> Searcher {
@@ -39,11 +41,12 @@ impl Searcher {
             incremental_komawari: 0,
             ini_position: Position::new(),
             cur_position: Position::new(),
+            game_record: GameRecord::new(),
         }
     }
 }
 
-pub fn visit_leaf_callback(searcher: &mut Searcher, _position1: &mut Position, display_information: &DisplayInformation) -> (i16) {
+pub fn visit_leaf_callback(searcher: &mut Searcher, display_information: &DisplayInformation) -> (i16) {
 
     // 評価値は駒割り。
     let komawari = searcher.incremental_komawari;
@@ -86,7 +89,7 @@ fn get_koma_score(km: &KmSyurui) -> i16 {
 }
 
 /// 指し手生成。
-pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_depth: i16, position1: &mut Position) -> (HashSet<u64>, bool) {
+pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_depth: i16) -> (HashSet<u64>, bool) {
 
     let mut hashset_movement : HashSet<u64> = HashSet::new();
     // 反復深化探索の打ち切り。
@@ -98,20 +101,20 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
 
 
     // 駒の動き方
-    insert_potential_move(&mut hashset_movement, &position1);
+    insert_potential_move(&searcher, &mut hashset_movement);
     // g_writeln("テスト ポテンシャルムーブ.");
     // use consoles::visuals::dumps::*;
     // hyoji_ss_hashset( &hashset_movement );
 
     if max_depth == cur_depth {
         // 王手されている場合、王手回避の手に絞り込む。
-        filtering_ss_except_oute(&mut hashset_movement, &position1);
+        filtering_ss_except_oute(&searcher, &mut hashset_movement);
 
         // FIXME 負けてても、千日手は除くぜ☆（＾～＾）ただし、千日手を取り除くと手がなくなる場合は取り除かないぜ☆（＾～＾）
-        filtering_ss_except_sennitite(searcher, &mut hashset_movement, position1);
+        filtering_ss_except_sennitite(searcher, &mut hashset_movement);
 
         // 自殺手は省くぜ☆（＾～＾）
-        filtering_ss_except_jisatusyu(searcher, &mut hashset_movement, position1);
+        filtering_ss_except_jisatusyu(searcher, &mut hashset_movement);
     };
 
     (hashset_movement, false)
@@ -122,13 +125,13 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
 /// # Arguments.
 ///
 /// * `movement_hash` - 指し手のハッシュ値。
-pub fn makemove(searcher: &mut Searcher, movement_hash: u64, position1: &mut Position) {
+pub fn makemove(searcher: &mut Searcher, movement_hash: u64) {
 
     let cap_kms;
     {
         let movement = Movement::from_hash(movement_hash);
         {
-            cap_kms = GAME_RECORD_WRAP.try_write().unwrap().make_movement2(&movement, position1);
+            cap_kms = searcher.game_record.make_movement2(&movement, &mut searcher.cur_position);
         }
     }
 
@@ -136,20 +139,20 @@ pub fn makemove(searcher: &mut Searcher, movement_hash: u64, position1: &mut Pos
     searcher.incremental_komawari += get_koma_score(&cap_kms);
 
     /*
-    // 現局面表示
+    // VERBOSE 現局面表示
     {
         let uchu_r = UCHU_WRAP.try_read().unwrap();
-        g_writeln(&uchu_r.kaku_ky(&position1, false));
+        g_writeln(&uchu_r.kaku_ky(&searcher.cur_position, false));
     }
      */
 }
 
-pub fn unmakemove(searcher: &mut Searcher, position1: &mut Position) -> (bool, KmSyurui) {
+pub fn unmakemove(searcher: &mut Searcher) -> (bool, KmSyurui) {
 
     let successful;
     let cap_kms;
     {
-        let (successful2, cap_kms2) = GAME_RECORD_WRAP.try_write().unwrap().unmake_movement2(position1);
+        let (successful2, cap_kms2) = searcher.game_record.unmake_movement2(&mut searcher.cur_position);
         successful = successful2;
         cap_kms = cap_kms2;
     }
@@ -160,17 +163,17 @@ pub fn unmakemove(searcher: &mut Searcher, position1: &mut Position) -> (bool, K
     }
 
     /*
-    // 現局面表示
+    // VERBOSE 現局面表示
     {
         let uchu_r = UCHU_WRAP.try_read().unwrap();
-        g_writeln(&uchu_r.kaku_ky(&position1, false));
+        g_writeln(&uchu_r.kaku_ky(&searcher.cur_position, false));
     }
      */
 
     (successful, cap_kms)
 }
-pub fn unmakemove_not_return(searcher: &mut Searcher, position1: &mut Position) {
-    unmakemove(searcher, position1);
+pub fn unmakemove_not_return(searcher: &mut Searcher) {
+    unmakemove(searcher);
 }
 
 /// 指し手の比較。
@@ -188,7 +191,7 @@ pub fn unmakemove_not_return(searcher: &mut Searcher, position1: &mut Position) 
 ///
 /// 1. 探索を打ち切るなら真。（ベータカット）
 /// 2. 探索をすみやかに安全に終了するなら真。
-pub fn compare_best_callback(searcher: &mut Searcher, best_movement_hash: &mut u64, alpha: &mut i16, beta: i16, movement_hash: u64, child_evaluation: i16, _position1: &mut Position) -> (bool, bool) {
+pub fn compare_best_callback(searcher: &mut Searcher, best_movement_hash: &mut u64, alpha: &mut i16, beta: i16, movement_hash: u64, child_evaluation: i16) -> (bool, bool) {
 
     // 比較して、一番良い手を選ぶ。（アップデート アルファ）
     if *alpha < child_evaluation {

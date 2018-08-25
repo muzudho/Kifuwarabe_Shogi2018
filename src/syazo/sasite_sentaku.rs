@@ -6,14 +6,13 @@ extern crate rand;
 use rand::Rng;
 
 use consoles::asserts::*;
-use GAME_RECORD_WRAP;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use searcher_impl::*;
 use std::collections::HashSet;
 use syazo::sasite_element::*;
 use thinks::results::komatori_result::*;
-use UCHU_WRAP;
+
 
 pub fn choice_1ss_by_hashset( ss_hashset:&HashSet<u64> ) -> Movement {
 
@@ -38,19 +37,19 @@ pub fn choice_1ss_by_hashset( ss_hashset:&HashSet<u64> ) -> Movement {
  * 王が取られる局面を除く手を選ぶぜ☆（＾～＾）
  */
 pub fn filtering_ss_except_oute(
-    ss_hashset_input:&mut HashSet<u64>,
-    position1: &Position
+    searcher: &Searcher,
+    ss_hashset_input:&mut HashSet<u64>
 ) {
     // 自玉の位置
-    let ms_r = UCHU_WRAP.try_read().unwrap().get_ms_r(&Jiai::Ji, &position1);
+    let ms_r = searcher.cur_position.ms_r[sn_to_num(&searcher.game_record.get_teban(&Jiai::Ji))];
     // g_writeln(&format!("info string My raion {}.", ms_r ));
 
     // 王手の一覧を取得
     let sn1;
     {
-        sn1 = GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ai);
+        sn1 = searcher.game_record.get_teban(&Jiai::Ai);
     }
-    let komatori_result_hashset : HashSet<u64> = lookup_banjo_catch(&sn1, ms_r, &position1);
+    let komatori_result_hashset : HashSet<u64> = lookup_banjo_catch(&searcher, &sn1, ms_r);
     if 0<komatori_result_hashset.len() {
         // 王手されていれば
 
@@ -109,22 +108,15 @@ pub fn filtering_ss_except_oute(
  */
 pub fn filtering_ss_except_jisatusyu(
     searcher: &mut Searcher,
-    ss_hashset_input:&mut HashSet<u64>,
-    position1: &mut Position
+    ss_hashset_input:&mut HashSet<u64>
 ){
 
     // 残すのはここに退避する☆（＾～＾）
     let mut ss_hashset_pickup : HashSet<u64> = HashSet::new();
 
     // 自玉の位置
-    let sn1;
-    {
-        sn1 = GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji);
-    }
-    let ms_r;
-    {
-        ms_r = position1.ms_r[ sn_to_num(&sn1) ];
-    }
+    let sn1 = searcher.game_record.get_teban(&Jiai::Ji);
+    let ms_r = searcher.cur_position.ms_r[ sn_to_num(&sn1) ];
 
 
     // 王手回避カードを発行する
@@ -135,7 +127,7 @@ pub fn filtering_ss_except_jisatusyu(
         let ss_potential = Movement::from_hash( *hash_ss_potential );
 
         // その手を指してみる
-        makemove(searcher, ss_potential.to_hash(), position1);
+        makemove(searcher, ss_potential.to_hash());
         // // 現局面表示
         // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
         // g_writeln( &s1 );            
@@ -150,20 +142,18 @@ pub fn filtering_ss_except_jisatusyu(
         // 利きの再計算
         // 有り得る移動元が入る☆（＾～＾）
         let mut attackers : HashSet<umasu> = HashSet::new();
-        let sn1;
-        {
-            sn1 = GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji); // 指定の升に駒を動かそうとしている手番
-        }
+        let sn1 = searcher.game_record.get_teban(&Jiai::Ji); // 指定の升に駒を動かそうとしている手番
+
         insert_narazu_src_by_sn_ms(
             &sn1,
             ms_r_new, // 指定の升
             &mut attackers,
-            &position1);
+            &searcher.cur_position);
         insert_narumae_src_by_sn_ms(
             &sn1,
             ms_r_new, // 指定の升
             &mut attackers,
-            &position1);
+            &searcher.cur_position);
 
 
         // 玉が利きに飛び込んでいるか？
@@ -181,7 +171,7 @@ pub fn filtering_ss_except_jisatusyu(
         */
 
         // 手を戻す
-        unmakemove(searcher, position1);
+        unmakemove(searcher);
         // // 現局面表示
         // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
         // g_writeln( &s2 );            
@@ -192,7 +182,7 @@ pub fn filtering_ss_except_jisatusyu(
 
         //g_writeln(&format!("info string SOLUTED ss={}.", movement_to_usi(&ss_potential) ));
         // 問題を全て解決していれば、入れる
-        ss_hashset_pickup.insert( ss_potential.to_hash() );
+        ss_hashset_pickup.insert(ss_potential.to_hash());
     }
     //g_writeln(&format!("info string {} solutions.", ss_hashset_pickup.len() ));
 
@@ -211,8 +201,7 @@ pub fn filtering_ss_except_jisatusyu(
  */
 pub fn filtering_ss_except_sennitite(
     searcher: &mut Searcher,
-    ss_hashset_input:&mut HashSet<u64>,
-    position1: &mut Position
+    ss_hashset_input:&mut HashSet<u64>
 ) {
     let mut ss_hashset_pickup = HashSet::new();
 
@@ -223,7 +212,7 @@ pub fn filtering_ss_except_sennitite(
             //ss_hashset.insert( *hash_ss_potential );
 
         // その手を指してみる
-        makemove(searcher, ss.to_hash(), position1);
+        makemove(searcher, ss.to_hash());
         
         // 現局面表示
         // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
@@ -231,7 +220,7 @@ pub fn filtering_ss_except_sennitite(
 
         // 千日手かどうかを判定する☆（＾～＾）
         {
-            if GAME_RECORD_WRAP.try_read().unwrap().count_same_ky() < SENNTITE_NUM {
+            if searcher.game_record.count_same_ky() < SENNTITE_NUM {
                 ss_hashset_pickup.insert( *hash_ss_potential );
             } else {
                 // 千日手
@@ -239,7 +228,7 @@ pub fn filtering_ss_except_sennitite(
         }
 
         // 手を戻す FIXME: 打った象が戻ってない？
-        unmakemove(searcher, position1);
+        unmakemove(searcher);
         // 現局面表示
         // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
         // g_writeln( &s2 );

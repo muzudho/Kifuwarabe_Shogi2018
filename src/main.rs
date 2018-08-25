@@ -62,6 +62,9 @@ lazy_static! {
 
     // 探索部に渡す局面。
     pub static ref CUR_POSITION_WRAP: RwLock<Position> = RwLock::new(Position::new());
+
+    // 棋譜。
+    pub static ref GAME_RECORD_WRAP: RwLock<GameRecord> = RwLock::new(GameRecord::new());
 }
 
 fn main() {

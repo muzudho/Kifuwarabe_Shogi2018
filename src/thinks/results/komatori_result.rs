@@ -7,8 +7,8 @@ use std::collections::HashSet;
 use consoles::asserts::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-// use memory::uchu::*;
 use meidai::math_meidai::*;
+use searcher_impl::*;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
 use teigi::conv::*;
@@ -159,7 +159,7 @@ impl KomatoriResult{
  *
  * return u64 : KomatoriResult のハッシュ
  */
-pub fn lookup_banjo_catch(sn:&Sengo, ms_target:umasu, position1: &Position)->HashSet<u64> {
+pub fn lookup_banjo_catch(searcher: &Searcher, sn:&Sengo, ms_target:umasu) -> HashSet<u64> {
     assert_banjo_ms(
         ms_target,
         &format!("(119)Ｌookup_banjo_catch sn={} ms_target={}"
@@ -180,13 +180,13 @@ pub fn lookup_banjo_catch(sn:&Sengo, ms_target:umasu, position1: &Position)->Has
         // 打は除く
 
         ss_hashset.clear();
-        insert_ss_by_ms_km_on_banjo(ms_target, &km_dst, &mut ss_hashset, &position1);
+        insert_ss_by_ms_km_on_banjo(&searcher, ms_target, &km_dst, &mut ss_hashset);
 
         // g_writeln( &format!("テスト lookup_banjo_catch insert_ss_by_ms_km_on_banjo kms_dst={}.",kms_dst) );
         // use consoles::visuals::dumps::*;
         // hyoji_ss_hashset( &ss_hashset );
 
-        let ss = choice_1ss_by_hashset( &ss_hashset );
+        let ss = choice_1ss_by_hashset(&ss_hashset);
         if ss.exists() {
             assert_banjo_ms(
                 ss.source,
@@ -203,7 +203,7 @@ pub fn lookup_banjo_catch(sn:&Sengo, ms_target:umasu, position1: &Position)->Has
             };
 
             // 重複がいっぱい
-            hash.insert( oute_result.to_hash() );
+            hash.insert(oute_result.to_hash());
         }        
     }
     hash

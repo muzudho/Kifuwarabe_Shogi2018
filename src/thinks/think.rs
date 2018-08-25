@@ -1,7 +1,10 @@
 /// 深い考えだぜ☆（＾～＾）
 extern crate rand;
 
+use CUR_POSITION_WRAP;
 use ENGINE_SETTINGS_WRAP;
+use GAME_RECORD_WRAP;
+use INI_POSITION_WRAP;
 use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
@@ -21,10 +24,15 @@ use UCHU_WRAP;
 /// # Arguments.
 ///
 /// * `milliseconds` - 残り思考時間(ミリ秒)
-pub fn think(milliseconds: i32, position1: &mut Position) -> Movement{
+pub fn think(milliseconds: i32) -> Movement{
 
     // 任意の構造体を作成する。
     let mut searcher = Searcher::new();
+    {
+        searcher.ini_position = INI_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.cur_position = CUR_POSITION_WRAP.try_read().unwrap().clone();
+        searcher.game_record = GAME_RECORD_WRAP.try_read().unwrap().clone();
+    }
 
     // 思考時間設定。
     searcher.thought_max_milliseconds = get_thought_max_milliseconds(milliseconds);
@@ -50,7 +58,7 @@ pub fn think(milliseconds: i32, position1: &mut Position) -> Movement{
         }
 
         // 相手の利き升調べ（自殺手防止のため）
-        let (local_kiki_su_by_sn, local_kiki_su_by_km) = refresh_kikisu(position1);
+        let (local_kiki_su_by_sn, local_kiki_su_by_km) = refresh_kikisu(&searcher.cur_position);
         // g_writeln( &format!("info string test is_s={}", kasetu::atamakin::is_s() ) );
 
         // 駒別
@@ -88,7 +96,7 @@ pub fn think(milliseconds: i32, position1: &mut Position) -> Movement{
 
         // 指し手を選ぶ。
         // min_value (負値) を - にすると正数があふれてしまうので、正の最大数に - を付ける。
-        let (id_best_movement_hash, best_evaluation) = start(&mut searcher, &mut callback_catalog, id_depth, id_depth, -<i16>::max_value(), <i16>::max_value(), position1);
+        let (id_best_movement_hash, best_evaluation) = start(&mut searcher, &mut callback_catalog, id_depth, id_depth, -<i16>::max_value(), <i16>::max_value());
 
         searcher.id_evaluation = best_evaluation;
 
@@ -125,6 +133,13 @@ pub fn think(milliseconds: i32, position1: &mut Position) -> Movement{
         */
 
         // 楽観王手の一覧はできているはず。
+
+    // クローンからオリジナルへ還元する。
+    {
+        INI_POSITION_WRAP.try_write().unwrap().set_all(&searcher.ini_position);
+        CUR_POSITION_WRAP.try_write().unwrap().set_all(&searcher.cur_position);
+        GAME_RECORD_WRAP.try_write().unwrap().set_all(&searcher.game_record);
+    }
 
     // 計測時間。
     let end = searcher.stopwatch.elapsed();

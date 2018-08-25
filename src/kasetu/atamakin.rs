@@ -3,30 +3,30 @@
  * 頭金仮説
  */
 
-use GAME_RECORD_WRAP;
 use kifuwarabe_position::*;
 // use memory::uchu::*;
 use teigi::conv::*;
 use teigi::shogi_syugo_seki::*;
 use teigi::banjometries::*;
-use UCHU_WRAP;
+
+use searcher_impl::*;
 
 /**
  * 後手視点で、相手らいおんの南側１升に、頭が丸い自駒がない？
  */
-pub fn is_s(position1: &Position)->bool{
+pub fn is_s(searcher: &Searcher) -> bool {
     // 相手玉の位置
-    let ms_r = UCHU_WRAP.try_read().unwrap().get_ms_r(&Jiai::Ai, &position1);
+    let ms_r = searcher.cur_position.ms_r[ sn_to_num(&searcher.game_record.get_teban(&Jiai::Ai)) ];
 
     let p_r = ms_to_p( ms_r );
     let p_south_r = p_r.to_south();
     if !p_in_ban(&p_south_r){ return true; }
 
     let ms_south_r = p_to_ms( &p_south_r );
-    let km = position1.get_km_by_ms( ms_south_r );
+    let km = searcher.cur_position.get_km_by_ms( ms_south_r );
     let jiai_km;
     {
-        jiai_km = GAME_RECORD_WRAP.try_read().unwrap().get_jiai_by_km( &km );
+        jiai_km = searcher.game_record.get_jiai_by_km( &km );
     }
     if !match_jiai( &jiai_km, &Jiai::Ji ) { return true; }
 
@@ -79,15 +79,15 @@ pub fn is_s(position1: &Position)->bool{
  * FIXME Aが動いたときの、逆王手が未考慮
  */
 pub fn is_atamakin(
+    searcher: &Searcher,
     _mskms_l : &MsKms,
     _mskms_s : &MsKms,
     _mskms_a : &MsKms,
-    _mskms_b : &MsKms,
-    position1: &Position
+    _mskms_b : &MsKms
 ) -> bool {
 
     // 相手らいおんのマス
-    let ms_ai_r = UCHU_WRAP.try_read().unwrap().get_ms_r(&Jiai::Ai, &position1);
+    let ms_ai_r = searcher.cur_position.ms_r[ sn_to_num(&searcher.game_record.get_teban(&Jiai::Ai)) ];
 
     // らいおん以外の相手の駒種類
     let mut kms_set_ai_c_r = KmsSyugo::new_all();
@@ -98,7 +98,7 @@ pub fn is_atamakin(
     // 単に下３つに移動できるか調べられたらいい。８１升別　利きを作るか？
     // 駒、相手の利き
     let p_k = ms_to_p( ms_ai_r );
-    if banjo_metrics::is_ji_km_by_ms(p_to_ms(&p_k.to_south_west()), &position1) {
+    if banjo_metrics::is_ji_km_by_ms(&searcher, p_to_ms(&p_k.to_south_west())) {
 
     }
     

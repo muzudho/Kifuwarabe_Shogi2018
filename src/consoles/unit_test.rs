@@ -9,6 +9,7 @@ use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use memory::uchu::*;
 use meidai::math_meidai::*;
+use searcher_impl::*;
 use std::collections::HashSet;
 use syazo::sasite_element::*;
 use thinks::randommove;
@@ -19,7 +20,7 @@ use tusin::us_conv::*;
  * test 2
  * といったコマンドに対応☆（＾～＾）
  */
-pub fn test(line:&String, starts:&mut usize, len:usize, position1: &Position) {
+pub fn test(searcher: &Searcher, line:&String, starts:&mut usize, len:usize) {
 
     // いろいろな動作テスト
     g_writeln( &format!("test starts={} len={}", *starts, len));
@@ -40,9 +41,9 @@ pub fn test(line:&String, starts:&mut usize, len:usize, position1: &Position) {
         g_writeln( &format!("kms={} km={} ms_dst={}",kms,km,ms_dst) );
         let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
         let mut da_kms_hashset : HashSet<usize> = HashSet::new();
-        insert_narazu_src_by_ms_km  (&position1, ms_dst, &km, &mut mv_src_hashset );
-        insert_narumae_src_by_ms_km (&position1, ms_dst, &km, &mut mv_src_hashset );
-        insert_da_kms_by_ms_km      (ms_dst, &km, &mut da_kms_hashset, &position1);
+        insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
+        insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
+        insert_da_kms_by_ms_km      (&searcher, ms_dst, &km, &mut da_kms_hashset);
         hyoji_ms_hashset    ( &mv_src_hashset);
         hyoji_kms_hashset   ( &da_kms_hashset);
 
@@ -61,8 +62,8 @@ pub fn test(line:&String, starts:&mut usize, len:usize, position1: &Position) {
         // 移動可能な元升
         let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
         //let mut da_kms_hashset : HashSet<usize> = HashSet::new();
-        insert_narazu_src_by_ms_km  (&position1, ms_dst, &km, &mut mv_src_hashset );
-        insert_narumae_src_by_ms_km (&position1, ms_dst, &km, &mut mv_src_hashset );
+        insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
+        insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
         //insert_da_kms_by_ms_km      ( ms_dst, &km, &mut da_kms_hashset );
         for ms_src in mv_src_hashset {
             ss.source = ms_src;
@@ -85,9 +86,9 @@ pub fn test(line:&String, starts:&mut usize, len:usize, position1: &Position) {
             g_writeln( &format!("kms={} km={} ms_dst={}",kms,km,ms_dst) );
             let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
             let mut da_kms_hashset : HashSet<usize> = HashSet::new();
-            insert_narazu_src_by_ms_km  (&position1, ms_dst, &km, &mut mv_src_hashset );
-            insert_narumae_src_by_ms_km (&position1, ms_dst, &km, &mut mv_src_hashset );
-            insert_da_kms_by_ms_km      (ms_dst, &km, &mut da_kms_hashset, &position1);
+            insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
+            insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
+            insert_da_kms_by_ms_km      (&searcher, ms_dst, &km, &mut da_kms_hashset);
             hyoji_ms_hashset    ( &mv_src_hashset);
             hyoji_kms_hashset   ( &da_kms_hashset);
         }
@@ -99,9 +100,9 @@ pub fn test(line:&String, starts:&mut usize, len:usize, position1: &Position) {
             g_writeln( &format!("kms={} km={} ms_dst={}",kms,km,ms_dst) );
             let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
             let mut da_kms_hashset : HashSet<usize> = HashSet::new();
-            insert_narazu_src_by_ms_km  (&position1, ms_dst, &km, &mut mv_src_hashset );
-            insert_narumae_src_by_ms_km (&position1, ms_dst, &km, &mut mv_src_hashset );
-            insert_da_kms_by_ms_km      (ms_dst, &km, &mut da_kms_hashset, &position1);
+            insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
+            insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
+            insert_da_kms_by_ms_km      (&searcher, ms_dst, &km, &mut da_kms_hashset);
             hyoji_ms_hashset    ( &mv_src_hashset);
             hyoji_kms_hashset   ( &da_kms_hashset);
         }
@@ -113,9 +114,9 @@ pub fn test(line:&String, starts:&mut usize, len:usize, position1: &Position) {
             g_writeln( &format!("kms={} km={} ms_dst={}",kms,km,ms_dst) );
             let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
             let mut da_kms_hashset : HashSet<usize> = HashSet::new();
-            insert_narazu_src_by_ms_km  (&position1, ms_dst, &km, &mut mv_src_hashset );
-            insert_narumae_src_by_ms_km (&position1, ms_dst, &km, &mut mv_src_hashset );
-            insert_da_kms_by_ms_km      (ms_dst, &km, &mut da_kms_hashset, &position1);
+            insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
+            insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
+            insert_da_kms_by_ms_km      (&searcher, ms_dst, &km, &mut da_kms_hashset);
             hyoji_ms_hashset    ( &mv_src_hashset);
             hyoji_kms_hashset   ( &da_kms_hashset);
         }
@@ -127,9 +128,9 @@ pub fn test(line:&String, starts:&mut usize, len:usize, position1: &Position) {
             g_writeln( &format!("kms={} km={} ms_dst={}",kms,km,ms_dst) );
             let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
             let mut da_kms_hashset : HashSet<usize> = HashSet::new();
-            insert_narazu_src_by_ms_km  (&position1, ms_dst, &km, &mut mv_src_hashset );
-            insert_narumae_src_by_ms_km (&position1, ms_dst, &km, &mut mv_src_hashset );
-            insert_da_kms_by_ms_km      (ms_dst, &km, &mut da_kms_hashset, &position1);
+            insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
+            insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
+            insert_da_kms_by_ms_km      (&searcher, ms_dst, &km, &mut da_kms_hashset);
             hyoji_ms_hashset    ( &mv_src_hashset);
             hyoji_kms_hashset   ( &da_kms_hashset);
         }
