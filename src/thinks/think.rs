@@ -2,7 +2,6 @@
 extern crate rand;
 
 use CUR_POSITION_WRAP;
-use CUR_POSITION_EX_WRAP;
 use ENGINE_SETTINGS_WRAP;
 use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
@@ -23,7 +22,7 @@ use UCHU_WRAP;
 /// # Arguments.
 ///
 /// * `milliseconds` - 残り思考時間(ミリ秒)
-pub fn think(milliseconds: u64) -> Movement{
+pub fn think(milliseconds: i32) -> Movement{
 
     // 任意の構造体を作成する。
     let mut searcher = Searcher::new();
@@ -74,7 +73,6 @@ pub fn think(milliseconds: u64) -> Movement{
         compare_best_callback: compare_best_callback,
     };
 
-
     // 探索を開始する。
     // どの深さまで潜るか。
     let mut max_depth = 3;
@@ -88,16 +86,20 @@ pub fn think(milliseconds: u64) -> Movement{
     g_writeln(&format!("info string max_depth:{}.", max_depth));
 
     // 反復深化探索 iteration deeping.
-    let mut best_movement_hash = TORYO_HASH;
+    let mut best_movement_hash = RESIGN_HASH;
     for id_depth in 1..max_depth+1 {
+        searcher.id_cur_depth = id_depth;
+
         // 指し手を選ぶ。
-        let (id_best_movement_hash, _best_evaluation) = search(&mut searcher, &mut callback_catalog, id_depth, id_depth,
+        let (id_best_movement_hash, best_evaluation) = start(&mut searcher, &mut callback_catalog, id_depth, id_depth,
         -<i16>::max_value(), // min_value (負値) を - にすると正数があふれてしまうので、正の最大数に - を付ける。
         <i16>::max_value());
 
+        searcher.id_evaluation = best_evaluation;
+
         // 反復深化探索の打ち切り。
         let end = searcher.stopwatch.elapsed(); // 計測時間。
-        if searcher.is_thought_timeout(end) {
+        if is_thought_timeout(&searcher, end) {
             // 指定時間以上考えていたら、すべての探索打切り。
             break;
         }
@@ -106,12 +108,8 @@ pub fn think(milliseconds: u64) -> Movement{
         best_movement_hash = id_best_movement_hash;
     }
 
-
-    // これはテスト
-    {
-        let position_ex = CUR_POSITION_EX_WRAP.try_read().unwrap();
-        g_writeln(&format!("info string TEST komawari calculation:{}. (Expected: 0)", position_ex.komawari ));
-    }
+    // 手を決めたときにも情報表示。
+    g_writeln(&format!("info score cp {} pv", searcher.id_evaluation));
 
 
         /*

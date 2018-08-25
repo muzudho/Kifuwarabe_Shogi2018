@@ -34,7 +34,7 @@ lazy_static! {
 }
 
 pub struct ShellVariable {
-    player_milliseconds_array : [u64; 2],
+    player_milliseconds_array : [i32; 2],
 }
 impl ShellVariable {
     pub fn new() -> ShellVariable {
@@ -79,8 +79,9 @@ pub fn do_do(request: &Request, response:&mut Response) {
 /// go btime 60000 wtime 50000 byoyomi 10000
 pub fn do_go(_request: &Request, response:&mut Response) {
     {
-        SHELL.try_write().unwrap().player_milliseconds_array[SN_SEN] = 0;
-        SHELL.try_write().unwrap().player_milliseconds_array[SN_GO] = 0;
+        // 指定しなければ無制限。
+        SHELL.try_write().unwrap().player_milliseconds_array[SN_SEN] = <i32>::max_value();
+        SHELL.try_write().unwrap().player_milliseconds_array[SN_GO] = <i32>::max_value();
     }
 
     // 行終了時に実行されるコールバック関数を１つ設定できる。
@@ -95,7 +96,7 @@ pub fn do_go_btime(_request: &Request, response:&mut Response) {
 
 pub fn do_go_btimevar(_request: &Request, response:&mut Response) {
     let word = &response.groups[0];
-    let num: u64 = word.parse().unwrap();
+    let num: i32 = word.parse().unwrap();
     {
         SHELL.try_write().unwrap().player_milliseconds_array[0] = num;
     }
@@ -108,7 +109,7 @@ pub fn do_go_wtime(_request: &Request, response:&mut Response) {
 
 pub fn do_go_wtimevar(_request: &Request, response:&mut Response) {
     let word = &response.groups[0];
-    let num: u64 = word.parse().unwrap();
+    let num: i32 = word.parse().unwrap();
     {
         SHELL.try_write().unwrap().player_milliseconds_array[1] = num;
     }
@@ -121,7 +122,7 @@ pub fn do_go_binc(_request: &Request, response:&mut Response) {
 
 pub fn do_go_bincvar(_request: &Request, response:&mut Response) {
     let word = &response.groups[0];
-    let num: u64 = word.parse().unwrap();
+    let num: i32 = word.parse().unwrap();
     {
         SHELL.try_write().unwrap().player_milliseconds_array[0] += num;
     }
@@ -134,7 +135,7 @@ pub fn do_go_winc(_request: &Request, response:&mut Response) {
 
 pub fn do_go_wincvar(_request: &Request, response:&mut Response) {
     let word = &response.groups[0];
-    let num: u64 = word.parse().unwrap();
+    let num: i32 = word.parse().unwrap();
     {
         SHELL.try_write().unwrap().player_milliseconds_array[1] += num;
     }

@@ -1,11 +1,13 @@
 use CUR_POSITION_EX_WRAP;
+use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use memory::uchu::*;
 use std::collections::HashSet;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
+use time_manager::*;
 
 
 /// 任意の構造体を作成する。
@@ -13,7 +15,11 @@ pub struct Searcher {
     pub stopwatch: Instant,
     pub info_stopwatch: Instant,
     /// 最大思考時間(秒)
-    pub thought_max_milliseconds: u64, 
+    pub thought_max_milliseconds: i32,
+    // 反復深化探索(iteration deeping)で現在探索途中の深さ。
+    pub id_cur_depth: i16,
+    // 反復深化探索(iteration deeping)で一番有力な評価値。
+    pub id_evaluation: i16,
 }
 impl Searcher {
     pub fn new() -> Searcher {
@@ -21,15 +27,13 @@ impl Searcher {
             stopwatch: Instant::now(),
             info_stopwatch: Instant::now(),
             thought_max_milliseconds: 0,
+            id_cur_depth: 0,
+            id_evaluation: 0,
         }
-    }
-
-    pub fn is_thought_timeout (&self, end: Duration) -> bool {
-        self.thought_max_milliseconds < end.as_secs() * 1000 + (end.subsec_nanos() / 1_000_000_000) as u64
     }
 }
 
-pub fn visit_leaf_callback(searcher: &mut Searcher) -> (i16) {
+pub fn visit_leaf_callback(searcher: &mut Searcher, display_information: &DisplayInformation) -> (i16) {
 
     // 評価値は駒割り。
     let komawari;
@@ -46,7 +50,7 @@ pub fn visit_leaf_callback(searcher: &mut Searcher) -> (i16) {
         }
         if 3 < end.as_secs() {
             // 3秒以上考えていたら、情報表示。
-            g_writeln(&format!("info depth 0 seldepth 0 time 0 nodes 0 score cp 0 nps 0 pv"));
+            g_writeln(&format!("info depth {} seldepth 0 time 0 nodes {} score cp {} nps 0 pv", searcher.id_cur_depth, display_information.nodes, searcher.id_evaluation));
             searcher.info_stopwatch = Instant::now();
         }
     }
@@ -83,7 +87,7 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
     let mut hashset_movement : HashSet<u64> = HashSet::new();
     // 反復深化探索の打ち切り。
     let end = searcher.stopwatch.elapsed(); // 計測時間。
-    if searcher.is_thought_timeout(end) {
+    if is_thought_timeout(searcher, end) {
         // 指定時間以上考えていたら探索打切り。
         return (hashset_movement, true);
     }
@@ -197,7 +201,7 @@ pub fn compare_best_callback(searcher: &mut Searcher, best_movement_hash: &mut u
 
     // 反復深化探索の打ち切り。
     let end = searcher.stopwatch.elapsed(); // 計測時間。
-    if searcher.is_thought_timeout(end) {
+    if is_thought_timeout(searcher, end) {
         // 指定時間以上考えていたら、すべての探索打切り。
         return (false, true);
     }

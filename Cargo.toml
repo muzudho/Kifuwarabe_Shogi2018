@@ -25,4 +25,4 @@ rev = "f2ec0e5e4635993177483641399e2338dd312a06"
 
 [dependencies.kifuwarabe_alpha_beta_search]
 git = "https://github.com/muzudho/rust_kifuwarabe_alpha_beta_search.git"
-rev = "b490c0411547780a272e03a6660509644826b14a"
+rev = "6ea67d50fcc5de6cf48f54173db1e7270de8398d"
