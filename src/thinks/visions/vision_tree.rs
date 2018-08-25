@@ -37,7 +37,7 @@ impl VisionTree{
  */
 #[allow(dead_code)]
 pub fn insert_rakkansuji(
-    _gen_ky: &Kyokumen,
+    _gen_ky: &Position,
     sn: &Sengo,
     vtree: &mut VisionTree,
     ai_ms_r: umasu

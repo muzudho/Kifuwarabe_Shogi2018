@@ -9,6 +9,7 @@ use consoles;
 use consoles::unit_test::*;
 use consoles::visuals::dumps::*;
 use consoles::visuals::title::*;
+use CUR_POSITION_WRAP;
 use ENGINE_SETTINGS_WRAP;
 use GAME_RECORD_WRAP;
 use INI_POSITION_WRAP;
@@ -51,6 +52,12 @@ impl ShellVariable {
 /// 指し手を入れる。
 pub fn do_do(request: &Request, response:&mut Response) {
 
+    // 局面のクローンを作成。
+    let mut position1;
+    {
+        position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+    }
+
     // コマンド読取。棋譜に追加され、手目も増える
     let (successful, umov) = parse_movement(&request.line, &mut response.caret, request.line_len);
     let movement = usi_to_movement(successful, &umov);
@@ -67,7 +74,12 @@ pub fn do_do(request: &Request, response:&mut Response) {
         let mut searcher = Searcher::new();
 
         // 入っている指し手の通り指すぜ☆（＾～＾）
-        makemove(&mut searcher, movement.to_hash());
+        makemove(&mut searcher, movement.to_hash(), &mut position1);
+    }
+
+    // 局面のクローンで上書き。
+    {
+        CUR_POSITION_WRAP.try_write().unwrap().set_all(&position1);
     }
 }
 
@@ -157,8 +169,20 @@ pub fn do_go_linebreak(_request: &Request, _response:&mut Response) {
         milliseconds = SHELL.try_read().unwrap().player_milliseconds_array[turn_num];
     }
 
+    // 局面のクローンを作成。
+    let mut position1;
+    {
+        position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+    }
+
     // 思考する。
-    let bestmove = think(milliseconds);
+    let bestmove = think(milliseconds, &mut position1);
+
+    // 局面のクローンで上書き。
+    {
+        CUR_POSITION_WRAP.try_write().unwrap().set_all(&position1);
+    }
+
     // 例： bestmove 7g7f
     g_writeln(&format!("bestmove {}", movement_to_usi(&bestmove)));
 }
@@ -181,7 +205,11 @@ pub fn do_hirate(_request: &Request, _response:&mut Response) {
     // 局面をクリアー。手目も 0 に戻します。
     UCHU_WRAP.try_write().unwrap().clear_ky01();
 
-    parse_position(&KY1.to_string(),
+    let mut searcher = Searcher::new();
+
+    parse_position(
+        &mut searcher,
+        &KY1.to_string(),
         |hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|
         {
             // 持ち駒数コピー。
@@ -207,7 +235,13 @@ pub fn do_hirate(_request: &Request, _response:&mut Response) {
             // 初期局面ハッシュを作り直す
             let ky_hash;
             {
-                ky_hash = GAME_RECORD_WRAP.try_read().unwrap().create_ky0_hash();
+                // 局面のクローンを作成。
+                let position0;
+                {
+                    position0 = INI_POSITION_WRAP.try_read().unwrap().clone();
+                }
+
+                ky_hash = GAME_RECORD_WRAP.try_read().unwrap().create_ky0_hash(&position0);
             }
 
             // グローバル変数に内容をセット。
@@ -216,13 +250,12 @@ pub fn do_hirate(_request: &Request, _response:&mut Response) {
                 game_record.set_ky0_hash( ky_hash );
             }
 
+            // 初期局面を、現局面にコピーします。
             {
-                let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-                // 初期局面を、現局面にコピーします
-                uchu_w.copy_ky0_to_ky1();            
+                CUR_POSITION_WRAP.try_write().unwrap().set_all(&INI_POSITION_WRAP.try_read().unwrap());
             }
         },
-        |successful, usi_movement|
+        |successful, usi_movement, mut searcher|
         {
             let movement = usi_to_movement(successful, &usi_movement);
 
@@ -233,11 +266,20 @@ pub fn do_hirate(_request: &Request, _response:&mut Response) {
             }
 
             if successful {
-                // 任意の構造体を作成する。
-                let mut searcher = Searcher::new();
+
+                // 局面のクローンを作成。
+                let mut position1;
+                {
+                    position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+                }
 
                 // 入っている指し手の通り指すぜ☆（＾～＾）
-                makemove(&mut searcher, movement.to_hash());
+                makemove(&mut searcher, movement.to_hash(), &mut position1);
+
+                // 局面のクローンで上書き。
+                {
+                    CUR_POSITION_WRAP.try_write().unwrap().set_all(&position1);
+                }
             }
         }
     );
@@ -342,8 +384,12 @@ pub fn do_position(request: &Request, response:&mut Response) {
     // 局面をクリアー。手目も 0 に戻します。
     UCHU_WRAP.try_write().unwrap().clear_ky01();
 
+    let mut searcher = Searcher::new();
+
     // positionコマンド読取。
-    parse_position(&request.line,
+    parse_position(
+        &mut searcher,
+        &request.line,
         // 持ち駒数読取。
         |hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|{
             let mut i=0;
@@ -367,7 +413,13 @@ pub fn do_position(request: &Request, response:&mut Response) {
             // 初期局面ハッシュを作り直す
             let ky_hash;
             {
-                ky_hash = GAME_RECORD_WRAP.try_read().unwrap().create_ky0_hash();
+                // 局面のクローンを作成。
+                let position0;
+                {
+                    position0 = INI_POSITION_WRAP.try_read().unwrap().clone();
+                }
+
+                ky_hash = GAME_RECORD_WRAP.try_read().unwrap().create_ky0_hash(&position0);
             }
 
             // グローバル変数に内容をセット。
@@ -376,14 +428,13 @@ pub fn do_position(request: &Request, response:&mut Response) {
                 game_record.set_ky0_hash( ky_hash );
             }
 
+            // 初期局面を、現局面にコピーします。
             {
-                // 初期局面を、現局面にコピーします
-                let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-                uchu_w.copy_ky0_to_ky1();            
+                CUR_POSITION_WRAP.try_write().unwrap().set_all(&INI_POSITION_WRAP.try_read().unwrap());
             }
         },
         // 指し手読取。
-        |successful, usi_movement|{
+        |successful, usi_movement, mut searcher|{
             let movement = usi_to_movement(successful, &usi_movement);
 
             // 棋譜に書き込み。
@@ -393,11 +444,19 @@ pub fn do_position(request: &Request, response:&mut Response) {
             }
 
             if successful {
-                // 任意の構造体を作成する。
-                let mut searcher = Searcher::new();
+                // 局面のクローンを作成。
+                let mut position1;
+                {
+                    position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+                }
 
                 // 指し手を指すぜ☆（＾～＾）
-                makemove(&mut searcher, movement.to_hash());
+                makemove(&mut searcher, movement.to_hash(), &mut position1);
+
+                // 局面のクローンで上書き。
+                {
+                    CUR_POSITION_WRAP.try_write().unwrap().set_all(&position1);
+                }
             }
         }
     );
@@ -537,10 +596,22 @@ pub fn do_test(request: &Request, response:&mut Response) {
 
 /// 指した手を１手戻す。
 pub fn do_undo(_request: &Request, _response:&mut Response) {
+
     // 任意の構造体を作成する。
     let mut searcher = Searcher::new();
 
-    let (successful, _cap_kms) = unmakemove(&mut searcher);
+    // 局面のクローンを作成。
+    let mut position1;
+    {
+        position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+    }
+
+    let (successful, _cap_kms) = unmakemove(&mut searcher, &mut position1);
+
+    // 局面のクローンで上書き。
+    {
+        CUR_POSITION_WRAP.try_write().unwrap().set_all(&position1);
+    }
 
     if !successful {
         let game_record = GAME_RECORD_WRAP.try_read().unwrap();

@@ -13,16 +13,16 @@ rev = "6deac338e5ad49992f2f7bfe94c9415bf8382a26"
 
 [dependencies.kifuwarabe_usi]
 git = "https://github.com/muzudho/rust_kifuwarabe_usi.git"
-rev = "f0be3fabdcc0eafc525101048e55b91b516052b6"
+rev = "4ef2b0a9a17f9a31242664f3f496b94a847e05cd"
 
 [dependencies.kifuwarabe_position]
 git = "https://github.com/muzudho/rust_kifuwarabe_position.git"
-rev = "8956e8b019be11e85ac4fee4d75b7602d5e7fc21"
+rev = "51fa0953f8ab49ce46a45896b17dc55bc4b9b45a"
 
 [dependencies.kifuwarabe_movement]
 git = "https://github.com/muzudho/rust_kifuwarabe_movement.git"
-rev = "f2ec0e5e4635993177483641399e2338dd312a06"
+rev = "f151f3b6ec4c09efee7d213ba2974d1e2238d868"
 
 [dependencies.kifuwarabe_alpha_beta_search]
 git = "https://github.com/muzudho/rust_kifuwarabe_alpha_beta_search.git"
-rev = "976c3889b91f3f49884f88bb1f8256d97cc205fb"
+rev = "d4b43dad325597d13d4c2add2f591a2e471d611e"

@@ -240,11 +240,11 @@ pub fn csa_main(argc:int, argv:[2:char])
   };
 
   // ０手目で、平手の局面で、持ち駒なしから開始しましょう。
-  KyokumenKomagumi Hirate( 0, HirateBan, HirateMotigoma);
+  PositionKomagumi Hirate( 0, HirateBan, HirateMotigoma);
   // k は局面。kyに変更。
-  KyokumenKomagumi ky(Hirate);
-  KyokumenKomagumi::InitKanagomaValue();
-  shoki=new Kyokumen(0,HirateBan,HirateMotigoma);
+  PositionKomagumi ky(Hirate);
+  PositionKomagumi::InitKanagomaValue();
+  shoki=new Position(0,HirateBan,HirateMotigoma);
   ky.Initialize();
 
   // これはまだ簡単な思考部なので、初期化も簡単です。
@@ -458,9 +458,9 @@ pub fn csa_main(argc:int, argv:[2:char])
     // 王手の千日手の判定
     g_writeln("千日手です。");
     int sennitite=0;
-    if (Kyokumen::OuteHistory[ky.Tesu]) {
+    if (Position::OuteHistory[ky.Tesu]) {
       for(int i=ky.Tesu;sennitite<=3&&i>0;i-=2) {
-        if (!Kyokumen::OuteHistory[i]) {
+        if (!Position::OuteHistory[i]) {
           break;
         }
         if (ky.HashHistory[i]==ky.HashVal) {
@@ -476,10 +476,10 @@ pub fn csa_main(argc:int, argv:[2:char])
           g_writeln("先手の勝ち。");
         }
       }
-    } else if (Kyokumen::OuteHistory[ky.Tesu-1]) {
+    } else if (Position::OuteHistory[ky.Tesu-1]) {
       // こちらは未検証
       for(int i=ky.Tesu;sennitite<=3&&i>0;i-=2) {
-        if (!Kyokumen::OuteHistory[i-1]) {
+        if (!Position::OuteHistory[i-1]) {
           break;
         }
         if (ky.HashHistory[i]==ky.HashVal) {

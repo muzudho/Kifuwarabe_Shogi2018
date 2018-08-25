@@ -56,6 +56,12 @@ lazy_static! {
 
     // エンジン設定。
     static ref ENGINE_SETTINGS_WRAP: RwLock<EngineSettings> = RwLock::new(EngineSettings::new());
+
+    // 初期局面。
+    pub static ref INI_POSITION_WRAP: RwLock<Position> = RwLock::new(Position::new());
+
+    // 探索部に渡す局面。
+    pub static ref CUR_POSITION_WRAP: RwLock<Position> = RwLock::new(Position::new());
 }
 
 fn main() {

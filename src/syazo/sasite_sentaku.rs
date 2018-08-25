@@ -109,7 +109,8 @@ pub fn filtering_ss_except_oute(
  */
 pub fn filtering_ss_except_jisatusyu(
     searcher: &mut Searcher,
-    ss_hashset_input:&mut HashSet<u64>
+    ss_hashset_input:&mut HashSet<u64>,
+    position1: &mut Position
 ){
 
     // 残すのはここに退避する☆（＾～＾）
@@ -134,7 +135,7 @@ pub fn filtering_ss_except_jisatusyu(
         let ss_potential = Movement::from_hash( *hash_ss_potential );
 
         // その手を指してみる
-        makemove(searcher, ss_potential.to_hash());
+        makemove(searcher, ss_potential.to_hash(), position1);
         // // 現局面表示
         // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
         // g_writeln( &s1 );            
@@ -178,9 +179,7 @@ pub fn filtering_ss_except_jisatusyu(
         */
 
         // 手を戻す
-        {
-            unmakemove(searcher);
-        }
+        unmakemove(searcher, position1);
         // // 現局面表示
         // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
         // g_writeln( &s2 );            
@@ -210,7 +209,8 @@ pub fn filtering_ss_except_jisatusyu(
  */
 pub fn filtering_ss_except_sennitite(
     searcher: &mut Searcher,
-    ss_hashset_input:&mut HashSet<u64>
+    ss_hashset_input:&mut HashSet<u64>,
+    position1: &mut Position
 ) {
     let mut ss_hashset_pickup = HashSet::new();
 
@@ -221,7 +221,7 @@ pub fn filtering_ss_except_sennitite(
             //ss_hashset.insert( *hash_ss_potential );
 
         // その手を指してみる
-        makemove(searcher, ss.to_hash());
+        makemove(searcher, ss.to_hash(), position1);
         
         // 現局面表示
         // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
@@ -237,9 +237,7 @@ pub fn filtering_ss_except_sennitite(
         }
 
         // 手を戻す FIXME: 打った象が戻ってない？
-        {
-            unmakemove(searcher);
-        }
+        unmakemove(searcher, position1);
         // 現局面表示
         // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
         // g_writeln( &s2 );

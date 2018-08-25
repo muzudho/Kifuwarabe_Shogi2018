@@ -23,7 +23,7 @@ use std::collections::HashSet;
  * TODO 先手１段目の香車とか、必ず成らないといけないぜ☆（＾～＾）
  */
 pub fn insert_narazu_src_by_ms_km(
-    gen_ky: &Kyokumen,
+    gen_ky: &Position,
     ms_dst: umasu,
     km_dst: &Koma,
     result: &mut HashSet<umasu>
@@ -307,7 +307,7 @@ pub fn insert_narazu_src_by_ms_km(
  * 成り　の動きでその結果になるような、元の升を返す☆（＾～＾）
  */
 pub fn insert_narumae_src_by_ms_km(
-    gen_ky: &Kyokumen,
+    gen_ky: &Position,
     ms_dst: umasu,
     km_dst: &Koma,
     result: &mut HashSet<umasu>

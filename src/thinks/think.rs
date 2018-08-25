@@ -22,7 +22,7 @@ use UCHU_WRAP;
 /// # Arguments.
 ///
 /// * `milliseconds` - 残り思考時間(ミリ秒)
-pub fn think(milliseconds: i32) -> Movement{
+pub fn think(milliseconds: i32, position1: &mut Position) -> Movement{
 
     // 任意の構造体を作成する。
     let mut searcher = Searcher::new();
@@ -92,7 +92,7 @@ pub fn think(milliseconds: i32) -> Movement{
 
         // 指し手を選ぶ。
         // min_value (負値) を - にすると正数があふれてしまうので、正の最大数に - を付ける。
-        let (id_best_movement_hash, best_evaluation) = start(&mut searcher, &mut callback_catalog, id_depth, id_depth, -<i16>::max_value(), <i16>::max_value());
+        let (id_best_movement_hash, best_evaluation) = start(&mut searcher, &mut callback_catalog, id_depth, id_depth, -<i16>::max_value(), <i16>::max_value(), position1);
 
         searcher.id_evaluation = best_evaluation;
 
@@ -109,6 +109,7 @@ pub fn think(milliseconds: i32) -> Movement{
 
     // 手を決めたときにも情報表示。
     g_writeln(&format!("info score cp {} pv", searcher.id_evaluation));
+    g_writeln(&format!("info string incremental_komawari: {}", searcher.incremental_komawari));
 
 
         /*

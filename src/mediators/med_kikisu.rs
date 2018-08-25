@@ -15,7 +15,7 @@ use std::collections::HashSet;
  *
  * TODO: 差分更新にしたい。
  */
-pub fn refresh_kikisu(gen_ky: &Kyokumen) -> (
+pub fn refresh_kikisu(gen_ky: &Position) -> (
     [NumberBoard; SN_LN],
     [NumberBoard; KM_LN]
 ){

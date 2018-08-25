@@ -8,19 +8,26 @@ use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
 use time_manager::*;
 
+use teigi::shogi_syugo::*;
+use UCHU_WRAP;
+
 
 /// 任意の構造体を作成する。
 pub struct Searcher {
     pub stopwatch: Instant,
     pub info_stopwatch: Instant,
-    /// 最大思考時間(秒)
+    /// 最大思考時間(秒)。
     pub thought_max_milliseconds: i32,
     // 反復深化探索(iteration deeping)で現在探索途中の深さ。
     pub id_cur_depth: i16,
     // 反復深化探索(iteration deeping)で一番有力な評価値。
     pub id_evaluation: i16,
-    // 駒割の差分更新
+    // 駒割の差分更新。
     pub incremental_komawari: i16,
+    // 初期局面のコピー。
+    pub ini_position: Position,
+    // 現局面のコピー。
+    pub cur_position: Position,
 }
 impl Searcher {
     pub fn new() -> Searcher {
@@ -31,21 +38,20 @@ impl Searcher {
             id_cur_depth: 0,
             id_evaluation: 0,
             incremental_komawari: 0,
+            ini_position: Position::new(),
+            cur_position: Position::new(),
         }
     }
 }
 
-pub fn visit_leaf_callback(searcher: &mut Searcher, display_information: &DisplayInformation) -> (i16) {
+pub fn visit_leaf_callback(searcher: &mut Searcher, _position1: &mut Position, display_information: &DisplayInformation) -> (i16) {
 
     // 評価値は駒割り。
     let komawari = searcher.incremental_komawari;
 
     // 読み筋表示。
     {
-        let end; // 計測時間。
-        {
-            end = searcher.info_stopwatch.elapsed();
-        }
+        let end = searcher.info_stopwatch.elapsed();
         if 3 < end.as_secs() {
             // 3秒以上考えていたら、情報表示。
             g_writeln(&format!("info depth {} seldepth 0 time 0 nodes {} score cp {} nps 0 pv", searcher.id_cur_depth, display_information.nodes, searcher.id_evaluation));
@@ -80,7 +86,7 @@ fn get_koma_score(km: &KmSyurui) -> i16 {
 }
 
 /// 指し手生成。
-pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_depth: i16) -> (HashSet<u64>, bool) {
+pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_depth: i16, position1: &mut Position) -> (HashSet<u64>, bool) {
 
     let mut hashset_movement : HashSet<u64> = HashSet::new();
     // 反復深化探索の打ち切り。
@@ -102,10 +108,10 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
         filtering_ss_except_oute(&mut hashset_movement);
 
         // FIXME 負けてても、千日手は除くぜ☆（＾～＾）ただし、千日手を取り除くと手がなくなる場合は取り除かないぜ☆（＾～＾）
-        filtering_ss_except_sennitite(searcher, &mut hashset_movement);
+        filtering_ss_except_sennitite(searcher, &mut hashset_movement, position1);
 
         // 自殺手は省くぜ☆（＾～＾）
-        filtering_ss_except_jisatusyu(searcher, &mut hashset_movement);
+        filtering_ss_except_jisatusyu(searcher, &mut hashset_movement, position1);
     };
 
     (hashset_movement, false)
@@ -116,32 +122,32 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
 /// # Arguments.
 ///
 /// * `movement_hash` - 指し手のハッシュ値。
-pub fn makemove(searcher: &mut Searcher, movement_hash: u64) {
+pub fn makemove(searcher: &mut Searcher, movement_hash: u64, position1: &mut Position) {
 
     let cap_kms;
     {
         let movement = Movement::from_hash(movement_hash);
-        cap_kms = GAME_RECORD_WRAP.try_write().unwrap().make_movement2(&movement);
+        {
+            cap_kms = GAME_RECORD_WRAP.try_write().unwrap().make_movement2(&movement, position1);
+        }
     }
 
     // 駒割の差分更新。
     searcher.incremental_komawari += get_koma_score(&cap_kms);
 
-/*
     // 現局面表示
     {
         let uchu_r = UCHU_WRAP.try_read().unwrap();
         g_writeln(&uchu_r.kaku_ky(&KyNums::Current, false));
     }
-*/
 }
 
-pub fn unmakemove(searcher: &mut Searcher) -> (bool, KmSyurui) {
+pub fn unmakemove(searcher: &mut Searcher, position1: &mut Position) -> (bool, KmSyurui) {
 
     let successful;
     let cap_kms;
     {
-        let (successful2, cap_kms2) = GAME_RECORD_WRAP.try_write().unwrap().unmake_movement2();
+        let (successful2, cap_kms2) = GAME_RECORD_WRAP.try_write().unwrap().unmake_movement2(position1);
         successful = successful2;
         cap_kms = cap_kms2;
     }
@@ -151,18 +157,16 @@ pub fn unmakemove(searcher: &mut Searcher) -> (bool, KmSyurui) {
         searcher.incremental_komawari -= get_koma_score(&cap_kms);
     }
 
-/*
     // 現局面表示
     {
         let uchu_r = UCHU_WRAP.try_read().unwrap();
         g_writeln(&uchu_r.kaku_ky(&KyNums::Current, false));
     }
-*/
 
     (successful, cap_kms)
 }
-pub fn unmakemove_not_return(searcher: &mut Searcher) {
-    unmakemove(searcher);
+pub fn unmakemove_not_return(searcher: &mut Searcher, position1: &mut Position) {
+    unmakemove(searcher, position1);
 }
 
 /// 指し手の比較。
@@ -180,7 +184,7 @@ pub fn unmakemove_not_return(searcher: &mut Searcher) {
 ///
 /// 1. 探索を打ち切るなら真。（ベータカット）
 /// 2. 探索をすみやかに安全に終了するなら真。
-pub fn compare_best_callback(searcher: &mut Searcher, best_movement_hash: &mut u64, alpha: &mut i16, beta: i16, movement_hash: u64, child_evaluation: i16) -> (bool, bool) {
+pub fn compare_best_callback(searcher: &mut Searcher, best_movement_hash: &mut u64, alpha: &mut i16, beta: i16, movement_hash: u64, child_evaluation: i16, _position1: &mut Position) -> (bool, bool) {
 
     // 比較して、一番良い手を選ぶ。（アップデート アルファ）
     if *alpha < child_evaluation {
