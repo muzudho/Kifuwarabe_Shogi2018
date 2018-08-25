@@ -65,7 +65,7 @@ pub fn think(milliseconds: i32) -> Movement{
     }
 
     // 任意の構造体を受け取る、コールバック カタログを作成する。
-    let mut callback_catalog = CallbackCatalog {
+    let mut callback_catalog = CallbackCatalog::<Searcher> {
         visit_leaf_callback: visit_leaf_callback,
         makemove_callback: makemove,
         unmakemove_callback: unmakemove_not_return,
@@ -91,9 +91,8 @@ pub fn think(milliseconds: i32) -> Movement{
         searcher.id_cur_depth = id_depth;
 
         // 指し手を選ぶ。
-        let (id_best_movement_hash, best_evaluation) = start(&mut searcher, &mut callback_catalog, id_depth, id_depth,
-        -<i16>::max_value(), // min_value (負値) を - にすると正数があふれてしまうので、正の最大数に - を付ける。
-        <i16>::max_value());
+        // min_value (負値) を - にすると正数があふれてしまうので、正の最大数に - を付ける。
+        let (id_best_movement_hash, best_evaluation) = start(&mut searcher, &mut callback_catalog, id_depth, id_depth, -<i16>::max_value(), <i16>::max_value());
 
         searcher.id_evaluation = best_evaluation;
 

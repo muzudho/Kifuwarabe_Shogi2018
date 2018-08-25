@@ -46,7 +46,6 @@ mod tusin;
 
 use memory::uchu::*;
 use misc::option::*;
-use misc::position_ex::*;
 use shell_impl::*;
 
 
@@ -57,8 +56,6 @@ lazy_static! {
 
     // エンジン設定。
     static ref ENGINE_SETTINGS_WRAP: RwLock<EngineSettings> = RwLock::new(EngineSettings::new());
-    // 計算中の局面(拡張)。
-    pub static ref CUR_POSITION_EX_WRAP: RwLock<PositionEx> = RwLock::new(PositionEx::new());
 }
 
 fn main() {

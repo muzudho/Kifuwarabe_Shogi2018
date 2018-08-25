@@ -63,8 +63,11 @@ pub fn do_do(request: &Request, response:&mut Response) {
     }
 
     if successful {
+        // 任意の構造体を作成する。
+        let mut searcher = Searcher::new();
+
         // 入っている指し手の通り指すぜ☆（＾～＾）
-        makemove(movement.to_hash());
+        makemove(&mut searcher, movement.to_hash());
     }
 }
 
@@ -230,8 +233,11 @@ pub fn do_hirate(_request: &Request, _response:&mut Response) {
             }
 
             if successful {
+                // 任意の構造体を作成する。
+                let mut searcher = Searcher::new();
+
                 // 入っている指し手の通り指すぜ☆（＾～＾）
-                makemove(movement.to_hash());
+                makemove(&mut searcher, movement.to_hash());
             }
         }
     );
@@ -387,8 +393,11 @@ pub fn do_position(request: &Request, response:&mut Response) {
             }
 
             if successful {
+                // 任意の構造体を作成する。
+                let mut searcher = Searcher::new();
+
                 // 指し手を指すぜ☆（＾～＾）
-                makemove(movement.to_hash());
+                makemove(&mut searcher, movement.to_hash());
             }
         }
     );
@@ -528,7 +537,11 @@ pub fn do_test(request: &Request, response:&mut Response) {
 
 /// 指した手を１手戻す。
 pub fn do_undo(_request: &Request, _response:&mut Response) {
-    let (successful, _cap_kms) = unmakemove();
+    // 任意の構造体を作成する。
+    let mut searcher = Searcher::new();
+
+    let (successful, _cap_kms) = unmakemove(&mut searcher);
+
     if !successful {
         let game_record = GAME_RECORD_WRAP.try_read().unwrap();
         let teme = game_record.teme;

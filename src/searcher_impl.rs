@@ -1,4 +1,3 @@
-use CUR_POSITION_EX_WRAP;
 use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
@@ -20,6 +19,8 @@ pub struct Searcher {
     pub id_cur_depth: i16,
     // 反復深化探索(iteration deeping)で一番有力な評価値。
     pub id_evaluation: i16,
+    // 駒割の差分更新
+    pub incremental_komawari: i16,
 }
 impl Searcher {
     pub fn new() -> Searcher {
@@ -29,6 +30,7 @@ impl Searcher {
             thought_max_milliseconds: 0,
             id_cur_depth: 0,
             id_evaluation: 0,
+            incremental_komawari: 0,
         }
     }
 }
@@ -36,11 +38,7 @@ impl Searcher {
 pub fn visit_leaf_callback(searcher: &mut Searcher, display_information: &DisplayInformation) -> (i16) {
 
     // 評価値は駒割り。
-    let komawari;
-    {
-        let position_ex = CUR_POSITION_EX_WRAP.try_read().unwrap();
-        komawari = position_ex.komawari;
-    }
+    let komawari = searcher.incremental_komawari;
 
     // 読み筋表示。
     {
@@ -104,10 +102,10 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
         filtering_ss_except_oute(&mut hashset_movement);
 
         // FIXME 負けてても、千日手は除くぜ☆（＾～＾）ただし、千日手を取り除くと手がなくなる場合は取り除かないぜ☆（＾～＾）
-        filtering_ss_except_sennitite(&mut hashset_movement);
+        filtering_ss_except_sennitite(searcher, &mut hashset_movement);
 
         // 自殺手は省くぜ☆（＾～＾）
-        filtering_ss_except_jisatusyu( &mut hashset_movement);
+        filtering_ss_except_jisatusyu(searcher, &mut hashset_movement);
     };
 
     (hashset_movement, false)
@@ -118,7 +116,7 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
 /// # Arguments.
 ///
 /// * `movement_hash` - 指し手のハッシュ値。
-pub fn makemove(movement_hash: u64) {
+pub fn makemove(searcher: &mut Searcher, movement_hash: u64) {
 
     let cap_kms;
     {
@@ -126,11 +124,8 @@ pub fn makemove(movement_hash: u64) {
         cap_kms = GAME_RECORD_WRAP.try_write().unwrap().make_movement2(&movement);
     }
 
-    // 駒割り
-    {
-        let mut position_ex = CUR_POSITION_EX_WRAP.try_write().unwrap();
-        position_ex.komawari += get_koma_score(&cap_kms);
-    }
+    // 駒割の差分更新。
+    searcher.incremental_komawari += get_koma_score(&cap_kms);
 
 /*
     // 現局面表示
@@ -141,7 +136,7 @@ pub fn makemove(movement_hash: u64) {
 */
 }
 
-pub fn unmakemove() -> (bool, KmSyurui) {
+pub fn unmakemove(searcher: &mut Searcher) -> (bool, KmSyurui) {
 
     let successful;
     let cap_kms;
@@ -153,8 +148,7 @@ pub fn unmakemove() -> (bool, KmSyurui) {
 
     if successful {
         // 駒割り
-        let mut position_ex = CUR_POSITION_EX_WRAP.try_write().unwrap();
-        position_ex.komawari -= get_koma_score(&cap_kms);
+        searcher.incremental_komawari -= get_koma_score(&cap_kms);
     }
 
 /*
@@ -167,8 +161,8 @@ pub fn unmakemove() -> (bool, KmSyurui) {
 
     (successful, cap_kms)
 }
-pub fn unmakemove_not_return() {
-    unmakemove();
+pub fn unmakemove_not_return(searcher: &mut Searcher) {
+    unmakemove(searcher);
 }
 
 /// 指し手の比較。

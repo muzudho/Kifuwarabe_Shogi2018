@@ -108,6 +108,7 @@ pub fn filtering_ss_except_oute(
  * 千日手には喜んで飛び込めだぜ☆（＾▽＾）ｗｗｗ
  */
 pub fn filtering_ss_except_jisatusyu(
+    searcher: &mut Searcher,
     ss_hashset_input:&mut HashSet<u64>
 ){
 
@@ -133,7 +134,7 @@ pub fn filtering_ss_except_jisatusyu(
         let ss_potential = Movement::from_hash( *hash_ss_potential );
 
         // その手を指してみる
-        makemove(ss_potential.to_hash());
+        makemove(searcher, ss_potential.to_hash());
         // // 現局面表示
         // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
         // g_writeln( &s1 );            
@@ -178,7 +179,7 @@ pub fn filtering_ss_except_jisatusyu(
 
         // 手を戻す
         {
-            unmakemove();
+            unmakemove(searcher);
         }
         // // 現局面表示
         // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
@@ -208,6 +209,7 @@ pub fn filtering_ss_except_jisatusyu(
  * ただし、千日手を取り除くと手がない場合は、千日手を選ぶぜ☆（＾～＾）
  */
 pub fn filtering_ss_except_sennitite(
+    searcher: &mut Searcher,
     ss_hashset_input:&mut HashSet<u64>
 ) {
     let mut ss_hashset_pickup = HashSet::new();
@@ -219,7 +221,7 @@ pub fn filtering_ss_except_sennitite(
             //ss_hashset.insert( *hash_ss_potential );
 
         // その手を指してみる
-        makemove(ss.to_hash());
+        makemove(searcher, ss.to_hash());
         
         // 現局面表示
         // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
@@ -236,7 +238,7 @@ pub fn filtering_ss_except_sennitite(
 
         // 手を戻す FIXME: 打った象が戻ってない？
         {
-            unmakemove();
+            unmakemove(searcher);
         }
         // 現局面表示
         // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
