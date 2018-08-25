@@ -8,8 +8,7 @@ use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
 use time_manager::*;
 
-// use teigi::shogi_syugo::*;
-use UCHU_WRAP;
+// use UCHU_WRAP;
 
 
 /// 任意の構造体を作成する。
@@ -48,7 +47,7 @@ pub fn visit_leaf_callback(searcher: &mut Searcher, _position1: &mut Position, d
 
     // 評価値は駒割り。
     let komawari = searcher.incremental_komawari;
-    g_writeln(&format!("info string DEBUG komawari {}", komawari));
+    // g_writeln(&format!("info string DEBUG komawari {}", komawari));
 
     // 読み筋表示。
     {
@@ -136,11 +135,13 @@ pub fn makemove(searcher: &mut Searcher, movement_hash: u64, position1: &mut Pos
     // 駒割の差分更新。
     searcher.incremental_komawari += get_koma_score(&cap_kms);
 
+    /*
     // 現局面表示
     {
         let uchu_r = UCHU_WRAP.try_read().unwrap();
         g_writeln(&uchu_r.kaku_ky(&position1, false));
     }
+     */
 }
 
 pub fn unmakemove(searcher: &mut Searcher, position1: &mut Position) -> (bool, KmSyurui) {
@@ -158,11 +159,13 @@ pub fn unmakemove(searcher: &mut Searcher, position1: &mut Position) -> (bool, K
         searcher.incremental_komawari -= get_koma_score(&cap_kms);
     }
 
+    /*
     // 現局面表示
     {
         let uchu_r = UCHU_WRAP.try_read().unwrap();
         g_writeln(&uchu_r.kaku_ky(&position1, false));
     }
+     */
 
     (successful, cap_kms)
 }
