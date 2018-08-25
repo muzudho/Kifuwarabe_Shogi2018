@@ -46,7 +46,6 @@ mod tusin;
 use memory::uchu::*;
 use misc::option::*;
 use misc::position_ex::*;
-use searcher_impl::*;
 use shell_impl::*;
 
 
@@ -59,8 +58,6 @@ lazy_static! {
     static ref ENGINE_SETTINGS_WRAP: RwLock<EngineSettings> = RwLock::new(EngineSettings::new());
     // 計算中の局面(拡張)。
     pub static ref CUR_POSITION_EX_WRAP: RwLock<PositionEx> = RwLock::new(PositionEx::new());
-    // 探索中に覚えておくもの。
-    pub static ref SEARCHER_VAR_WRAP: RwLock<SearcherVariable> = RwLock::new(SearcherVariable::new());
 }
 
 fn main() {

@@ -10,9 +10,9 @@ use kifuwarabe_position::*;
 use mediators::med_kikisu::*;
 use memory::uchu::*;
 use searcher_impl::*;
-use SEARCHER_VAR_WRAP;
 use std::time::{Instant};
 use UCHU_WRAP;
+
 
 
 
@@ -20,10 +20,12 @@ use UCHU_WRAP;
 /// 現局面での最善手を返すぜ☆（*＾～＾*）
 pub fn think() -> Movement{
 
+    // 任意の構造体を作成する。
+    let mut searcher = Searcher::new();
+
     // 時間計測。
-    {
-        SEARCHER_VAR_WRAP.try_write().unwrap().stopwatch = Instant::now();
-    }
+    searcher.stopwatch = Instant::now();
+    searcher.info_stopwatch = Instant::now();
 
     // 現局面まで、状態に進める。（差分更新できない部分）
     // グローバル変数を使う。
@@ -55,13 +57,14 @@ pub fn think() -> Movement{
         uchu.set_kiki_su_by_sn( local_kiki_su_by_sn);
     }
 
-
-    let mut alpha_beta_searcher = AlphaBetaSearcher::new();
-    alpha_beta_searcher.leaf_callback = default_leaf_callback;
-    alpha_beta_searcher.makemove_callback = default_makemove_callback;
-    alpha_beta_searcher.unmakemove_callback = default_unmakemove_callback;
-    alpha_beta_searcher.pick_movements_callback = default_pick_movements_callback;
-    alpha_beta_searcher.compare_best_callback = default_compare_best_callback;
+    // 任意の構造体を受け取る、コールバック カタログを作成する。
+    let mut callback_catalog = CallbackCatalog {
+        visit_leaf_callback: visit_leaf_callback,
+        makemove_callback: makemove_callback,
+        unmakemove_callback: unmakemove_callback,
+        pick_movements_callback: pick_movements_callback,
+        compare_best_callback: compare_best_callback,
+    };
 
 
     // 探索を開始する。
@@ -69,32 +72,29 @@ pub fn think() -> Movement{
     let mut max_depth = 3;
     {
         let eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
-        if eng.contains(&"max_depth".to_string()) {
-            max_depth = eng.get(&"max_depth".to_string()).parse::<i16>().unwrap();
+        if eng.contains(&"depth".to_string()) {
+            max_depth = eng.get(&"depth".to_string()).parse::<i16>().unwrap();
         }
     }
     g_writeln(&format!("info string max_depth:{}.", max_depth));
 
-    // TODO: 反復深化探索
-    let mut best_movement = Movement::new();
+    // 反復深化探索 iteration deeping.
+    let mut best_movement_hash = TORYO_HASH;
     for id_depth in 1..max_depth+1 {
         // 指し手を選ぶ。
-        let (id_best_movement, _best_evaluation) = alpha_beta_searcher.search(id_depth, id_depth,
+        let (id_best_movement_hash, _best_evaluation) = search(&mut searcher, &mut callback_catalog, id_depth, id_depth,
         -<i16>::max_value(), // min_value (負値) を - にすると正数があふれてしまうので、正の最大数に - を付ける。
         <i16>::max_value());
 
         // 反復深化探索の打ち切り。
-        let end; // 計測時間。
-        {
-            end = SEARCHER_VAR_WRAP.try_read().unwrap().stopwatch.elapsed();
-        }
+        let end = searcher.stopwatch.elapsed(); // 計測時間。
         if 30 < end.as_secs() {
             // TODO: 30秒以上考えていたら、すべての探索打切り。
             break;
         }
 
         // 更新
-        best_movement = id_best_movement;
+        best_movement_hash = id_best_movement_hash;
     }
 
 
@@ -124,12 +124,9 @@ pub fn think() -> Movement{
         // 楽観王手の一覧はできているはず。
 
     // 計測時間。
-    let end;
-    {
-        end = SEARCHER_VAR_WRAP.try_write().unwrap().stopwatch.elapsed();
-    }
+    let end = searcher.stopwatch.elapsed();
     g_writeln(&format!("info string {}.{:03}sec.", end.as_secs(), end.subsec_nanos() / 1_000_000));
 
     // 返却
-    best_movement
+    Movement::from_hash(best_movement_hash)
 }

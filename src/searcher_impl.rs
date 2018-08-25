@@ -1,26 +1,27 @@
 use CUR_POSITION_EX_WRAP;
-use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-use SEARCHER_VAR_WRAP;
+use memory::uchu::*;
 use std::collections::HashSet;
 use std::time::{Instant};
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
 
 
-pub struct SearcherVariable {
+/// 任意の構造体を作成する。
+pub struct Searcher {
     pub stopwatch: Instant,
+    pub info_stopwatch: Instant,
 }
-impl SearcherVariable {
-    pub fn new() -> SearcherVariable {
-        SearcherVariable {
-            stopwatch: Instant::now()
+impl Searcher {
+    pub fn new() -> Searcher {
+        Searcher {
+            stopwatch: Instant::now(),
+            info_stopwatch: Instant::now()
         }
     }
 }
 
-pub fn default_leaf_callback() -> (Movement, i16) {
-    // 現局面の駒割りを評価値とする。
+pub fn visit_leaf_callback(searcher: &mut Searcher) -> (i16) {
 
     // 評価値は駒割り。
     let komawari;
@@ -29,8 +30,21 @@ pub fn default_leaf_callback() -> (Movement, i16) {
         komawari = position_ex.komawari;
     }
 
-    // まだ次の手ではないので、点数は逆さにしておくと、さかさまにし直すように動く。
-    (Movement::new(), -komawari)
+    // 読み筋表示。
+    {
+        let end; // 計測時間。
+        {
+            end = searcher.info_stopwatch.elapsed();
+        }
+        if 3 < end.as_secs() {
+            // 3秒以上考えていたら、情報表示。
+            g_writeln(&format!("info depth 0 seldepth 0 time 0 nodes 0 score cp 0 nps 0 pv"));
+            searcher.info_stopwatch = Instant::now();
+        }
+    }
+
+    // 現局面の駒割りを評価値とする。
+    komawari
 }
 
 /// 駒割り。
@@ -56,14 +70,11 @@ fn get_koma_score(km: &KmSyurui) -> i16 {
 }
 
 /// 指し手生成。
-pub fn default_pick_movements_callback(max_depth: i16, cur_depth: i16) -> (HashSet<u64>, bool) {
+pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_depth: i16) -> (HashSet<u64>, bool) {
 
     let mut hashset_movement : HashSet<u64> = HashSet::new();
     // 反復深化探索の打ち切り。
-    let end; // 計測時間。
-    {
-        end = SEARCHER_VAR_WRAP.try_read().unwrap().stopwatch.elapsed();
-    }
+    let end = searcher.stopwatch.elapsed(); // 計測時間。
     if 30 < end.as_secs() {
         // TODO: 30秒以上考えていたら探索打切り。
         return (hashset_movement, true);
@@ -90,7 +101,7 @@ pub fn default_pick_movements_callback(max_depth: i16, cur_depth: i16) -> (HashS
     (hashset_movement, false)
 }
 
-pub fn default_makemove_callback(cap: &KmSyurui) {
+pub fn makemove_callback(cap: &KmSyurui) {
     // 駒割り
     let mut position_ex = CUR_POSITION_EX_WRAP.try_write().unwrap();
     position_ex.komawari += get_koma_score(&cap);
@@ -104,7 +115,7 @@ pub fn default_makemove_callback(cap: &KmSyurui) {
 */
 }
 
-pub fn default_unmakemove_callback(cap: &KmSyurui) {
+pub fn unmakemove_callback(cap: &KmSyurui) {
     // 駒割り
     let mut position_ex = CUR_POSITION_EX_WRAP.try_write().unwrap();
     position_ex.komawari -= get_koma_score(&cap);
@@ -122,21 +133,23 @@ pub fn default_unmakemove_callback(cap: &KmSyurui) {
 ///
 /// # Arguments.
 ///
-/// * `_best_movement` - ベストな指し手。
-/// * `_alpha` - alpha。より良い手があれば増える。
-/// * `_beta` - beta。
-/// * `_movement` - 今回比較する指し手。
-/// * `_child_evaluation` - 今回比較する指し手の評価値。
+/// * `t` - 任意のオブジェクト。
+/// * `best_movement_hash` - ベストな指し手のハッシュ値。
+/// * `alpha` - より良い手があれば増える。
+/// * `beta` - ベータ。
+/// * `movement_hash` - 今回比較する指し手のハッシュ値。
+/// * `evaluation` - 今回比較する指し手の評価値。
 ///
 /// # Returns.
 ///
-/// 探索を打ち切るなら真。
-pub fn default_compare_best_callback(best_movement: &mut Movement, alpha: &mut i16, beta: i16, movement: Movement, child_evaluation: i16) -> (bool, bool) {
+/// 1. 探索を打ち切るなら真。（ベータカット）
+/// 2. 探索をすみやかに安全に終了するなら真。
+pub fn compare_best_callback(searcher: &mut Searcher, best_movement_hash: &mut u64, alpha: &mut i16, beta: i16, movement_hash: u64, child_evaluation: i16) -> (bool, bool) {
 
     // 比較して、一番良い手を選ぶ。（アップデート アルファ）
     if *alpha < child_evaluation {
         *alpha = child_evaluation;
-        *best_movement = movement; // この手。
+        *best_movement_hash = movement_hash; // この手。
     }
 
     if beta < *alpha {
@@ -145,10 +158,7 @@ pub fn default_compare_best_callback(best_movement: &mut Movement, alpha: &mut i
     }
 
     // 反復深化探索の打ち切り。
-    let end; // 計測時間。
-    {
-        end = SEARCHER_VAR_WRAP.try_read().unwrap().stopwatch.elapsed();
-    }
+    let end = searcher.stopwatch.elapsed(); // 計測時間。
     if 30 < end.as_secs() {
         // TODO: 30秒以上考えていたら、すべての探索打切り。
         return (false, true);
