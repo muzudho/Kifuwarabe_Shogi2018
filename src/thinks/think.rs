@@ -11,6 +11,7 @@ use mediators::med_kikisu::*;
 use memory::uchu::*;
 use searcher_impl::*;
 use std::time::{Instant};
+use time_manager::*;
 use UCHU_WRAP;
 
 
@@ -18,10 +19,17 @@ use UCHU_WRAP;
 
 
 /// 現局面での最善手を返すぜ☆（*＾～＾*）
-pub fn think() -> Movement{
+///
+/// # Arguments.
+///
+/// * `milliseconds` - 残り思考時間(ミリ秒)
+pub fn think(milliseconds: u64) -> Movement{
 
     // 任意の構造体を作成する。
     let mut searcher = Searcher::new();
+
+    // 思考時間設定。
+    searcher.thought_max_milliseconds = get_thought_max_milliseconds(milliseconds);
 
     // 時間計測。
     searcher.stopwatch = Instant::now();
@@ -76,6 +84,7 @@ pub fn think() -> Movement{
             max_depth = eng.get(&"depth".to_string()).parse::<i16>().unwrap();
         }
     }
+    g_writeln(&format!("info string thought seconds: {}/{}.", searcher.thought_max_milliseconds, milliseconds));
     g_writeln(&format!("info string max_depth:{}.", max_depth));
 
     // 反復深化探索 iteration deeping.
@@ -88,8 +97,8 @@ pub fn think() -> Movement{
 
         // 反復深化探索の打ち切り。
         let end = searcher.stopwatch.elapsed(); // 計測時間。
-        if 30 < end.as_secs() {
-            // TODO: 30秒以上考えていたら、すべての探索打切り。
+        if searcher.is_thought_timeout(end) {
+            // 指定時間以上考えていたら、すべての探索打切り。
             break;
         }
 

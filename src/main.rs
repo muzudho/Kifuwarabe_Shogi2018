@@ -39,6 +39,7 @@ mod searcher_impl;
 mod shell_impl;
 mod syazo;
 mod thinks;
+mod time_manager;
 mod teigi;
 //mod teiri;
 mod tusin;
@@ -72,7 +73,17 @@ fn main() {
 
     // コマンド トークン構成。
     shell.insert_node("ND_do", "do ", do_do);
+
     shell.insert_node("ND_go", "go", do_go);
+    shell.insert_node("ND_go_btime", "btime", do_go_btime);
+    shell.insert_node_re("ND_go_btimevar", r"(\d+)", do_go_btimevar);
+    shell.insert_node("ND_go_wtime", "wtime", do_go_wtime);
+    shell.insert_node_re("ND_go_wtimevar", r"(\d+)", do_go_wtimevar);
+    shell.insert_node("ND_go_binc", "binc", do_go_binc);
+    shell.insert_node_re("ND_go_bincvar", r"(\d+)", do_go_bincvar);
+    shell.insert_node("ND_go_winc", "winc", do_go_winc);
+    shell.insert_node_re("ND_go_wincvar", r"(\d+)", do_go_wincvar);
+
     shell.insert_node("ND_hash", "hash", do_hash);
     shell.insert_node("ND_hirate", "hirate", do_hirate);
     shell.insert_node("ND_isready", "isready", do_isready);

@@ -3,7 +3,7 @@ use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use memory::uchu::*;
 use std::collections::HashSet;
-use std::time::{Instant};
+use std::time::{Duration, Instant};
 use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
 
@@ -12,13 +12,20 @@ use syazo::sasite_sentaku::*;
 pub struct Searcher {
     pub stopwatch: Instant,
     pub info_stopwatch: Instant,
+    /// 最大思考時間(秒)
+    pub thought_max_milliseconds: u64, 
 }
 impl Searcher {
     pub fn new() -> Searcher {
         Searcher {
             stopwatch: Instant::now(),
-            info_stopwatch: Instant::now()
+            info_stopwatch: Instant::now(),
+            thought_max_milliseconds: 0,
         }
+    }
+
+    pub fn is_thought_timeout (&self, end: Duration) -> bool {
+        self.thought_max_milliseconds < end.as_secs() * 1000 + (end.subsec_nanos() / 1_000_000_000) as u64
     }
 }
 
@@ -76,8 +83,8 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
     let mut hashset_movement : HashSet<u64> = HashSet::new();
     // 反復深化探索の打ち切り。
     let end = searcher.stopwatch.elapsed(); // 計測時間。
-    if 30 < end.as_secs() {
-        // TODO: 30秒以上考えていたら探索打切り。
+    if searcher.is_thought_timeout(end) {
+        // 指定時間以上考えていたら探索打切り。
         return (hashset_movement, true);
     }
 
@@ -190,8 +197,8 @@ pub fn compare_best_callback(searcher: &mut Searcher, best_movement_hash: &mut u
 
     // 反復深化探索の打ち切り。
     let end = searcher.stopwatch.elapsed(); // 計測時間。
-    if 30 < end.as_secs() {
-        // TODO: 30秒以上考えていたら、すべての探索打切り。
+    if searcher.is_thought_timeout(end) {
+        // 指定時間以上考えていたら、すべての探索打切り。
         return (false, true);
     }
 

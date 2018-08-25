@@ -1,3 +1,4 @@
+extern crate lazy_static;
 extern crate rand;
 
 // デバッグ出力。
@@ -26,7 +27,22 @@ use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
 use UCHU_WRAP;
 
+// グローバル変数。
+use std::sync::RwLock;
+lazy_static! {
+    static ref SHELL: RwLock<ShellVariable> = RwLock::new(ShellVariable::new());
+}
 
+pub struct ShellVariable {
+    player_milliseconds_array : [u64; 2],
+}
+impl ShellVariable {
+    pub fn new() -> ShellVariable {
+        ShellVariable {
+            player_milliseconds_array : [0, 0]
+        }
+    }
+}
 
 /*****
  * D *
@@ -58,9 +74,87 @@ pub fn do_do(request: &Request, response:&mut Response) {
  *****/
 
 /// 思考を開始する。bestmoveコマンドを返却する。
-pub fn do_go(_request: &Request, _response:&mut Response) {
-    // go btime 40000 wtime 50000 binc 10000 winc 10000
-    let bestmove = think();
+///
+/// ### 例。
+/// go btime 60000 wtime 50000 byoyomi 10000
+pub fn do_go(_request: &Request, response:&mut Response) {
+    {
+        SHELL.try_write().unwrap().player_milliseconds_array[SN_SEN] = 0;
+        SHELL.try_write().unwrap().player_milliseconds_array[SN_GO] = 0;
+    }
+
+    // 行終了時に実行されるコールバック関数を１つ設定できる。
+    response.set_linebreak_controller(do_go_linebreak);
+
+    response.next = "ND_go_btime";
+}
+
+pub fn do_go_btime(_request: &Request, response:&mut Response) {
+    response.next = "ND_go_btimevar";
+}
+
+pub fn do_go_btimevar(_request: &Request, response:&mut Response) {
+    let word = &response.groups[0];
+    let num: u64 = word.parse().unwrap();
+    {
+        SHELL.try_write().unwrap().player_milliseconds_array[0] = num;
+    }
+    response.next = "ND_go_wtime";
+}
+
+pub fn do_go_wtime(_request: &Request, response:&mut Response) {
+    response.next = "ND_go_wtimevar";
+}
+
+pub fn do_go_wtimevar(_request: &Request, response:&mut Response) {
+    let word = &response.groups[0];
+    let num: u64 = word.parse().unwrap();
+    {
+        SHELL.try_write().unwrap().player_milliseconds_array[1] = num;
+    }
+    response.next = "ND_go_binc";
+}
+
+pub fn do_go_binc(_request: &Request, response:&mut Response) {
+    response.next = "ND_go_bincvar";
+}
+
+pub fn do_go_bincvar(_request: &Request, response:&mut Response) {
+    let word = &response.groups[0];
+    let num: u64 = word.parse().unwrap();
+    {
+        SHELL.try_write().unwrap().player_milliseconds_array[0] += num;
+    }
+    response.next = "ND_go_winc";
+}
+
+pub fn do_go_winc(_request: &Request, response:&mut Response) {
+    response.next = "ND_go_wincvar";
+}
+
+pub fn do_go_wincvar(_request: &Request, response:&mut Response) {
+    let word = &response.groups[0];
+    let num: u64 = word.parse().unwrap();
+    {
+        SHELL.try_write().unwrap().player_milliseconds_array[1] += num;
+    }
+}
+
+pub fn do_go_linebreak(_request: &Request, _response:&mut Response) {
+    // 自分の手番
+    let turn_num;
+    {
+        turn_num = sn_to_num( &GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji));
+    }
+
+    // 自分の持ち時間。
+    let milliseconds;
+    {
+        milliseconds = SHELL.try_read().unwrap().player_milliseconds_array[turn_num];
+    }
+
+    // 思考する。
+    let bestmove = think(milliseconds);
     // 例： bestmove 7g7f
     g_writeln(&format!("bestmove {}", movement_to_usi(&bestmove)));
 }
