@@ -24,7 +24,7 @@ use syazo::sasite_seisei::*;
 use thinks;
 use thinks::think::*;
 use teigi::constants::*;
-use teigi::shogi_syugo::*;
+// use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
 use UCHU_WRAP;
 
@@ -338,7 +338,13 @@ pub fn do_ky0(_request: &Request, _response:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
-    let s = uchu_r.kaku_ky(&KyNums::Start, true);
+    // 局面のクローンを作成。
+    let position0;
+    {
+        position0 = INI_POSITION_WRAP.try_read().unwrap().clone();
+    }
+
+    let s = uchu_r.kaku_ky(&position0, true);
     g_writeln( &s );
 }
 
@@ -347,7 +353,13 @@ pub fn do_ky(_request: &Request, _response:&mut Response) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
-    let s = uchu_r.kaku_ky(&KyNums::Current, true);
+    // 局面のクローンを作成。
+    let position1;
+    {
+        position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+    }
+
+    let s = uchu_r.kaku_ky(&position1, true);
     g_writeln( &s );            
 }
 
@@ -367,8 +379,14 @@ pub fn do_other(_request: &Request, _response:&mut Response){
         // カーソルが２行分場所を取るんだぜ☆（＾～＾）
         hyoji_title();
     }else{
+        // 局面のクローンを作成。
+        let position1;
+        {
+            position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+        }
+
         // 局面表示
-        let s = &uchu_w.kaku_ky(&KyNums::Current, true);
+        let s = &uchu_w.kaku_ky(&position1, true);
         g_writeln( &s );
     }
 }

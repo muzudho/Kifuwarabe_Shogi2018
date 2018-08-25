@@ -8,7 +8,7 @@ use syazo::sasite_seisei::*;
 use syazo::sasite_sentaku::*;
 use time_manager::*;
 
-use teigi::shogi_syugo::*;
+// use teigi::shogi_syugo::*;
 use UCHU_WRAP;
 
 
@@ -138,7 +138,7 @@ pub fn makemove(searcher: &mut Searcher, movement_hash: u64, position1: &mut Pos
     // 現局面表示
     {
         let uchu_r = UCHU_WRAP.try_read().unwrap();
-        g_writeln(&uchu_r.kaku_ky(&KyNums::Current, false));
+        g_writeln(&uchu_r.kaku_ky(&position1, false));
     }
 }
 
@@ -160,7 +160,7 @@ pub fn unmakemove(searcher: &mut Searcher, position1: &mut Position) -> (bool, K
     // 現局面表示
     {
         let uchu_r = UCHU_WRAP.try_read().unwrap();
-        g_writeln(&uchu_r.kaku_ky(&KyNums::Current, false));
+        g_writeln(&uchu_r.kaku_ky(&position1, false));
     }
 
     (successful, cap_kms)

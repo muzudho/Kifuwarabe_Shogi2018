@@ -256,15 +256,7 @@ impl Uchu{
      * 後手から見た盤を表示するぜ☆（＾～＾）
      * デカルト座標の第一象限と x,y 方向が一致するメリットがあるぜ☆（＾～＾）
      */
-    pub fn kaku_ky(&self, num:&KyNums, visible_record: bool)->String{
-        // グローバル変数を使う場合がある。
-        let cur_position = CUR_POSITION_WRAP.try_read().unwrap();
-        let ini_position = INI_POSITION_WRAP.try_read().unwrap();
-
-        let ky = match *num {
-            KyNums::Current => &cur_position,
-            KyNums::Start => &ini_position,
-        };
+    pub fn kaku_ky(&self, position: &Position, visible_record: bool) -> String {
 
         let mut teme = 0;
         let mut teban = Sengo::Sen;
@@ -276,7 +268,7 @@ impl Uchu{
             same = game_record.count_same_ky();
         }
 
-
+        let ky = position;
         // 局面表示
         format!("\
 表示 {95}手目 {96} 同一局面{97}回目
