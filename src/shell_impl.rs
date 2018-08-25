@@ -16,6 +16,7 @@ use kifuwarabe_shell::*;
 use kifuwarabe_usi::*;
 use memory::uchu::*;
 use rand::Rng;
+use searcher_impl::*;
 use std::collections::HashSet;
 use syazo::sasite_seisei::*;
 use thinks;
@@ -43,10 +44,11 @@ pub fn do_do(request: &Request, response:&mut Response) {
         // 書込許可モードで、ロック。
         let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
         game_record.set_movement(movement);
-        if successful {
-            // 入っている指し手の通り指すぜ☆（＾～＾）
-            game_record.make_movement2(&movement, |&_cap|{});
-        }
+    }
+
+    if successful {
+        // 入っている指し手の通り指すぜ☆（＾～＾）
+        makemove(movement.to_hash());
     }
 }
 
@@ -130,10 +132,11 @@ pub fn do_hirate(_request: &Request, _response:&mut Response) {
             {
                 let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
                 game_record.set_movement(movement);
-                if successful {
-                    // 入っている指し手の通り指すぜ☆（＾～＾）
-                    game_record.make_movement2(&movement, |&_cap|{});
-                }
+            }
+
+            if successful {
+                // 入っている指し手の通り指すぜ☆（＾～＾）
+                makemove(movement.to_hash());
             }
         }
     );
@@ -286,10 +289,11 @@ pub fn do_position(request: &Request, response:&mut Response) {
             {
                 let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
                 game_record.set_movement(movement);
-                if successful {
-                    // 指し手を指すぜ☆（＾～＾）
-                    game_record.make_movement2(&movement, |&_cap|{});
-                }
+            }
+
+            if successful {
+                // 指し手を指すぜ☆（＾～＾）
+                makemove(movement.to_hash());
             }
         }
     );
@@ -429,8 +433,9 @@ pub fn do_test(request: &Request, response:&mut Response) {
 
 /// 指した手を１手戻す。
 pub fn do_undo(_request: &Request, _response:&mut Response) {
-    let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-    if !game_record.unmake_movement2(|&_cap|{}) {
+    let (successful, _cap_kms) = unmakemove();
+    if !successful {
+        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
         let teme = game_record.teme;
         g_writeln( &format!("teme={} を、これより戻せません", teme));
     }

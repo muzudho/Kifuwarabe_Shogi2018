@@ -1,4 +1,5 @@
 use CUR_POSITION_EX_WRAP;
+use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use memory::uchu::*;
 use std::collections::HashSet;
@@ -101,10 +102,24 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
     (hashset_movement, false)
 }
 
-pub fn makemove_callback(cap: &KmSyurui) {
+/// １手指す。
+///
+/// # Arguments.
+///
+/// * `movement_hash` - 指し手のハッシュ値。
+pub fn makemove(movement_hash: u64) {
+
+    let cap_kms;
+    {
+        let movement = Movement::from_hash(movement_hash);
+        cap_kms = GAME_RECORD_WRAP.try_write().unwrap().make_movement2(&movement);
+    }
+
     // 駒割り
-    let mut position_ex = CUR_POSITION_EX_WRAP.try_write().unwrap();
-    position_ex.komawari += get_koma_score(&cap);
+    {
+        let mut position_ex = CUR_POSITION_EX_WRAP.try_write().unwrap();
+        position_ex.komawari += get_koma_score(&cap_kms);
+    }
 
 /*
     // 現局面表示
@@ -115,10 +130,21 @@ pub fn makemove_callback(cap: &KmSyurui) {
 */
 }
 
-pub fn unmakemove_callback(cap: &KmSyurui) {
-    // 駒割り
-    let mut position_ex = CUR_POSITION_EX_WRAP.try_write().unwrap();
-    position_ex.komawari -= get_koma_score(&cap);
+pub fn unmakemove() -> (bool, KmSyurui) {
+
+    let successful;
+    let cap_kms;
+    {
+        let (successful2, cap_kms2) = GAME_RECORD_WRAP.try_write().unwrap().unmake_movement2();
+        successful = successful2;
+        cap_kms = cap_kms2;
+    }
+
+    if successful {
+        // 駒割り
+        let mut position_ex = CUR_POSITION_EX_WRAP.try_write().unwrap();
+        position_ex.komawari -= get_koma_score(&cap_kms);
+    }
 
 /*
     // 現局面表示
@@ -127,6 +153,11 @@ pub fn unmakemove_callback(cap: &KmSyurui) {
         g_writeln(&uchu_r.kaku_ky(&KyNums::Current, false));
     }
 */
+
+    (successful, cap_kms)
+}
+pub fn unmakemove_not_return() {
+    unmakemove();
 }
 
 /// 指し手の比較。

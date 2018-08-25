@@ -60,8 +60,8 @@ pub fn think() -> Movement{
     // 任意の構造体を受け取る、コールバック カタログを作成する。
     let mut callback_catalog = CallbackCatalog {
         visit_leaf_callback: visit_leaf_callback,
-        makemove_callback: makemove_callback,
-        unmakemove_callback: unmakemove_callback,
+        makemove_callback: makemove,
+        unmakemove_callback: unmakemove_not_return,
         pick_movements_callback: pick_movements_callback,
         compare_best_callback: compare_best_callback,
     };

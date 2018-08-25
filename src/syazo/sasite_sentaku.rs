@@ -10,11 +10,10 @@ use consoles::asserts::*;
 use GAME_RECORD_WRAP;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-// use memory::uchu::*;
+use searcher_impl::*;
 use std::collections::HashSet;
 use syazo::sasite_element::*;
 use thinks::results::komatori_result::*;
-// use tusin::us_conv::*;
 use UCHU_WRAP;
 
 pub fn choice_1ss_by_hashset( ss_hashset:&HashSet<u64> ) -> Movement {
@@ -134,10 +133,7 @@ pub fn filtering_ss_except_jisatusyu(
         let ss_potential = Movement::from_hash( *hash_ss_potential );
 
         // その手を指してみる
-        {
-            let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
-            game_record.make_movement2(&ss_potential, |&_cap|{});
-        }
+        makemove(ss_potential.to_hash());
         // // 現局面表示
         // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
         // g_writeln( &s1 );            
@@ -182,7 +178,7 @@ pub fn filtering_ss_except_jisatusyu(
 
         // 手を戻す
         {
-            GAME_RECORD_WRAP.try_write().unwrap().unmake_movement2(|&_cap|{});
+            unmakemove();
         }
         // // 現局面表示
         // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
@@ -223,9 +219,7 @@ pub fn filtering_ss_except_sennitite(
             //ss_hashset.insert( *hash_ss_potential );
 
         // その手を指してみる
-        {
-            GAME_RECORD_WRAP.try_write().unwrap().make_movement2(&ss, |&_cap|{});
-        }
+        makemove(ss.to_hash());
         
         // 現局面表示
         // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
@@ -242,7 +236,7 @@ pub fn filtering_ss_except_sennitite(
 
         // 手を戻す FIXME: 打った象が戻ってない？
         {
-            GAME_RECORD_WRAP.try_write().unwrap().unmake_movement2(|&_cap|{});
+            unmakemove();
         }
         // 現局面表示
         // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
