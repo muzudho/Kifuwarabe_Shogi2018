@@ -77,6 +77,9 @@ pub fn think(milliseconds: i32) -> Movement{
         compare_best_callback: compare_best_callback,
     };
 
+    // ノード数を累計していく。
+    let mut display_information = DisplayInformation::new();
+
     // 探索を開始する。
     // どの深さまで潜るか。
     let mut max_depth = 3;
@@ -86,8 +89,7 @@ pub fn think(milliseconds: i32) -> Movement{
             max_depth = eng.get(&"depth".to_string()).parse::<i16>().unwrap();
         }
     }
-    g_writeln(&format!("info string thought seconds: {}/{}.", searcher.thought_max_milliseconds, milliseconds));
-    g_writeln(&format!("info string max_depth:{}.", max_depth));
+    g_writeln(&format!("info string thought seconds: {}/{}, max_depth:{}.", searcher.thought_max_milliseconds, milliseconds, max_depth));
 
     // 反復深化探索 iteration deeping.
     let mut best_movement_hash = RESIGN_HASH;
@@ -96,7 +98,7 @@ pub fn think(milliseconds: i32) -> Movement{
 
         // 指し手を選ぶ。
         // min_value (負値) を - にすると正数があふれてしまうので、正の最大数に - を付ける。
-        let (id_best_movement_hash, best_evaluation) = start(&mut searcher, &mut callback_catalog, id_depth, id_depth, -<i16>::max_value(), <i16>::max_value());
+        let (id_best_movement_hash, best_evaluation) = search(&mut searcher, &mut callback_catalog, id_depth, id_depth, -<i16>::max_value(), <i16>::max_value(), &mut display_information);
 
         searcher.id_evaluation = best_evaluation;
 
@@ -114,8 +116,8 @@ pub fn think(milliseconds: i32) -> Movement{
     // 手を決めたときにも情報表示。
     g_writeln(&format!("info score cp {}", searcher.id_evaluation));
     // VERBOSE
-    g_writeln(&format!("info string score: {}, bestmove: {},  incremental_komawari: {}",
-        searcher.id_evaluation, Movement::from_hash(best_movement_hash), searcher.incremental_komawari));
+    g_writeln(&format!("info string score: {}, nodes: {}, bestmove: {},  incremental_komawari: {}",
+        searcher.id_evaluation, display_information.nodes, Movement::from_hash(best_movement_hash), searcher.incremental_komawari));
 
 
         /*

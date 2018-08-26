@@ -139,7 +139,7 @@ pub fn makemove(searcher: &mut Searcher, movement_hash: u64) {
         let uchu_r = UCHU_WRAP.try_read().unwrap();
         g_writeln(&uchu_r.kaku_ky(&searcher.cur_position, false));
     }
-     */
+    // */
 }
 
 pub fn unmakemove(searcher: &mut Searcher) -> (bool, KmSyurui) {
@@ -157,7 +157,7 @@ pub fn unmakemove(searcher: &mut Searcher) -> (bool, KmSyurui) {
         let uchu_r = UCHU_WRAP.try_read().unwrap();
         g_writeln(&uchu_r.kaku_ky(&searcher.cur_position, false));
     }
-     */
+    // */
 
     (successful, cap_kms)
 }

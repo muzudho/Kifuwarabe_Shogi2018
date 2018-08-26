@@ -8,3 +8,9 @@ position startpos moves 5i5h 5a6b 7i6h 6b7b 1i1h 3c3d 3i4h 5c5d 6h7i 3a4b 3g3f 4
 option name depth type spin default 1 min 1 max 3
 setoption name depth value 2
 setoption name depth value 3
+
+# なぜ投了
+position startpos moves 2g2f 6a7b 2f2e 3c3d 2e2d 1c1d 2d2c+ 2b4d P*2b 2a1c 2b2a+ 3a4b 2a1a 4a3a 1a1b 8c8d L*4f 4d5e 1b1c 5a6a 1c2b 3a4a 2b3b 4a5a 5g5f 5e6d 2c2b 5a5b 2h2c+ 4b5a 4f4c+ 5b6b 2c3d 5c5d 7g7f 5a5b 3b4b 5b4a 3d3a 7b8c 3a4a 6a7b 4b5b 8c9d 8h4d 6b6a 4a6a
+go btime 494000 wtime 289000 binc 10000 winc 10000
+
+- 玉を取られた時点で探索を打ち切りたい。

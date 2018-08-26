@@ -21,18 +21,24 @@ pub fn insert_potential_move(searcher: &Searcher, ss_hashset:&mut HashSet<u64>) 
     // +----------------+
     // | 盤上の駒の移動 |
     // +----------------+
+
+    // 移動元の升をスキャンする。
     for dan_src in 1..10 {
         for suji_src in 1..10 {
+
             let ms_src = suji_dan_to_ms( suji_src, dan_src );
             let km_src = searcher.cur_position.get_km_by_ms( ms_src );
             let sn = km_to_sn(&km_src);
 
             let sn1 = searcher.game_record.get_teban(&Jiai::Ji);
 
-            if match_sn( &sn, &sn1) {
+            if match_sn(&sn, &sn1) {
                 // 手番の駒
 
+                // [成らず]
+
                 let mut dst_hashset : HashSet<umasu> = HashSet::new();
+                // 升と駒から、移動しようとする先を返す。
                 insert_dst_by_ms_km(ms_src, &km_src,
                     false, // 成らず
                     &mut dst_hashset,
@@ -43,6 +49,7 @@ pub fn insert_potential_move(searcher: &Searcher, ss_hashset:&mut HashSet<u64>) 
                 // hyoji_ms_hashset( &dst_hashset );
 
                 for ms_dst in &dst_hashset {
+                    // 自-->至 の arrow を作成。
                     ss_hashset.insert( Movement{
                         source: ms_src,
                         destination: *ms_dst,
@@ -51,12 +58,16 @@ pub fn insert_potential_move(searcher: &Searcher, ss_hashset:&mut HashSet<u64>) 
                     }.to_hash() );
                 }
 
+                // [成り]
+
                 dst_hashset.clear();
                 insert_dst_by_ms_km(ms_src, &km_src,
                     true, // 成り
                     &mut dst_hashset,
                     &searcher.cur_position);
+
                 for ms_dst in &dst_hashset {
+                    // 自-->至 の arrow を作成。
                     ss_hashset.insert( Movement{
                         source: ms_src,
                         destination: *ms_dst,

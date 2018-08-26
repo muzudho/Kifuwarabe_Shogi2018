@@ -2,16 +2,24 @@ use searcher_impl::*;
 use std::time::Duration;
 
 /// マージン 1000ミリ秒。
-const MARGIN_MILLISECONDS : i32 = 1000;
+const MARGIN_MILLISECONDS : i32 = 1_000;
+const LIMIT_MILLISECONDS : i32 = 20_000;
+const MIN_MILLISECONDS : i32 = 1_000;
 
 /// 思考時間の上限。
 pub fn get_thought_max_milliseconds(milliseconds: i32) -> i32 {
-    // 全体の 10分の1 を思考時間に充てる☆（＾ｑ＾）
-    let mut a = milliseconds / 10;
+    // 全体の 30分の1 を思考時間に充てる☆（＾ｑ＾）
+    // 10分なら 600秒なので 1手20秒☆（＾～＾）
+    let mut a = milliseconds / 30;
 
-    // マージン1秒として、 30秒以内に収める。
-    if 30_000 - MARGIN_MILLISECONDS < a {
-        a = 30_000 - MARGIN_MILLISECONDS;
+    // マージン1秒として、 20秒以内に収める。
+    if LIMIT_MILLISECONDS - MARGIN_MILLISECONDS < a {
+        a = LIMIT_MILLISECONDS - MARGIN_MILLISECONDS;
+    }
+
+    // とはいえ、1秒は使うようにする。
+    if a < MIN_MILLISECONDS {
+        a = MIN_MILLISECONDS;
     }
 
     a
