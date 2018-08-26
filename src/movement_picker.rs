@@ -203,6 +203,9 @@ pub fn insert_picked_movement(cur_position: &Position, game_record: &GameRecord,
     // | 盤上の駒の移動 |
     // +----------------+
 
+    // ハッシュセットは使いまわす。
+    let mut hashset1 : HashSet<umasu> = HashSet::new();
+
     // 移動元の升をスキャンする。
     for dan_src in 1..10 {
         for suji_src in 1..10 {
@@ -218,18 +221,18 @@ pub fn insert_picked_movement(cur_position: &Position, game_record: &GameRecord,
 
                 // [成らず]
 
-                let mut dst_hashset : HashSet<umasu> = HashSet::new();
+                hashset1.clear(); // Dst hashset.
                 // 升と駒から、移動しようとする先を返す。
                 insert_dst_by_ms_km(ms_src, &km_src,
                     false, // 成らず
-                    &mut dst_hashset,
+                    &mut hashset1,
                     &cur_position);
 
                 // g_writeln("テスト ポテンシャルムーブ insert_dst_by_ms_km(成らず).");
                 // use consoles::visuals::dumps::*;
-                // hyoji_ms_hashset( &dst_hashset );
+                // hyoji_ms_hashset( &hashset1 );
 
-                for ms_dst in &dst_hashset {
+                for ms_dst in &hashset1 {
                     // 自-->至 の arrow を作成。
                     ss_hashset.insert( Movement{
                         source: ms_src,
@@ -241,13 +244,13 @@ pub fn insert_picked_movement(cur_position: &Position, game_record: &GameRecord,
 
                 // [成り]
 
-                dst_hashset.clear();
+                hashset1.clear(); // Dst hashset.
                 insert_dst_by_ms_km(ms_src, &km_src,
                     true, // 成り
-                    &mut dst_hashset,
+                    &mut hashset1,
                     &cur_position);
 
-                for ms_dst in &dst_hashset {
+                for ms_dst in &hashset1 {
                     // 自-->至 の arrow を作成。
                     ss_hashset.insert( Movement{
                         source: ms_src,
@@ -263,6 +266,7 @@ pub fn insert_picked_movement(cur_position: &Position, game_record: &GameRecord,
     // +----+
     // | 打 |
     // +----+
+    let mut hashset2 : HashSet<usize> = HashSet::new(); // Da Kms hashset.
     for dan_dst in 1..10 {
         for suji_dst in 1..10 {
             let ms_dst = suji_dan_to_ms( suji_dst, dan_dst );
@@ -271,7 +275,7 @@ pub fn insert_picked_movement(cur_position: &Position, game_record: &GameRecord,
                 Koma::Kara => {
                     // 駒が無いところに打つ
 
-                    let mut da_kms_hashset = HashSet::new();
+                    hashset2.clear();
                     for kms_motigoma in MGS_ARRAY.iter() {
 
                         let sn1 = game_record.get_teban(&Jiai::Ji);
@@ -279,11 +283,11 @@ pub fn insert_picked_movement(cur_position: &Position, game_record: &GameRecord,
 
                         if 0<cur_position.get_mg( &km_motigoma ) {
                             // 駒を持っていれば
-                            insert_da_kms_by_ms_km(&cur_position, ms_dst, &km_motigoma, &mut da_kms_hashset);
+                            insert_da_kms_by_ms_km(&cur_position, ms_dst, &km_motigoma, &mut hashset2);
                         }
                     }
-                    for num_kms_da in da_kms_hashset {
-                        let kms = num_to_kms( num_kms_da );
+                    for num_kms_da in &hashset2 {
+                        let kms = num_to_kms(*num_kms_da);
                         ss_hashset.insert( Movement{
                             source: SS_SRC_DA,    // 駒大
                             destination: ms_dst,       // どの升へ行きたいか

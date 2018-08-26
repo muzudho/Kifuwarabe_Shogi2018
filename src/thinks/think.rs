@@ -71,7 +71,8 @@ pub fn think(shell_var: &mut ShellVar, milliseconds: i32) -> Movement{
 
     // 探索を開始する。
     // どの深さまで潜るか。
-    let mut max_depth = 3;
+    // 深さ 3 ぐらいなら 0.015秒ぐらい。
+    let mut max_depth = 4;
     {
         if shell_var.engine_settings.contains(&"depth".to_string()) {
             max_depth = shell_var.engine_settings.get(&"depth".to_string()).parse::<i16>().unwrap();
