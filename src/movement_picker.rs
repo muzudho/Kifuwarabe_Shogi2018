@@ -204,7 +204,8 @@ pub fn insert_picked_movement(cur_position: &Position, game_record: &GameRecord,
     // +----------------+
 
     // ハッシュセットは使いまわす。
-    let mut hashset1 : HashSet<umasu> = HashSet::new();
+    let mut hashset_work : HashSet<umasu> = HashSet::new();
+    let mut hashset_result : HashSet<umasu> = HashSet::new();
 
     // 移動元の升をスキャンする。
     for dan_src in 1..10 {
@@ -221,18 +222,20 @@ pub fn insert_picked_movement(cur_position: &Position, game_record: &GameRecord,
 
                 // [成らず]
 
-                hashset1.clear(); // Dst hashset.
+                hashset_work.clear(); // Dst hashset.
+                hashset_result.clear();
                 // 升と駒から、移動しようとする先を返す。
                 insert_dst_by_ms_km(ms_src, &km_src,
                     false, // 成らず
-                    &mut hashset1,
+                    &mut hashset_work,
+                    &mut hashset_result,
                     &cur_position);
 
                 // g_writeln("テスト ポテンシャルムーブ insert_dst_by_ms_km(成らず).");
                 // use consoles::visuals::dumps::*;
                 // hyoji_ms_hashset( &hashset1 );
 
-                for ms_dst in &hashset1 {
+                for ms_dst in &hashset_result {
                     // 自-->至 の arrow を作成。
                     ss_hashset.insert( Movement{
                         source: ms_src,
@@ -244,13 +247,15 @@ pub fn insert_picked_movement(cur_position: &Position, game_record: &GameRecord,
 
                 // [成り]
 
-                hashset1.clear(); // Dst hashset.
+                hashset_work.clear(); // Dst hashset.
+                hashset_result.clear();
                 insert_dst_by_ms_km(ms_src, &km_src,
                     true, // 成り
-                    &mut hashset1,
+                    &mut hashset_work,
+                    &mut hashset_result,
                     &cur_position);
 
-                for ms_dst in &hashset1 {
+                for ms_dst in &hashset_result {
                     // 自-->至 の arrow を作成。
                     ss_hashset.insert( Movement{
                         source: ms_src,
@@ -382,26 +387,34 @@ pub fn insert_da_kms_by_ms_km(cur_position: &Position, ms_dst:umasu, km_dst:&Kom
     }
     result_kms.insert( kms_to_num(&kms_dst) );
 }
-/**
- * 移動先升生成
- *
- * 1. 移動元升
- * 2. 移動したい駒
- * 
- * 駒の移動先を取得。合法手生成の動き☆（＾～＾）
- *
- * km_src   : 移動元の駒
- * ms_src   : 移動元の升
- * to_nari  : 成りの手を生成するなら真
- * ky       : 現局面
- */
+/// 移動先升生成
+///
+/// 1. 移動元升
+/// 2. 移動したい駒
+/// 
+/// 駒の移動先を取得。合法手生成の動き☆（＾～＾）
+///
+/// # Arguments.
+///
+/// * `km_src` - 移動元の駒。
+/// * `ms_src` - 移動元の升。
+/// * `to_promotion` - 成りの手を生成するなら真。
+/// * `hashset_work` - 空っぽのハッシュセット。計算途中で使う。
+/// * `hashset_result` - 空っぽのハッシュセット。ここに計算結果を入れて返す。
+/// * `position1` - 現局面。
+///
+/// # Returns.
+///
+/// ハッシュセット。
 pub fn insert_dst_by_ms_km(
-    ms_src:umasu,
-    km_src:&Koma,
-    to_nari:bool,
-    result:&mut HashSet<umasu>,
+    ms_src: umasu,
+    km_src: &Koma,
+    to_promotion: bool,
+    hashset_work: &mut HashSet<umasu>,
+    hashset_result: &mut HashSet<umasu>,
     position1: &Position
 ) {
+
     // assert_banjo_ms(ms_src,"Ｉnsert_dst_by_ms_km");
 
     // 移動先の筋、段、駒種類、駒種類インデックス
@@ -412,12 +425,13 @@ pub fn insert_dst_by_ms_km(
     // +--------------+
     // | 成れる駒か？ |
     // +--------------+
-    if to_nari && !kms_can_pro( &kms_src ) {
-        return; // 成れる駒でないなら、成りの動きはしない
+    if to_promotion && !kms_can_pro( &kms_src ) {
+        return; // 成れる駒でないなら、成りの動きはしない。
     }
     
     let kms_num = kms_to_num(&kms_src);
 
+    // 駒の動き。
     for i_dir in 0..KM_UGOKI_LN{ // 指定の駒種類の、全ての逆向きに動ける方向
         let _kmdir;
         let p_kmdir : &KmDir;
@@ -438,7 +452,7 @@ pub fn insert_dst_by_ms_km(
                             if dx+i_east<SUJI_10 {
                                 let ms_src = suji_dan_to_ms(dx+i_east, dy);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
                         }
@@ -447,7 +461,7 @@ pub fn insert_dst_by_ms_km(
                         if dx+1<SUJI_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                         }
                     },
             // 北東
@@ -457,7 +471,7 @@ pub fn insert_dst_by_ms_km(
                             if dx+i_ne<SUJI_10 && dy+i_ne<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx+i_ne, dy+i_ne);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
                         }
@@ -466,7 +480,7 @@ pub fn insert_dst_by_ms_km(
                         if dx+1<SUJI_10 && dy+1<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy+1);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                         }
                     },
             // 北北東
@@ -474,7 +488,7 @@ pub fn insert_dst_by_ms_km(
                         if dx+1<SUJI_10 && dy+2<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy+2);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                         }
                     },
             // 北
@@ -484,7 +498,7 @@ pub fn insert_dst_by_ms_km(
                             if dy+i_south<DAN_10{
                                 let ms_src = suji_dan_to_ms(dx, dy+i_south);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
                         }
@@ -493,7 +507,7 @@ pub fn insert_dst_by_ms_km(
                         if dy+1<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx, dy+1);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                         }
                     },
             // 北北西
@@ -501,7 +515,7 @@ pub fn insert_dst_by_ms_km(
                         if SUJI_0<dx-1 && dy+2<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx-1, dy+2);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                         }
                     },
             // 北西
@@ -511,7 +525,7 @@ pub fn insert_dst_by_ms_km(
                             if SUJI_0<dx-i_se && dy+i_se<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx-i_se, dy+i_se);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
                         }
@@ -520,7 +534,7 @@ pub fn insert_dst_by_ms_km(
                         if dx-1>SUJI_0 && DAN_10>dy+1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy+1);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                         }
                     },
             // 西
@@ -530,7 +544,7 @@ pub fn insert_dst_by_ms_km(
                             if SUJI_0<dx-i_east{
                                 let ms_src = suji_dan_to_ms(dx-i_east, dy);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
                         }
@@ -539,7 +553,7 @@ pub fn insert_dst_by_ms_km(
                         if SUJI_0<dx-1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                         }
                     },
             // 南西
@@ -549,7 +563,7 @@ pub fn insert_dst_by_ms_km(
                             if SUJI_0<dx-i_ne && DAN_0<dy-i_ne {
                                 let ms_src = suji_dan_to_ms(dx-i_ne, dy-i_ne);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
                         }
@@ -558,7 +572,7 @@ pub fn insert_dst_by_ms_km(
                         if SUJI_0<dx-1 && DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy-1);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                         }
                     },
             // 南南西
@@ -566,7 +580,7 @@ pub fn insert_dst_by_ms_km(
                         if SUJI_0<dx-1 && DAN_0<dy-2 {
                             let ms_src = suji_dan_to_ms(dx-1, dy-2);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                         }
                     },
             // 南
@@ -576,7 +590,7 @@ pub fn insert_dst_by_ms_km(
                             if DAN_0<dy-i_north {
                                 let ms_src = suji_dan_to_ms(dx, dy-i_north);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
                         }
@@ -585,7 +599,7 @@ pub fn insert_dst_by_ms_km(
                         if DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx, dy-1);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                         }
                     },
             // 南南東
@@ -593,7 +607,7 @@ pub fn insert_dst_by_ms_km(
                         if dx+1<SUJI_10 && DAN_0<dy-2 {
                             let ms_src = suji_dan_to_ms(dx+1, dy-2);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                         }
                     },
             // 南東
@@ -603,7 +617,7 @@ pub fn insert_dst_by_ms_km(
                             if dx+i_nw<SUJI_10 && DAN_0<dy-i_nw {
                                 let ms_src = suji_dan_to_ms(dx+i_nw, dy-i_nw);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                                 if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
                             }
                         }
@@ -612,14 +626,15 @@ pub fn insert_dst_by_ms_km(
                         if dx+1<SUJI_10 && DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx+1, dy-1);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { result.insert( ms_src); }
+                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
                         }
                     },
             Owari =>{ break },
         }                
     }
 
-    if to_nari {
+    if to_promotion {
+
         // +------------------------------+
         // | 成れる動き以外での成りの禁止 |
         // +------------------------------+
@@ -628,59 +643,35 @@ pub fn insert_dst_by_ms_km(
             K0 | Z0 | N0 => {
                 // ▼きりん、▼ぞう、▼ねこ　は
                 // 移動元または移動先が　１～３段目なら成れる
-                let mut result2 : HashSet<umasu> = HashSet::new();
-                for ms_dst in result.iter() {
+                for ms_dst in hashset_work.iter() {
                     let (_sx2,sy2) = ms_to_suji_dan( ms_src );
                     let (_dx2,dy2) = ms_to_suji_dan( *ms_dst );
-                    if sy2 < DAN_4 && dy2 < DAN_4 { result2.insert( *ms_dst ); }
-                }
-                // 入れ直し
-                result.clear();
-                for ms_dst in result2.iter() {
-                    result.insert( *ms_dst );
+                    if sy2 < DAN_4 && dy2 < DAN_4 { hashset_result.insert( *ms_dst ); }
                 }
             },
             U0 | S0 | H0 => {
                 // ▼うさぎ、▼しし、▼ひよこ　は
                 // 移動先が　１～３段目なら成れる
-                let mut result2 : HashSet<umasu> = HashSet::new();
-                for ms_dst in result.iter() {
+                for ms_dst in hashset_work.iter() {
                     let (_dx2,dy2) = ms_to_suji_dan( *ms_dst );
-                    if dy2 < DAN_4 { result2.insert( *ms_dst ); }
-                }
-                // 入れ直し
-                result.clear();
-                for ms_dst in result2.iter() {
-                    result.insert( *ms_dst );
+                    if dy2 < DAN_4 { hashset_result.insert( *ms_dst ); }
                 }
             },
             K1 | Z1 | N1 => {
                 // △きりん、△ぞう、△ねこ　は
                 // 移動元または移動先が　７～９段目なら成れる
-                let mut result2 : HashSet<umasu> = HashSet::new();
-                for ms_dst in result.iter() {
+                for ms_dst in hashset_work.iter() {
                     let (_sx2,sy2) = ms_to_suji_dan( ms_src );
                     let (_dx2,dy2) = ms_to_suji_dan( *ms_dst );
-                    if DAN_6 < sy2 && DAN_6 < dy2 { result2.insert( *ms_dst ); }
-                }
-                // 入れ直し
-                result.clear();
-                for ms_dst in result2.iter() {
-                    result.insert( *ms_dst );
+                    if DAN_6 < sy2 && DAN_6 < dy2 { hashset_result.insert( *ms_dst ); }
                 }
             },
             U1 | S1 | H1 => {
                 // △うさぎ、△しし、△ひよこ　は
                 // 移動先が　７～９段目なら成れる
-                let mut result2 : HashSet<umasu> = HashSet::new();
-                for ms_dst in result.iter() {
+                for ms_dst in hashset_work.iter() {
                     let (_dx2,dy2) = ms_to_suji_dan( *ms_dst );
-                    if DAN_6 < dy2 { result2.insert( *ms_dst ); }
-                }
-                // 入れ直し
-                result.clear();
-                for ms_dst in result2.iter() {
-                    result.insert( *ms_dst );
+                    if DAN_6 < dy2 { hashset_result.insert( *ms_dst ); }
                 }
             },
             _ => {},
@@ -693,54 +684,30 @@ pub fn insert_dst_by_ms_km(
         match *km_src {
             U0      => {
                 // ▼うさぎ　は１、２段目には進めない
-                let mut result2 : HashSet<umasu> = HashSet::new();
-                for ms_dst in result.iter() {
+                for ms_dst in hashset_work.iter() {
                     let (_dx2,dy2) = ms_to_suji_dan( *ms_dst );
-                    if dy2 < DAN_3 { } else { result2.insert( *ms_dst ); }
-                }
-                // 入れ直し
-                result.clear();
-                for ms_dst in result2.iter() {
-                    result.insert( *ms_dst );
+                    if dy2 < DAN_3 { } else { hashset_result.insert( *ms_dst ); }
                 }
             },
             S0 | H0 => {
                 // ▼しし、▼ひよこ　は１段目には進めない
-                let mut result2 : HashSet<umasu> = HashSet::new();
-                for ms_dst in result.iter() {
+                for ms_dst in hashset_work.iter() {
                     let (_dx2,dy2) = ms_to_suji_dan( *ms_dst );
-                    if dy2 < DAN_2 { } else { result2.insert( *ms_dst ); }
-                }
-                // 入れ直し
-                result.clear();
-                for ms_dst in result2.iter() {
-                    result.insert( *ms_dst );
+                    if dy2 < DAN_2 { } else { hashset_result.insert( *ms_dst ); }
                 }
             },
             U1      => {
                 // △うさぎ　は８、９段目には進めない
-                let mut result2 : HashSet<umasu> = HashSet::new();
-                for ms_dst in result.iter() {
+                for ms_dst in hashset_work.iter() {
                     let (_dx2,dy2) = ms_to_suji_dan( *ms_dst );
-                    if DAN_7 < dy2 { } else { result2.insert( *ms_dst ); }
-                }
-                // 入れ直し
-                result.clear();
-                for ms_dst in result2.iter() {
-                    result.insert( *ms_dst );
+                    if DAN_7 < dy2 { } else { hashset_result.insert( *ms_dst ); }
                 }
             },
             S1 | H1 => {
                 // △しし、△ひよこ　は９段目には進めない
-                let mut result2 : HashSet<umasu> = HashSet::new();
-                for ms_dst in result.iter() {
+                for ms_dst in hashset_work.iter() {
                     let (_dx2,dy2) = ms_to_suji_dan( *ms_dst );
-                    if DAN_8 < dy2 { } else { result2.insert( *ms_dst ); }                
-                }
-                // 入れ直し
-                result.clear();
-                for ms_dst in result2.iter() {
-                    result.insert( *ms_dst );
+                    if DAN_8 < dy2 { } else { hashset_result.insert( *ms_dst ); }                
                 }
             },
             _ => {}
