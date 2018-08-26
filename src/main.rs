@@ -33,6 +33,7 @@ mod mediators;
 mod memory;
 mod misc;
 mod movement_picker;
+mod movement_thinks;
 mod searcher_impl;
 mod shell_impl;
 mod thinks;

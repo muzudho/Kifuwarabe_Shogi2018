@@ -9,6 +9,7 @@ use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use meidai::math_meidai::*;
 use movement_picker::*;
+use movement_thinks::*;
 use searcher_impl::*;
 use teigi::conv::*;
 use teigi::geometries::geo_teigi::*;
