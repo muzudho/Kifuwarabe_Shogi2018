@@ -6,7 +6,6 @@
 use consoles::asserts::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-use movement_picker::*;
 use movement_thinks::*;
 use searcher_impl::*;
 use std::collections::HashSet;

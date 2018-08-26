@@ -3,6 +3,7 @@ use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use memory::uchu::*;
 use movement_picker::*;
+use movement_thinks::*;
 use std::collections::HashSet;
 use std::time::Instant;
 use time_manager::*;
