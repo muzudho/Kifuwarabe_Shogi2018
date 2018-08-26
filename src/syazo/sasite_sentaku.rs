@@ -129,7 +129,7 @@ pub fn filtering_ss_except_jisatusyu(
         // その手を指してみる
         makemove(searcher, ss_potential.to_hash());
         // // 現局面表示
-        // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
+        // let s1 = kaku_ky(&KyNums::Current);
         // g_writeln( &s1 );            
 
         // 狙われている方の玉の位置
@@ -173,7 +173,7 @@ pub fn filtering_ss_except_jisatusyu(
         // 手を戻す
         unmakemove(searcher);
         // // 現局面表示
-        // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
+        // let s2 = kaku_ky(&KyNums::Current);
         // g_writeln( &s2 );            
 
         if jisatusyu {
@@ -215,7 +215,7 @@ pub fn filtering_ss_except_sennitite(
         makemove(searcher, ss.to_hash());
         
         // 現局面表示
-        // let s1 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
+        // let s1 = kaku_ky(&KyNums::Current);
         // g_writeln( &s1 );            
 
         // 千日手かどうかを判定する☆（＾～＾）
@@ -230,7 +230,7 @@ pub fn filtering_ss_except_sennitite(
         // 手を戻す FIXME: 打った象が戻ってない？
         unmakemove(searcher);
         // 現局面表示
-        // let s2 = &UCHU_WRAP.try_read().unwrap().kaku_ky(&KyNums::Current, true);
+        // let s2 = kaku_ky(&KyNums::Current);
         // g_writeln( &s2 );
     }
 

@@ -7,6 +7,7 @@ use consoles;
 use consoles::unit_test::*;
 use consoles::visuals::dumps::*;
 use consoles::visuals::title::*;
+use display_impl::*;
 use kifuwarabe_usi::*;
 use memory::uchu::*;
 use rand::Rng;
@@ -142,10 +143,7 @@ pub fn do_go_linebreak(shell_var: &mut ShellVar, _request: &Request, _response:&
 
 /// 局面ハッシュ表示。
 pub fn do_hash(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    // 読取許可モードで、ロック。
-    let uchu_r = UCHU_WRAP.try_read().unwrap();
-
-    let s = uchu_r.kaku_ky_hash(&shell_var.searcher.game_record);
+    let s = kaku_ky_hash(&shell_var.searcher.game_record);
     g_writeln( &s );
 }
 
@@ -217,10 +215,7 @@ pub fn do_isready(_shell_var: &mut ShellVar, _request: &Request, _response:&mut 
 
 /// 棋譜表示。
 pub fn do_kifu(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    // 読取許可モードで、ロック。
-    let uchu_r = UCHU_WRAP.try_read().unwrap();
-
-    let s = uchu_r.kaku_kifu(&shell_var.searcher.game_record);
+    let s = kaku_kifu(&shell_var.searcher.game_record);
     g_writeln( &s );
 }
 
@@ -260,25 +255,13 @@ pub fn do_kmugoki(_shell_var: &mut ShellVar, _request: &Request, _response:&mut 
 
 /// 初期局面表示。
 pub fn do_ky0(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    // 読取許可モードで、ロック。
-    let uchu_r = UCHU_WRAP.try_read().unwrap();
-
-    // 局面のクローンを作成。
-    let position0 = shell_var.searcher.ini_position.clone();
-
-    let s = uchu_r.kaku_ky(&position0, &shell_var.searcher.game_record, true);
+    let s = kaku_ky(&shell_var.searcher.ini_position, &shell_var.searcher.game_record);
     g_writeln( &s );
 }
 
 /// 現局面表示。
 pub fn do_ky(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    // 読取許可モードで、ロック。
-    let uchu_r = UCHU_WRAP.try_read().unwrap();
-
-    // 局面のクローンを作成。
-    let position1 = shell_var.searcher.cur_position.clone();
-
-    let s = uchu_r.kaku_ky(&position1, &shell_var.searcher.game_record, true);
+    let s = kaku_ky(&shell_var.searcher.cur_position, &shell_var.searcher.game_record);
     g_writeln( &s );            
 }
 
@@ -298,11 +281,8 @@ pub fn do_other(shell_var: &mut ShellVar, _request: &Request, _response:&mut Res
         // カーソルが２行分場所を取るんだぜ☆（＾～＾）
         hyoji_title();
     }else{
-        // 局面のクローンを作成。
-        let position1 = shell_var.searcher.cur_position.clone();
-
         // 局面表示
-        let s = &uchu_w.kaku_ky(&position1, &shell_var.searcher.game_record, true);
+        let s = kaku_ky(&shell_var.searcher.cur_position, &shell_var.searcher.game_record);
         g_writeln( &s );
     }
 }

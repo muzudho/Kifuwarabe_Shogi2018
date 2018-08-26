@@ -7,17 +7,14 @@
 extern crate rand;
 #[macro_use]
 extern crate lazy_static;
-
 extern crate kifuwarabe_shell;
 use kifuwarabe_shell::*;
 
 extern crate kifuwarabe_usi;
-
 extern crate kifuwarabe_position;
 use kifuwarabe_position::*;
 
 extern crate kifuwarabe_movement;
-
 extern crate kifuwarabe_alpha_beta_search;
 
 ///
@@ -29,6 +26,7 @@ extern crate kifuwarabe_alpha_beta_search;
 
 mod config;
 mod consoles;
+mod display_impl;
 mod kasetu;
 mod meidai;
 mod mediators;
@@ -48,6 +46,10 @@ use misc::option::*;
 use shell_impl::*;
 
 
+use rand::Rng;
+
+
+
 // グローバル変数。
 use std::sync::RwLock;
 lazy_static! {
@@ -63,8 +65,26 @@ fn main() {
     let mut shell_var = ShellVar::new();
     // グローバル変数と内容を合わせなくても、初期状態は同じ。
 
-    // 宇宙爆誕。
-    UCHU_WRAP.try_write().unwrap().big_bang(&mut shell_var.searcher.game_record);
+    // 局面ハッシュの種をリセット
+    {
+        // 盤上の駒
+        for i_ms in MASU_0..BAN_SIZE {
+            for i_km in 0..KM_LN {
+                // FIXME 18446744073709551615 が含まれないだろ、どうなってるんだぜ☆（＾～＾）！？
+                shell_var.searcher.game_record.ky_hash_seed.km[i_ms][i_km] = rand::thread_rng().gen_range(0,18446744073709551615);
+            }
+        }
+        // 持ち駒
+        for i_km in 0..KM_LN {
+            for i_mg in 0..MG_MAX {
+                shell_var.searcher.game_record.ky_hash_seed.mg[i_km][i_mg] = rand::thread_rng().gen_range(0,18446744073709551615);
+            }
+        }
+        // 先後
+        for i_sn in 0..SN_LN {
+            shell_var.searcher.game_record.ky_hash_seed.sn[i_sn] = rand::thread_rng().gen_range(0,18446744073709551615);
+        }
+    }
 
     // シェルの作成。
     let mut shell = new_shell();

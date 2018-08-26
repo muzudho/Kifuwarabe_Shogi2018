@@ -136,8 +136,7 @@ pub fn makemove(searcher: &mut Searcher, movement_hash: u64) {
     /*
     // VERBOSE 現局面表示
     {
-        let uchu_r = UCHU_WRAP.try_read().unwrap();
-        g_writeln(&uchu_r.kaku_ky(&searcher.cur_position, false));
+        g_writeln(kaku_ky(&searcher.cur_position));
     }
     // */
 }
@@ -154,8 +153,7 @@ pub fn unmakemove(searcher: &mut Searcher) -> (bool, KmSyurui) {
     /*
     // VERBOSE 現局面表示
     {
-        let uchu_r = UCHU_WRAP.try_read().unwrap();
-        g_writeln(&uchu_r.kaku_ky(&searcher.cur_position, false));
+        g_writeln(kaku_ky(&searcher.cur_position));
     }
     // */
 
