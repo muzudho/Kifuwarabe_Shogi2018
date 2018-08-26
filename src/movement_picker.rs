@@ -201,13 +201,15 @@ pub fn kmdir_id(kmdir:&KmDir) -> usize{
 ///
 /// * `ss_hashset` - ここに結果を入れる。
 /// * `hashset_work` - 空っぽのハッシュセット。計算途中で使う。
-/// * `hashset_result` - 空っぽのハッシュセット。ここに計算結果を入れて返す。
+/// * `hashset_result` - 空っぽのハッシュセット。計算途中で使う。
+/// * `hashset_drop` - 空っぽのハッシュセット。計算途中で使う。
 pub fn insert_picked_movement(
     cur_position: &Position,
     game_record: &GameRecord,
     ss_hashset: &mut HashSet<u64>,
     hashset_work: &mut HashSet<umasu>,
     hashset_result: &mut HashSet<umasu>,
+    hashset_drop: &mut HashSet<umasu>,
     ) {
     // +----------------+
     // | 盤上の駒の移動 |
@@ -277,7 +279,6 @@ pub fn insert_picked_movement(
     // +----+
     // | 打 |
     // +----+
-    let mut hashset2 : HashSet<usize> = HashSet::new(); // Da Kms hashset.
     for dan_dst in 1..10 {
         for suji_dst in 1..10 {
             let ms_dst = suji_dan_to_ms( suji_dst, dan_dst );
@@ -286,7 +287,7 @@ pub fn insert_picked_movement(
                 Koma::Kara => {
                     // 駒が無いところに打つ
 
-                    hashset2.clear();
+                    hashset_drop.clear();
                     for kms_motigoma in MGS_ARRAY.iter() {
 
                         let sn1 = game_record.get_teban(&Jiai::Ji);
@@ -294,10 +295,10 @@ pub fn insert_picked_movement(
 
                         if 0<cur_position.get_mg( &km_motigoma ) {
                             // 駒を持っていれば
-                            insert_da_kms_by_ms_km(&cur_position, ms_dst, &km_motigoma, &mut hashset2);
+                            insert_da_kms_by_ms_km(&cur_position, ms_dst, &km_motigoma, hashset_drop);
                         }
                     }
-                    for num_kms_da in &hashset2 {
+                    for num_kms_da in hashset_drop.iter() {
                         let kms = num_to_kms(*num_kms_da);
                         ss_hashset.insert( Movement{
                             source: SS_SRC_DA,    // 駒大

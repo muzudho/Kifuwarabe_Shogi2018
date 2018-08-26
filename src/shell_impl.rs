@@ -396,7 +396,7 @@ pub fn do_sasite(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
     let mut ss_potential_hashset = HashSet::new();
     
     insert_picked_movement(&shell_var.searcher.cur_position, &shell_var.searcher.game_record, &mut ss_potential_hashset,
-        &mut shell_var.searcher.movepicker_hashset_work, &mut shell_var.searcher.movepicker_hashset_result);
+        &mut shell_var.searcher.movepicker_hashset_work, &mut shell_var.searcher.movepicker_hashset_result, &mut shell_var.searcher.movepicker_hashset_drop);
     g_writeln("----指し手生成 ここから----");
     hyoji_ss_hashset( &ss_potential_hashset );
     g_writeln("----指し手生成 ここまで----");
