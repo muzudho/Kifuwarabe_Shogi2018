@@ -7,10 +7,8 @@
 extern crate rand;
 use rand::Rng;
 
-use CUR_POSITION_WRAP;
 use config::*;
-use GAME_RECORD_WRAP;
-use INI_POSITION_WRAP;
+use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use memory::number_board::*;
 use std::fs::File;
@@ -120,10 +118,8 @@ impl Uchu{
     /**
      * 宇宙誕生
      */
-    pub fn big_bang(&mut self) {
+    pub fn big_bang(&mut self, game_record: &mut GameRecord) {
         // 局面ハッシュの種をリセット
-
-        let mut game_record = GAME_RECORD_WRAP.try_write().unwrap();
 
         // 盤上の駒
         for i_ms in MASU_0..BAN_SIZE {
@@ -143,33 +139,6 @@ impl Uchu{
             game_record.ky_hash_seed.sn[i_sn] = rand::thread_rng().gen_range(0,18446744073709551615);
         }
     }
-    /**
-     * 初期局面、現局面ともにクリアーします。
-     * 手目も 0 に戻します。
-     */
-    pub fn clear_ky01(&mut self){
-        INI_POSITION_WRAP.try_write().unwrap().clear();
-        CUR_POSITION_WRAP.try_write().unwrap().clear();
-        GAME_RECORD_WRAP.try_write().unwrap().set_teme(0);
-    }
-    /**
-     * 初期局面を、現局面にコピーします
-    pub fn copy_ky0_to_ky1(&mut self){
-        // グローバル変数を使う。
-        {
-            let ini_pos =  INI_POSITION_WRAP.try_read().unwrap();
-            // 盤上
-            for i_ms in 0..BAN_SIZE{
-                CUR_POSITION_WRAP.try_write().unwrap().set_km_by_ms(i_ms, ini_pos.get_km_by_ms(i_ms));
-            }
-
-            // 持ち駒
-            for i_mg in 0..KM_LN{
-                CUR_POSITION_WRAP.try_write().unwrap().mg[i_mg] = ini_pos.mg[i_mg];
-            }
-        }
-    }
-     */
 
     /* ******
      * 棋譜 *
@@ -179,24 +148,16 @@ impl Uchu{
     ///
     /// let s = uchu.kaku_kifu();
     /// g_writeln( &s );
-    pub fn kaku_kifu(&self)->String{
+    pub fn kaku_kifu(&self, game_record: &GameRecord)->String{
         let mut s = String::new();
-        let teme: usize;
-        {
-            teme = GAME_RECORD_WRAP.try_read().unwrap().teme;
-        }
+        let teme: usize = game_record.teme;
         for i_teme in 0..teme {
-            let ss;
-            {
-                let game_record = GAME_RECORD_WRAP.try_read().unwrap();
-                ss = game_record.moves[i_teme];
-            }
+            let ss = game_record.moves[i_teme];
             s.push_str(&format!("[{}] {}", i_teme, movement_to_usi(&ss)));
         }
         s
     }
-    pub fn kaku_ky_hash(&self)->String{
-        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+    pub fn kaku_ky_hash(&self, game_record: &GameRecord)->String{
         let mut s = String::new();
         let teme: usize;
         {
@@ -215,8 +176,7 @@ impl Uchu{
     * 自陣
     */
     #[allow(dead_code)]
-    pub fn get_ji_jin(&self)->Vec<umasu>{
-        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+    pub fn get_ji_jin(&self, game_record: &GameRecord)->Vec<umasu>{
         if let Sengo::Sen = game_record.get_teban(&Jiai::Ji) {
             SenteJin::to_elm()
         } else {
@@ -227,8 +187,7 @@ impl Uchu{
     * 相手陣
     */
     #[allow(dead_code)]
-    pub fn get_aite_jin(&self)->Vec<umasu>{
-        let game_record = GAME_RECORD_WRAP.try_read().unwrap();
+    pub fn get_aite_jin(&self, game_record: &GameRecord)->Vec<umasu>{
         if let Sengo::Sen = game_record.get_teban(&Jiai::Ji) {
             GoteJin::to_elm()
         } else {
@@ -242,13 +201,12 @@ impl Uchu{
      * 後手から見た盤を表示するぜ☆（＾～＾）
      * デカルト座標の第一象限と x,y 方向が一致するメリットがあるぜ☆（＾～＾）
      */
-    pub fn kaku_ky(&self, position: &Position, visible_record: bool) -> String {
+    pub fn kaku_ky(&self, position: &Position, game_record: &GameRecord, visible_record: bool) -> String {
 
         let mut teme = 0;
         let mut teban = Sengo::Sen;
         let mut same = 0;
         if visible_record {
-            let game_record = GAME_RECORD_WRAP.try_read().unwrap();
             teme = game_record.get_teme();
             teban = game_record.get_teban(&Jiai::Ji);
             same = game_record.count_same_ky();

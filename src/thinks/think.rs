@@ -1,10 +1,7 @@
 /// 深い考えだぜ☆（＾～＾）
 extern crate rand;
 
-use CUR_POSITION_WRAP;
 use ENGINE_SETTINGS_WRAP;
-use GAME_RECORD_WRAP;
-use INI_POSITION_WRAP;
 use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
@@ -24,15 +21,7 @@ use UCHU_WRAP;
 /// # Arguments.
 ///
 /// * `milliseconds` - 残り思考時間(ミリ秒)
-pub fn think(milliseconds: i32) -> Movement{
-
-    // 任意の構造体を作成する。
-    let mut searcher = Searcher::new();
-    {
-        searcher.ini_position = INI_POSITION_WRAP.try_read().unwrap().clone();
-        searcher.cur_position = CUR_POSITION_WRAP.try_read().unwrap().clone();
-        searcher.game_record = GAME_RECORD_WRAP.try_read().unwrap().clone();
-    }
+pub fn think(searcher: &mut Searcher, milliseconds: i32) -> Movement{
 
     // 思考時間設定。
     searcher.thought_max_milliseconds = get_thought_max_milliseconds(milliseconds);
@@ -98,7 +87,7 @@ pub fn think(milliseconds: i32) -> Movement{
 
         // 指し手を選ぶ。
         // min_value (負値) を - にすると正数があふれてしまうので、正の最大数に - を付ける。
-        let (id_best_movement_hash, best_evaluation) = search(&mut searcher, &mut callback_catalog, id_depth, id_depth, -<i16>::max_value(), <i16>::max_value(), &mut display_information);
+        let (id_best_movement_hash, best_evaluation) = search(searcher, &mut callback_catalog, id_depth, id_depth, -<i16>::max_value(), <i16>::max_value(), &mut display_information);
 
         searcher.id_evaluation = best_evaluation;
 
@@ -119,31 +108,6 @@ pub fn think(milliseconds: i32) -> Movement{
     g_writeln(&format!("info string score: {}, nodes: {}, bestmove: {},  incremental_komawari: {}",
         searcher.id_evaluation, display_information.nodes, Movement::from_hash(best_movement_hash), searcher.incremental_komawari));
 
-
-        /*
-        // 現局面を見て、ビジョンを作り直せだぜ☆（＾～＾）
-        &UCHU_WRAP.try_write().unwrap().remake_visions();
-        */
-
-        /*
-        // 楽観筋
-        for sn in SN_ARRAY.iter() {
-            let ai_sn = hanten_sn( sn );
-            // 相手の　らいおん　の位置を覚える
-            let ai_ms_r = CUR_POSITION_WRAP.try_read().unwrap().ms_r[sn_to_num(&ai_sn)];
-            insert_rakkansuji(&sn, &mut UCHU_WRAP.try_write().unwrap().vision_tree_by_sn[sn_to_num(sn)], ai_ms_r);
-        }
-        // TODO 楽観筋はまだ使ってない☆（＾～＾）
-        */
-
-        // 楽観王手の一覧はできているはず。
-
-    // クローンからオリジナルへ還元する。
-    {
-        INI_POSITION_WRAP.try_write().unwrap().set_all(&searcher.ini_position);
-        CUR_POSITION_WRAP.try_write().unwrap().set_all(&searcher.cur_position);
-        GAME_RECORD_WRAP.try_write().unwrap().set_all(&searcher.game_record);
-    }
 
     // 計測時間。
     let end = searcher.stopwatch.elapsed();

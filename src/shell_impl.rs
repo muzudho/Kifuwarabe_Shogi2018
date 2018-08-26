@@ -7,10 +7,7 @@ use consoles;
 use consoles::unit_test::*;
 use consoles::visuals::dumps::*;
 use consoles::visuals::title::*;
-use CUR_POSITION_WRAP;
 use ENGINE_SETTINGS_WRAP;
-use GAME_RECORD_WRAP;
-use INI_POSITION_WRAP;
 use kifuwarabe_usi::*;
 use memory::uchu::*;
 use rand::Rng;
@@ -27,12 +24,14 @@ use UCHU_WRAP;
 
 // 任意のオブジェクト。
 pub struct ShellVar {
-    player_milliseconds_array : [i32; 2],
+    player_milliseconds_array: [i32; 2],
+    pub searcher: Searcher,
 }
 impl ShellVar {
     pub fn new() -> ShellVar {
         ShellVar {
-            player_milliseconds_array : [0, 0]
+            player_milliseconds_array: [0, 0],
+            searcher: Searcher::new(),
         }
     }
 }
@@ -43,32 +42,17 @@ impl ShellVar {
  *****/
 
 /// 指し手を入れる。
-pub fn do_do(_shell_var: &mut ShellVar, request: &Request, response:&mut Response<ShellVar>) {
-
-    // 任意の構造体を作成する。
-    let mut searcher = Searcher::new();
-    {
-        searcher.ini_position = INI_POSITION_WRAP.try_read().unwrap().clone();
-        searcher.cur_position = CUR_POSITION_WRAP.try_read().unwrap().clone();
-        searcher.game_record = GAME_RECORD_WRAP.try_read().unwrap().clone();
-    }
+pub fn do_do(shell_var: &mut ShellVar, request: &Request, response:&mut Response<ShellVar>) {
 
     // コマンド読取。棋譜に追加され、手目も増える
     let (successful, umov) = parse_movement(&request.line, &mut response.caret, request.line_len);
     let movement = usi_to_movement(successful, &umov);
 
-    searcher.game_record.set_movement(movement);
+    shell_var.searcher.game_record.set_movement(movement);
 
     if successful {
         // 入っている指し手の通り指すぜ☆（＾～＾）
-        makemove(&mut searcher, movement.to_hash());
-
-        // クローンからオリジナルへ還元する。
-        {
-            INI_POSITION_WRAP.try_write().unwrap().set_all(&searcher.ini_position);
-            CUR_POSITION_WRAP.try_write().unwrap().set_all(&searcher.cur_position);
-            GAME_RECORD_WRAP.try_write().unwrap().set_all(&searcher.game_record);
-        }
+        makemove(&mut shell_var.searcher, movement.to_hash());
     }
 }
 
@@ -137,16 +121,13 @@ pub fn do_go_wincvar(shell_var: &mut ShellVar, _request: &Request, response:&mut
 
 pub fn do_go_linebreak(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     // 自分の手番
-    let turn_num;
-    {
-        turn_num = sn_to_num( &GAME_RECORD_WRAP.try_read().unwrap().get_teban(&Jiai::Ji));
-    }
+    let turn_num = sn_to_num( &shell_var.searcher.game_record.get_teban(&Jiai::Ji));
 
     // 自分の持ち時間。
     let milliseconds = shell_var.player_milliseconds_array[turn_num];
 
     // 思考する。
-    let bestmove = think(milliseconds);
+    let bestmove = think(&mut shell_var.searcher, milliseconds);
 
     // 例： bestmove 7g7f
     g_writeln(&format!("bestmove {}", movement_to_usi(&bestmove)));
@@ -157,28 +138,23 @@ pub fn do_go_linebreak(shell_var: &mut ShellVar, _request: &Request, _response:&
  *****/
 
 /// 局面ハッシュ表示。
-pub fn do_hash(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_hash(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
-    let s = uchu_r.kaku_ky_hash();
+    let s = uchu_r.kaku_ky_hash(&shell_var.searcher.game_record);
     g_writeln( &s );
 }
 
 /// 平手初期局面にする。
-pub fn do_hirate(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    // 局面をクリアー。手目も 0 に戻します。
-    UCHU_WRAP.try_write().unwrap().clear_ky01();
-
-    let mut searcher = Searcher::new();
-    {
-        searcher.ini_position = INI_POSITION_WRAP.try_read().unwrap().clone();
-        searcher.cur_position = CUR_POSITION_WRAP.try_read().unwrap().clone();
-        searcher.game_record = GAME_RECORD_WRAP.try_read().unwrap().clone();
-    }
+pub fn do_hirate(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+    // 初期局面、現局面ともにクリアーします。手目も 0 に戻します。
+    shell_var.searcher.ini_position.clear();
+    shell_var.searcher.cur_position.clear();
+    shell_var.searcher.game_record.set_teme(0);
 
     parse_position(
-        &mut searcher,
+        &mut shell_var.searcher,
         &KY1.to_string(),
         #[allow(unused_mut)]
         |mut searcher, hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|
@@ -221,13 +197,6 @@ pub fn do_hirate(_shell_var: &mut ShellVar, _request: &Request, _response:&mut R
             }
         }
     );
-
-    // クローンからオリジナルへ還元する。
-    {
-        INI_POSITION_WRAP.try_write().unwrap().set_all(&searcher.ini_position);
-        CUR_POSITION_WRAP.try_write().unwrap().set_all(&searcher.cur_position);
-        GAME_RECORD_WRAP.try_write().unwrap().set_all(&searcher.game_record);
-    }
 }
 
 /*****
@@ -244,11 +213,11 @@ pub fn do_isready(_shell_var: &mut ShellVar, _request: &Request, _response:&mut 
  *****/
 
 /// 棋譜表示。
-pub fn do_kifu(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_kifu(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
-    let s = uchu_r.kaku_kifu();
+    let s = uchu_r.kaku_kifu(&shell_var.searcher.game_record);
     g_writeln( &s );
 }
 
@@ -287,26 +256,26 @@ pub fn do_kmugoki(_shell_var: &mut ShellVar, _request: &Request, _response:&mut 
 }
 
 /// 初期局面表示。
-pub fn do_ky0(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_ky0(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
     // 局面のクローンを作成。
-    let position0 = INI_POSITION_WRAP.try_read().unwrap().clone();
+    let position0 = shell_var.searcher.ini_position.clone();
 
-    let s = uchu_r.kaku_ky(&position0, true);
+    let s = uchu_r.kaku_ky(&position0, &shell_var.searcher.game_record, true);
     g_writeln( &s );
 }
 
 /// 現局面表示。
-pub fn do_ky(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_ky(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
     // 局面のクローンを作成。
-    let position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+    let position1 = shell_var.searcher.cur_position.clone();
 
-    let s = uchu_r.kaku_ky(&position1, true);
+    let s = uchu_r.kaku_ky(&position1, &shell_var.searcher.game_record, true);
     g_writeln( &s );            
 }
 
@@ -315,7 +284,7 @@ pub fn do_ky(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Respo
  * O *
  *****/
 
-pub fn do_other(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>){
+pub fn do_other(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>){
     // 書込許可モードで、ロック。
     let mut uchu_w = UCHU_WRAP.try_write().unwrap();
     if !&uchu_w.dialogue_mode {
@@ -327,10 +296,10 @@ pub fn do_other(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
         hyoji_title();
     }else{
         // 局面のクローンを作成。
-        let position1 = CUR_POSITION_WRAP.try_read().unwrap().clone();
+        let position1 = shell_var.searcher.cur_position.clone();
 
         // 局面表示
-        let s = &uchu_w.kaku_ky(&position1, true);
+        let s = &uchu_w.kaku_ky(&position1, &shell_var.searcher.game_record, true);
         g_writeln( &s );
     }
 }
@@ -342,20 +311,15 @@ pub fn do_other(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
  *****/
 
 /// USIプロトコル参照。
-pub fn do_position(_shell_var: &mut ShellVar, request: &Request, response:&mut Response<ShellVar>) {
-    // 局面をクリアー。手目も 0 に戻します。
-    UCHU_WRAP.try_write().unwrap().clear_ky01();
-
-    let mut searcher = Searcher::new();
-    {
-        searcher.ini_position = INI_POSITION_WRAP.try_read().unwrap().clone();
-        searcher.cur_position = CUR_POSITION_WRAP.try_read().unwrap().clone();
-        searcher.game_record = GAME_RECORD_WRAP.try_read().unwrap().clone();
-    }
+pub fn do_position(shell_var: &mut ShellVar, request: &Request, response:&mut Response<ShellVar>) {
+    // 初期局面、現局面ともにクリアーします。手目も 0 に戻します。
+    shell_var.searcher.ini_position.clear();
+    shell_var.searcher.cur_position.clear();
+    shell_var.searcher.game_record.set_teme(0);
 
     // positionコマンド読取。
     parse_position(
-        &mut searcher,
+        &mut shell_var.searcher,
         &request.line,
         // 持ち駒数読取。
         |searcher, hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|{
@@ -398,13 +362,6 @@ pub fn do_position(_shell_var: &mut ShellVar, request: &Request, response:&mut R
         }
     );
 
-    // クローンからオリジナルへ還元する。
-    {
-        INI_POSITION_WRAP.try_write().unwrap().set_all(&searcher.ini_position);
-        CUR_POSITION_WRAP.try_write().unwrap().set_all(&searcher.cur_position);
-        GAME_RECORD_WRAP.try_write().unwrap().set_all(&searcher.game_record);
-    }
-
     response.done_line = true;
 }
 
@@ -445,24 +402,16 @@ pub fn do_rndms(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
  *****/
 
 /// 同一局面回数調べ。
-pub fn do_same(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    g_writeln( &format!("同一局面調べ count={}", GAME_RECORD_WRAP.try_read().unwrap().count_same_ky()));
+pub fn do_same(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+    g_writeln( &format!("同一局面調べ count={}", shell_var.searcher.game_record.count_same_ky()));
 }
 
 
 /// 合法手を確認する。
-pub fn do_sasite(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    // 任意の構造体を作成する。
-    let mut searcher = Searcher::new();
-    {
-        searcher.ini_position = INI_POSITION_WRAP.try_read().unwrap().clone();
-        searcher.cur_position = CUR_POSITION_WRAP.try_read().unwrap().clone();
-        searcher.game_record = GAME_RECORD_WRAP.try_read().unwrap().clone();
-    }
-
+pub fn do_sasite(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     // FIXME 合法手とは限らない
     let mut ss_potential_hashset = HashSet::new();
-    insert_potential_move(&searcher, &mut ss_potential_hashset);
+    insert_potential_move(&shell_var.searcher, &mut ss_potential_hashset);
     g_writeln("----指し手生成 ここから----");
     hyoji_ss_hashset( &ss_potential_hashset );
     g_writeln("----指し手生成 ここまで----");
@@ -536,17 +485,9 @@ pub fn do_teigi_conv(_shell_var: &mut ShellVar, _request: &Request, _response:&m
 }
 
 /// いろいろな動作テストをしたいときに汎用的に使う。
-pub fn do_test(_shell_var: &mut ShellVar, request: &Request, response:&mut Response<ShellVar>) {
-    // 任意の構造体を作成する。
-    let mut searcher = Searcher::new();
-    {
-        searcher.ini_position = INI_POSITION_WRAP.try_read().unwrap().clone();
-        searcher.cur_position = CUR_POSITION_WRAP.try_read().unwrap().clone();
-        searcher.game_record = GAME_RECORD_WRAP.try_read().unwrap().clone();
-    }
-
+pub fn do_test(shell_var: &mut ShellVar, request: &Request, response:&mut Response<ShellVar>) {
     g_writeln( &format!("test caret={} len={}", request.caret, request.line_len));
-    test(&searcher, &request.line, &mut response.caret, request.line_len);
+    test(&shell_var.searcher, &request.line, &mut response.caret, request.line_len);
 }
 
 
@@ -555,39 +496,22 @@ pub fn do_test(_shell_var: &mut ShellVar, request: &Request, response:&mut Respo
  *****/
 
 /// 指した手を１手戻す。
-pub fn do_undo(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_undo(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+    let (successful, _cap_kms) = unmakemove(&mut shell_var.searcher);
 
-    // 任意の構造体を作成する。
-    let mut searcher = Searcher::new();
-    {
-        searcher.ini_position = INI_POSITION_WRAP.try_read().unwrap().clone();
-        searcher.cur_position = CUR_POSITION_WRAP.try_read().unwrap().clone();
-        searcher.game_record = GAME_RECORD_WRAP.try_read().unwrap().clone();
-    }
-
-    let (successful, _cap_kms) = unmakemove(&mut searcher);
-
-    if successful {
-        // クローンからオリジナルへ還元する。
-        {
-            INI_POSITION_WRAP.try_write().unwrap().set_all(&searcher.ini_position);
-            CUR_POSITION_WRAP.try_write().unwrap().set_all(&searcher.cur_position);
-            GAME_RECORD_WRAP.try_write().unwrap().set_all(&searcher.game_record);
-        }
-
-    } else {
-        let teme = searcher.game_record.teme;
+    if !successful {
+        let teme = shell_var.searcher.game_record.teme;
         g_writeln( &format!("teme={} を、これより戻せません", teme));
 
     }
 }
 
 /// USIプロトコル参照。
-pub fn do_usinewgame(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    // 書込許可モードで、ロック。
-    let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-    
-    uchu_w.clear_ky01();
+pub fn do_usinewgame(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+    // 初期局面、現局面ともにクリアーします。手目も 0 に戻します。
+    shell_var.searcher.ini_position.clear();
+    shell_var.searcher.cur_position.clear();
+    shell_var.searcher.game_record.set_teme(0);
 }
 
 /// USIプロトコル参照。

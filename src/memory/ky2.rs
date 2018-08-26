@@ -1,4 +1,4 @@
-use GAME_RECORD_WRAP;
+use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use std::collections::*;
 
@@ -26,11 +26,8 @@ impl KmSyugo {
     }
     /// 自分相手
     #[allow(dead_code)]
-    pub fn new_jiai(&self, jiai:&Jiai) -> KmSyugo {
-        let sn0;
-        {
-            sn0 = GAME_RECORD_WRAP.try_read().unwrap().get_teban(&jiai);
-        }
+    pub fn new_jiai(&self, jiai:&Jiai, game_record: &GameRecord) -> KmSyugo {
+        let sn0 = game_record.get_teban(&jiai);
         let mut num_syugo1 : HashSet<usize> = HashSet::new();
         for km in KM_ARRAY.iter() {
             let (sn1,_kms) = km_to_sn_kms( km );

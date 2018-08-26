@@ -17,7 +17,6 @@ extern crate kifuwarabe_position;
 use kifuwarabe_position::*;
 
 extern crate kifuwarabe_movement;
-use kifuwarabe_movement::*;
 
 extern crate kifuwarabe_alpha_beta_search;
 
@@ -56,27 +55,19 @@ lazy_static! {
 
     // エンジン設定。
     static ref ENGINE_SETTINGS_WRAP: RwLock<EngineSettings> = RwLock::new(EngineSettings::new());
-
-    // 初期局面。
-    pub static ref INI_POSITION_WRAP: RwLock<Position> = RwLock::new(Position::new());
-
-    // 探索部に渡す局面。
-    pub static ref CUR_POSITION_WRAP: RwLock<Position> = RwLock::new(Position::new());
-
-    // 棋譜。
-    pub static ref GAME_RECORD_WRAP: RwLock<GameRecord> = RwLock::new(GameRecord::new());
 }
 
 
 
 
 fn main() {
+    
+    // 任意の構造体を作成する。
+    let mut shell_var = ShellVar::new();
+    // グローバル変数と内容を合わせなくても、初期状態は同じ。
 
     // 宇宙爆誕。
-    UCHU_WRAP.try_write().unwrap().big_bang();
-    
-    // 任意のオブジェクト。
-    let mut shell_var = ShellVar::new();
+    UCHU_WRAP.try_write().unwrap().big_bang(&mut shell_var.searcher.game_record);
 
     // シェルの作成。
     let mut shell = new_shell();
