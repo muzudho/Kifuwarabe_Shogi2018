@@ -29,6 +29,10 @@ pub struct Searcher {
     pub cur_position: Position,
     // 棋譜のコピー。
     pub game_record: GameRecord,
+
+    // 使いまわし変数。
+    pub movepicker_hashset_work: HashSet<umasu>,
+    pub movepicker_hashset_result: HashSet<umasu>,
 }
 impl Searcher {
     pub fn new() -> Searcher {
@@ -42,6 +46,8 @@ impl Searcher {
             ini_position: Position::new(),
             cur_position: Position::new(),
             game_record: GameRecord::new(),
+            movepicker_hashset_work: HashSet::new(),
+            movepicker_hashset_result: HashSet::new(),
         }
     }
 }
@@ -99,9 +105,9 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
         return (hashset_movement, true);
     }
 
-
     // 駒の動き方
-    insert_picked_movement(&searcher.cur_position, &searcher.game_record, &mut hashset_movement);
+    insert_picked_movement(&searcher.cur_position, &searcher.game_record, &mut hashset_movement,
+        &mut searcher.movepicker_hashset_work, &mut searcher.movepicker_hashset_result);
     // g_writeln("テスト ポテンシャルムーブ.");
     // use consoles::visuals::dumps::*;
     // hyoji_ss_hashset( &hashset_movement );

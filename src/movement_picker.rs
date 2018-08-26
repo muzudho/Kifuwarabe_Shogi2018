@@ -190,22 +190,28 @@ pub fn kmdir_id(kmdir:&KmDir) -> usize{
 
 
 
-/**
- * 現局面の、任意の移動先升の、
- * - 盤上の駒の移動
- * - 打
- * の指し手を生成。
- *
- * 王手回避漏れや、千日手などのチェックは行っていない
- */
-pub fn insert_picked_movement(cur_position: &Position, game_record: &GameRecord, ss_hashset:&mut HashSet<u64>) {
+/// 現局面の、任意の移動先升の、
+/// - 盤上の駒の移動
+/// - 打
+/// の指し手を生成。
+///
+/// 王手回避漏れや、千日手などのチェックは行っていない。
+///
+/// # Arguments.
+///
+/// * `ss_hashset` - ここに結果を入れる。
+/// * `hashset_work` - 空っぽのハッシュセット。計算途中で使う。
+/// * `hashset_result` - 空っぽのハッシュセット。ここに計算結果を入れて返す。
+pub fn insert_picked_movement(
+    cur_position: &Position,
+    game_record: &GameRecord,
+    ss_hashset: &mut HashSet<u64>,
+    hashset_work: &mut HashSet<umasu>,
+    hashset_result: &mut HashSet<umasu>,
+    ) {
     // +----------------+
     // | 盤上の駒の移動 |
     // +----------------+
-
-    // ハッシュセットは使いまわす。
-    let mut hashset_work : HashSet<umasu> = HashSet::new();
-    let mut hashset_result : HashSet<umasu> = HashSet::new();
 
     // 移動元の升をスキャンする。
     for dan_src in 1..10 {
@@ -227,15 +233,15 @@ pub fn insert_picked_movement(cur_position: &Position, game_record: &GameRecord,
                 // 升と駒から、移動しようとする先を返す。
                 insert_dst_by_ms_km(ms_src, &km_src,
                     false, // 成らず
-                    &mut hashset_work,
-                    &mut hashset_result,
+                    hashset_work,
+                    hashset_result,
                     &cur_position);
 
                 // g_writeln("テスト ポテンシャルムーブ insert_dst_by_ms_km(成らず).");
                 // use consoles::visuals::dumps::*;
                 // hyoji_ms_hashset( &hashset1 );
 
-                for ms_dst in &hashset_result {
+                for ms_dst in hashset_result.iter() {
                     // 自-->至 の arrow を作成。
                     ss_hashset.insert( Movement{
                         source: ms_src,
@@ -251,11 +257,11 @@ pub fn insert_picked_movement(cur_position: &Position, game_record: &GameRecord,
                 hashset_result.clear();
                 insert_dst_by_ms_km(ms_src, &km_src,
                     true, // 成り
-                    &mut hashset_work,
-                    &mut hashset_result,
+                    hashset_work,
+                    hashset_result,
                     &cur_position);
 
-                for ms_dst in &hashset_result {
+                for ms_dst in hashset_result.iter() {
                     // 自-->至 の arrow を作成。
                     ss_hashset.insert( Movement{
                         source: ms_src,
