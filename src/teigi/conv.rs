@@ -5,6 +5,7 @@
 
 use consoles::asserts::*;
 use kifuwarabe_position::*;
+use movement_picker::*;
 use teigi::geometries::geo_teigi::*;
 use teigi::shogi_syugo::*;
 
@@ -111,7 +112,7 @@ pub fn p_to_ms(p:&Point)->umasu{
   * 上下反転
   */
 pub fn hanten_kmdir_joge(kmdir:&KmDir)->KmDir{
-    use teigi::shogi_syugo::KmDir::*;
+    use movement_picker::KmDir::*;
     match *kmdir{
         // 東
         E(b)  => E(b),

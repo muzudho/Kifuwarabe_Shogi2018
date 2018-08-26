@@ -6,7 +6,6 @@ use kifuwarabe_position::*;
 use movement_picker::*;
 use searcher_impl::*;
 use std::collections::HashSet;
-use teigi::shogi_syugo::*;
 use teigi::conv::*;
 use thinks::results::komatori_result::*;
 
@@ -182,7 +181,7 @@ pub fn insert_narazu_src_by_ms_km(
             p_kmdir = &_kmdir;
         };
         // 移動先を開始地点にして、駒の位置を終了地点にする
-        use teigi::shogi_syugo::KmDir::*;
+        use movement_picker::KmDir::*;
         match *p_kmdir {
             // 東
             E  (b)=>if b {
@@ -471,7 +470,7 @@ pub fn insert_narumae_src_by_ms_km(
         };
 
         // 移動先を開始地点にして、駒の位置を終了地点にする
-        use teigi::shogi_syugo::KmDir::*;
+        use movement_picker::KmDir::*;
         match *p_kmdir {
             // 東
             E  (b)=>if b {
