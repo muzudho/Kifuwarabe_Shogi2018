@@ -674,7 +674,12 @@ pub fn insert_dst_by_ms_km(
                     if DAN_6 < dy2 { hashset_result.insert( *ms_dst ); }
                 }
             },
-            _ => {},
+            _ => {
+                // 入れ直し
+                for ms_dst in hashset_work.iter() {
+                    hashset_result.insert(*ms_dst);
+                }
+            },
         }
     } else {
         // +----------------------------------------+
@@ -710,7 +715,12 @@ pub fn insert_dst_by_ms_km(
                     if DAN_8 < dy2 { } else { hashset_result.insert( *ms_dst ); }                
                 }
             },
-            _ => {}
+            _ => {
+                // 入れ直し
+                for ms_dst in hashset_work.iter() {
+                    hashset_result.insert(*ms_dst);
+                }
+            }
         }
     }
 }
