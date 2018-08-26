@@ -10,10 +10,10 @@ use consoles::visuals::title::*;
 use display_impl::*;
 use kifuwarabe_usi::*;
 use memory::uchu::*;
+use movement_picker::*;
 use rand::Rng;
 use searcher_impl::*;
 use std::collections::HashSet;
-use syazo::sasite_seisei::*;
 use thinks;
 use thinks::think::*;
 use teigi::constants::*;
@@ -394,7 +394,7 @@ pub fn do_same(shell_var: &mut ShellVar, _request: &Request, _response:&mut Resp
 pub fn do_sasite(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     // FIXME 合法手とは限らない
     let mut ss_potential_hashset = HashSet::new();
-    insert_potential_move(&shell_var.searcher, &mut ss_potential_hashset);
+    insert_picked_movement(&shell_var.searcher, &mut ss_potential_hashset);
     g_writeln("----指し手生成 ここから----");
     hyoji_ss_hashset( &ss_potential_hashset );
     g_writeln("----指し手生成 ここまで----");

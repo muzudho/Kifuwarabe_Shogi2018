@@ -2,10 +2,9 @@ use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use memory::uchu::*;
+use movement_picker::*;
 use std::collections::HashSet;
 use std::time::Instant;
-use syazo::sasite_seisei::*;
-use syazo::sasite_sentaku::*;
 use time_manager::*;
 
 // use UCHU_WRAP;
@@ -101,7 +100,7 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
 
 
     // 駒の動き方
-    insert_potential_move(&searcher, &mut hashset_movement);
+    insert_picked_movement(&searcher, &mut hashset_movement);
     // g_writeln("テスト ポテンシャルムーブ.");
     // use consoles::visuals::dumps::*;
     // hyoji_ss_hashset( &hashset_movement );

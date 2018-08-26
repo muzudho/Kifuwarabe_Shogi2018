@@ -5,7 +5,7 @@
 use consoles::asserts::*;
 use kifuwarabe_position::*;
 use memory::number_board::*;
-use syazo::sasite_element::*;
+use movement_picker::*;
 use std::collections::HashSet;
 
 /**

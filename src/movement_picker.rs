@@ -1,13 +1,252 @@
-/**
- * 指し手の要素☆（＾～＾）
+/// 指し手生成☆（＾～＾）
+
+/*
+ * 現局面を使った指し手生成
  */
+extern crate rand;
 
 use consoles::asserts::*;
+use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
+use rand::Rng;
 use searcher_impl::*;
 use std::collections::HashSet;
 use teigi::shogi_syugo::*;
 use teigi::conv::*;
+use thinks::results::komatori_result::*;
+
+/**
+ * 現局面の、任意の移動先升の、
+ * - 盤上の駒の移動
+ * - 打
+ * の指し手を生成。
+ *
+ * 王手回避漏れや、千日手などのチェックは行っていない
+ */
+pub fn insert_picked_movement(searcher: &Searcher, ss_hashset:&mut HashSet<u64>) {
+    // +----------------+
+    // | 盤上の駒の移動 |
+    // +----------------+
+
+    // 移動元の升をスキャンする。
+    for dan_src in 1..10 {
+        for suji_src in 1..10 {
+
+            let ms_src = suji_dan_to_ms( suji_src, dan_src );
+            let km_src = searcher.cur_position.get_km_by_ms( ms_src );
+            let sn = km_to_sn(&km_src);
+
+            let sn1 = searcher.game_record.get_teban(&Jiai::Ji);
+
+            if match_sn(&sn, &sn1) {
+                // 手番の駒
+
+                // [成らず]
+
+                let mut dst_hashset : HashSet<umasu> = HashSet::new();
+                // 升と駒から、移動しようとする先を返す。
+                insert_dst_by_ms_km(ms_src, &km_src,
+                    false, // 成らず
+                    &mut dst_hashset,
+                    &searcher.cur_position);
+
+                // g_writeln("テスト ポテンシャルムーブ insert_dst_by_ms_km(成らず).");
+                // use consoles::visuals::dumps::*;
+                // hyoji_ms_hashset( &dst_hashset );
+
+                for ms_dst in &dst_hashset {
+                    // 自-->至 の arrow を作成。
+                    ss_hashset.insert( Movement{
+                        source: ms_src,
+                        destination: *ms_dst,
+                        promotion: false, // 成らず
+                        drop: KmSyurui::Kara,
+                    }.to_hash() );
+                }
+
+                // [成り]
+
+                dst_hashset.clear();
+                insert_dst_by_ms_km(ms_src, &km_src,
+                    true, // 成り
+                    &mut dst_hashset,
+                    &searcher.cur_position);
+
+                for ms_dst in &dst_hashset {
+                    // 自-->至 の arrow を作成。
+                    ss_hashset.insert( Movement{
+                        source: ms_src,
+                        destination: *ms_dst,
+                        promotion: true, // 成り
+                        drop: KmSyurui::Kara,
+                    }.to_hash() );
+                }
+            }
+        }
+    }
+
+    // +----+
+    // | 打 |
+    // +----+
+    for dan_dst in 1..10 {
+        for suji_dst in 1..10 {
+            let ms_dst = suji_dan_to_ms( suji_dst, dan_dst );
+            let km_dst = searcher.cur_position.get_km_by_ms( ms_dst );
+            match km_dst {
+                Koma::Kara => {
+                    // 駒が無いところに打つ
+
+                    let mut da_kms_hashset = HashSet::new();
+                    for kms_motigoma in MGS_ARRAY.iter() {
+
+                        let sn1 = searcher.game_record.get_teban(&Jiai::Ji);
+                        let km_motigoma = sn_kms_to_km( &sn1, kms_motigoma );
+
+                        if 0<searcher.cur_position.get_mg( &km_motigoma ) {
+                            // 駒を持っていれば
+                            insert_da_kms_by_ms_km(&searcher, ms_dst, &km_motigoma, &mut da_kms_hashset);
+                        }
+                    }
+                    for num_kms_da in da_kms_hashset {
+                        let kms = num_to_kms( num_kms_da );
+                        ss_hashset.insert( Movement{
+                            source: SS_SRC_DA,    // 駒大
+                            destination: ms_dst,       // どの升へ行きたいか
+                            promotion: false,        // 打に成りは無し
+                            drop: kms,         // 打った駒種類
+                        }.to_hash() );
+                    }
+                },
+                _ => {},
+            }            
+        }//suji
+    }//dan   
+}
+
+/**
+ * 1. 移動先升指定  ms_dst
+ * 2. 移動先駒指定  km_dst
+ *
+ * 盤上の駒の移動の最初の１つ。打を除く
+ */
+pub fn insert_ss_by_ms_km_on_banjo(searcher: &Searcher, ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut HashSet<u64>) {
+    assert_banjo_ms(ms_dst,"Ｉnsert_ss_by_ms_km_on_banjo");
+
+    // 手番の先後、駒種類
+    let (sn,_kms_dst) = km_to_sn_kms( &km_dst );
+
+    // 移動先に自駒があれば、指し手は何もない。終わり。
+    if match_sn(&searcher.cur_position.get_sn_by_ms(ms_dst), &sn) {
+        return;
+    }
+
+    // ハッシュを作るのに使う
+    let mut ss_hash_builder = Movement::new();
+
+    ss_hash_builder.destination = ms_dst;
+
+    // 移動元の升
+    let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
+
+    // +----------------+
+    // | 盤上（成らず） |
+    // +----------------+
+    // 現局面を読取専用で取得し、ロック。
+    insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, &km_dst, &mut mv_src_hashset);
+    for ms_src in &mv_src_hashset{
+        assert_banjo_ms(
+            *ms_src,
+            "Ｉnsert_ss_by_ms_km_on_banjo ms_src(成らず)"
+        );
+
+        ss_hash_builder.source = *ms_src;
+        // 成らず
+        ss_hash_builder.promotion = false;
+        ss_hash_builder.drop = KmSyurui::Kara;
+        ss_hashset.insert( ss_hash_builder.to_hash() );
+    }
+
+    // +--------------+
+    // | 盤上（成り） |
+    // +--------------+
+    mv_src_hashset.clear();
+
+    insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, &km_dst, &mut mv_src_hashset );
+
+    for ms_src in &mv_src_hashset{
+        assert_banjo_ms(
+            *ms_src,
+            "Ｉnsert_ss_by_ms_km_on_banjo ms_src(成り)"
+        );
+
+        ss_hash_builder.source = *ms_src;
+        // 成り
+        ss_hash_builder.promotion = true;
+        ss_hash_builder.drop = KmSyurui::Kara;
+        ss_hashset.insert( ss_hash_builder.to_hash() );
+    }
+}
+/**
+ * 打
+*
+ * 1. 移動先升指定  ms_dst
+ * 2. 移動先駒指定  km_dst
+ */
+pub fn insert_ss_by_ms_km_on_da(searcher: &Searcher, ms_dst:umasu, km_dst:&Koma, ss_hashset:&mut HashSet<u64>) {
+    assert_banjo_ms(ms_dst,"Ｉnsert_ss_by_ms_km_on_da");
+
+    // 手番の先後、駒種類
+    let (sn,_kms_dst) = km_to_sn_kms( &km_dst );
+
+    // 移動先に自駒があれば、指し手は何もない。終わり。
+    if match_sn( &searcher.cur_position.get_sn_by_ms(ms_dst), &sn ) {
+        return;
+    }
+
+    // ハッシュを作るのに使う
+    let mut ss_hash_builder = Movement::new();
+
+    ss_hash_builder.destination = ms_dst;
+
+    // 移動元の升
+    //let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
+
+    // +----+
+    // | 打 |
+    // +----+
+
+    let mut da_kms_hashset : HashSet<usize> = HashSet::new();
+    insert_da_kms_by_ms_km(&searcher, ms_dst, &km_dst, &mut da_kms_hashset);
+    // 打
+    for num_kms_da in da_kms_hashset.iter() {
+        let kms_da = num_to_kms( *num_kms_da );
+        
+        let hash_ss = Movement{
+            source: SS_SRC_DA,
+            destination: ms_dst,
+            promotion: false,
+            drop: kms_da,
+        }.to_hash();
+        ss_hashset.insert( hash_ss );
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * 成る前を含めない、移動元升生成
@@ -1632,3 +1871,257 @@ pub fn get_ms_vec_as_aigoma(
     vec
 }
 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+pub fn choice_1ss_by_hashset( ss_hashset:&HashSet<u64> ) -> Movement {
+
+    let index = if ss_hashset.len()==0 {
+        0
+    } else {
+        rand::thread_rng().gen_range( 0, ss_hashset.len() )
+    };
+    let mut i = 0;
+    let mut ss_choice_hash = 0;
+    for ss_hash in ss_hashset.iter() {
+        if i==index {
+            ss_choice_hash = *ss_hash;
+            break;
+        }
+        i += 1;
+    }
+    Movement::from_hash( ss_choice_hash )
+}
+
+/**
+ * 王が取られる局面を除く手を選ぶぜ☆（＾～＾）
+ */
+pub fn filtering_ss_except_oute(
+    searcher: &Searcher,
+    ss_hashset_input:&mut HashSet<u64>
+) {
+    // 自玉の位置
+    let ms_r = searcher.cur_position.ms_r[sn_to_num(&searcher.game_record.get_teban(&Jiai::Ji))];
+    // g_writeln(&format!("info string My raion {}.", ms_r ));
+
+    // 王手の一覧を取得
+    let sn1;
+    {
+        sn1 = searcher.game_record.get_teban(&Jiai::Ai);
+    }
+    let komatori_result_hashset : HashSet<u64> = lookup_banjo_catch(&searcher, &sn1, ms_r);
+    if 0<komatori_result_hashset.len() {
+        // 王手されていれば
+
+        // 表示
+        /*
+        // g_writeln(&format!("info string My raion is {} OUTED.", komatori_result_hashset.len() ));
+        for komatori_result_hash0 in komatori_result_hashset.iter() {
+            let komatori_result = KomatoriResult::from_hash( *komatori_result_hash0);
+            // どんな王手か、出力
+            // g_writeln(&format!("info string OUTE: {}.", komatori_result ));
+        }
+        */
+
+        let mut ss_hashset_pickup : HashSet<u64> = HashSet::new();
+
+        // 指せる手から、王手が消えている手だけ、選び抜くぜ☆（＾～＾）
+        'idea: for hash_ss_potential in ss_hashset_input.iter() {
+            let ss_potential = Movement::from_hash( *hash_ss_potential );
+            for komatori_result_hash in komatori_result_hashset.iter() {
+                let komatori_result = KomatoriResult::from_hash( *komatori_result_hash);
+
+                assert_banjo_ms( ss_potential.destination, "(206)Ｓearch_gohoshu_hash" );
+                match komatori_result.get_result(&ss_potential) {
+                        KomatoriResultResult::NoneAttacker
+                    | KomatoriResultResult::NoneAigoma
+                    | KomatoriResultResult::NoneMoved
+                    => {
+                        // 駒取りが起こらないものだけが解決
+                    },
+                    _ => {
+                        // 解決しないのが１つでもあれば、次のアイデアへ☆（＾～＾）
+                        continue 'idea;
+                    },
+                }
+            }
+
+            // 王手を回避している指し手
+            ss_hashset_pickup.insert( *hash_ss_potential );
+        }
+
+        // 振り替え
+        ss_hashset_input.clear();
+        for hash_ss in ss_hashset_pickup.iter() {
+            ss_hashset_input.insert( *hash_ss );
+        }
+
+    } else {
+        // 王手されていなければ
+        // g_writeln(&format!("info string My raion is not outed."));
+    }
+}
+
+/**
+ * 王手されていれば、王手を解除しろだぜ☆（＾～＾）
+ * 千日手には喜んで飛び込めだぜ☆（＾▽＾）ｗｗｗ
+ */
+pub fn filtering_ss_except_jisatusyu(
+    searcher: &mut Searcher,
+    ss_hashset_input:&mut HashSet<u64>
+){
+
+    // 残すのはここに退避する☆（＾～＾）
+    let mut ss_hashset_pickup : HashSet<u64> = HashSet::new();
+
+    // 自玉の位置
+    let sn1 = searcher.game_record.get_teban(&Jiai::Ji);
+    let ms_r = searcher.cur_position.ms_r[ sn_to_num(&sn1) ];
+
+
+    // 王手回避カードを発行する
+    // TODO 王手が２か所から掛かっていたら、全部回避しないといけない☆
+
+    // 指せる手から、王手が消えている手だけ、選び抜くぜ☆（＾～＾）
+    'idea: for hash_ss_potential in ss_hashset_input.iter() {
+        let ss_potential = Movement::from_hash( *hash_ss_potential );
+
+        // その手を指してみる
+        makemove(searcher, ss_potential.to_hash());
+        // // 現局面表示
+        // let s1 = kaku_ky(&KyNums::Current);
+        // g_writeln( &s1 );            
+
+        // 狙われている方の玉の位置
+        let ms_r_new = if ss_potential.source == ms_r {
+                ss_potential.destination // 狙われていた方の玉が動いた先
+            } else {
+                ms_r // 動いていない、狙われていた方の玉の居場所
+            };
+
+        // 利きの再計算
+        // 有り得る移動元が入る☆（＾～＾）
+        let mut attackers : HashSet<umasu> = HashSet::new();
+        let sn1 = searcher.game_record.get_teban(&Jiai::Ji); // 指定の升に駒を動かそうとしている手番
+
+        insert_narazu_src_by_sn_ms(
+            &sn1,
+            ms_r_new, // 指定の升
+            &mut attackers,
+            &searcher.cur_position);
+        insert_narumae_src_by_sn_ms(
+            &sn1,
+            ms_r_new, // 指定の升
+            &mut attackers,
+            &searcher.cur_position);
+
+
+        // 玉が利きに飛び込んでいるか？
+        let jisatusyu = 0<attackers.len();
+        /*
+        // g_writeln(&format!("info string {} evaluated => {} attackers. offence={}->{}",
+            movement_to_usi(&ss_potential),
+            attackers.len(),
+            sn1,
+            ms_r_new
+        ));
+        for ms_atk in attackers.iter() {
+            // g_writeln(&format!("info string ms_atk={}.",ms_atk ));
+        }
+        */
+
+        // 手を戻す
+        unmakemove(searcher);
+        // // 現局面表示
+        // let s2 = kaku_ky(&KyNums::Current);
+        // g_writeln( &s2 );            
+
+        if jisatusyu {
+            continue 'idea;
+        }
+
+        //g_writeln(&format!("info string SOLUTED ss={}.", movement_to_usi(&ss_potential) ));
+        // 問題を全て解決していれば、入れる
+        ss_hashset_pickup.insert(ss_potential.to_hash());
+    }
+    //g_writeln(&format!("info string {} solutions.", ss_hashset_pickup.len() ));
+
+    // 空っぽにする
+    ss_hashset_input.clear();
+    // 振り替える
+    for hash_ss in ss_hashset_pickup.iter() {
+        ss_hashset_input.insert( *hash_ss );
+    }
+}
+
+/**
+ * 千日手の指し手を取り除いた集合を作るぜ☆（＾～＾）
+ *
+ * ただし、千日手を取り除くと手がない場合は、千日手を選ぶぜ☆（＾～＾）
+ */
+pub fn filtering_ss_except_sennitite(
+    searcher: &mut Searcher,
+    ss_hashset_input:&mut HashSet<u64>
+) {
+    let mut ss_hashset_pickup = HashSet::new();
+
+    // 指せる手から、千日手が消えている手だけ選んで、集合を作るぜ☆（＾～＾）
+    'idea: for hash_ss_potential in ss_hashset_input.iter() {
+
+        let ss = Movement::from_hash( *hash_ss_potential );
+            //ss_hashset.insert( *hash_ss_potential );
+
+        // その手を指してみる
+        makemove(searcher, ss.to_hash());
+        
+        // 現局面表示
+        // let s1 = kaku_ky(&KyNums::Current);
+        // g_writeln( &s1 );            
+
+        // 千日手かどうかを判定する☆（＾～＾）
+        {
+            if searcher.game_record.count_same_ky() < SENNTITE_NUM {
+                ss_hashset_pickup.insert( *hash_ss_potential );
+            } else {
+                // 千日手
+            }
+        }
+
+        // 手を戻す FIXME: 打った象が戻ってない？
+        unmakemove(searcher);
+        // 現局面表示
+        // let s2 = kaku_ky(&KyNums::Current);
+        // g_writeln( &s2 );
+    }
+
+    // ただし、千日手を取り除くと手がない場合は、千日手を選ぶぜ☆（＾～＾）
+    if 0==ss_hashset_pickup.len() {
+        return;
+    }
+
+    // 振り替え
+    ss_hashset_input.clear();
+    for hash_ss in ss_hashset_pickup.iter() {
+        ss_hashset_input.insert( *hash_ss );
+    }    
+}

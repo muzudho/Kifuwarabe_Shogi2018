@@ -6,9 +6,8 @@
 use consoles::asserts::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
+use movement_picker::*;
 use searcher_impl::*;
-use syazo::sasite_seisei::*;
-use syazo::sasite_sentaku::*;
 use std::collections::HashSet;
 use thinks::randommove;
 use thinks::results::jisatusyu_result::*;
