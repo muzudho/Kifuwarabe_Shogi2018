@@ -7,7 +7,6 @@ use consoles;
 use consoles::unit_test::*;
 use consoles::visuals::dumps::*;
 use consoles::visuals::title::*;
-use ENGINE_SETTINGS_WRAP;
 use kifuwarabe_usi::*;
 use memory::uchu::*;
 use rand::Rng;
@@ -25,13 +24,17 @@ use UCHU_WRAP;
 // 任意のオブジェクト。
 pub struct ShellVar {
     player_milliseconds_array: [i32; 2],
+    /// 探索部で使う。
     pub searcher: Searcher,
+    /// エンジン設定。
+    pub engine_settings: EngineSettings,
 }
 impl ShellVar {
     pub fn new() -> ShellVar {
         ShellVar {
             player_milliseconds_array: [0, 0],
             searcher: Searcher::new(),
+            engine_settings: EngineSettings::new(),
         }
     }
 }
@@ -127,7 +130,7 @@ pub fn do_go_linebreak(shell_var: &mut ShellVar, _request: &Request, _response:&
     let milliseconds = shell_var.player_milliseconds_array[turn_num];
 
     // 思考する。
-    let bestmove = think(&mut shell_var.searcher, milliseconds);
+    let bestmove = think(shell_var, milliseconds);
 
     // 例： bestmove 7g7f
     g_writeln(&format!("bestmove {}", movement_to_usi(&bestmove)));
@@ -431,12 +434,11 @@ pub fn do_setoption_name(_shell_var: &mut ShellVar, _request: &Request, response
     if VERBOSE { println!("Name."); }
     response.next = "ND_setoption_namevar";
 }
-pub fn do_setoption_namevar(_shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_setoption_namevar(shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
     let name = &response.groups[0];
     if VERBOSE { println!("Namevar begin. [{}]", name); }
 
-    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
-    eng.buffer_name = name.to_string();
+    shell_var.engine_settings.buffer_name = name.to_string();
     response.next = "ND_setoption_value";
     if VERBOSE { println!("Namevar end."); }
 }
@@ -444,19 +446,17 @@ pub fn do_setoption_value(_shell_var: &mut ShellVar, _request: &Request, respons
     if VERBOSE { println!("Value."); }
     response.next = "ND_setoption_valuevar";
 }
-pub fn do_setoption_valuevar(_shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_setoption_valuevar(shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
     let value = &response.groups[0];
     if VERBOSE { println!("Valuevar begin. [{}]", value); }
 
-    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
-    eng.buffer_value = value.to_string();
+    shell_var.engine_settings.buffer_value = value.to_string();
     response.done_line = true;
     if VERBOSE { println!("Valuevar end."); }
 }
-pub fn do_setoption_lineend(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_setoption_lineend(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     if VERBOSE { println!("Lineend begin."); }
-    let mut eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
-    eng.flush();
+    shell_var.engine_settings.flush();
     if VERBOSE { println!("Lineend end."); }
 }
 

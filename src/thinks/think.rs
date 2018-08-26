@@ -1,13 +1,13 @@
 /// 深い考えだぜ☆（＾～＾）
 extern crate rand;
 
-use ENGINE_SETTINGS_WRAP;
 use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use mediators::med_kikisu::*;
 use memory::uchu::*;
 use searcher_impl::*;
+use shell_impl::*;
 use std::time::{Instant};
 use time_manager::*;
 use UCHU_WRAP;
@@ -21,14 +21,14 @@ use UCHU_WRAP;
 /// # Arguments.
 ///
 /// * `milliseconds` - 残り思考時間(ミリ秒)
-pub fn think(searcher: &mut Searcher, milliseconds: i32) -> Movement{
+pub fn think(shell_var: &mut ShellVar, milliseconds: i32) -> Movement{
 
     // 思考時間設定。
-    searcher.thought_max_milliseconds = get_thought_max_milliseconds(milliseconds);
+    shell_var.searcher.thought_max_milliseconds = get_thought_max_milliseconds(milliseconds);
 
     // 時間計測。
-    searcher.stopwatch = Instant::now();
-    searcher.info_stopwatch = Instant::now();
+    shell_var.searcher.stopwatch = Instant::now();
+    shell_var.searcher.info_stopwatch = Instant::now();
 
     // 現局面まで、状態に進める。（差分更新できない部分）
     // グローバル変数を使う。
@@ -47,7 +47,7 @@ pub fn think(searcher: &mut Searcher, milliseconds: i32) -> Movement{
         }
 
         // 相手の利き升調べ（自殺手防止のため）
-        let (local_kiki_su_by_sn, local_kiki_su_by_km) = refresh_kikisu(&searcher.cur_position);
+        let (local_kiki_su_by_sn, local_kiki_su_by_km) = refresh_kikisu(&shell_var.searcher.cur_position);
         // g_writeln( &format!("info string test is_s={}", kasetu::atamakin::is_s() ) );
 
         // 駒別
@@ -73,27 +73,26 @@ pub fn think(searcher: &mut Searcher, milliseconds: i32) -> Movement{
     // どの深さまで潜るか。
     let mut max_depth = 3;
     {
-        let eng = ENGINE_SETTINGS_WRAP.try_write().unwrap();
-        if eng.contains(&"depth".to_string()) {
-            max_depth = eng.get(&"depth".to_string()).parse::<i16>().unwrap();
+        if shell_var.engine_settings.contains(&"depth".to_string()) {
+            max_depth = shell_var.engine_settings.get(&"depth".to_string()).parse::<i16>().unwrap();
         }
     }
-    g_writeln(&format!("info string thought seconds: {}/{}, max_depth:{}.", searcher.thought_max_milliseconds, milliseconds, max_depth));
+    g_writeln(&format!("info string thought seconds: {}/{}, max_depth:{}.", shell_var.searcher.thought_max_milliseconds, milliseconds, max_depth));
 
     // 反復深化探索 iteration deeping.
     let mut best_movement_hash = RESIGN_HASH;
     for id_depth in 1..max_depth+1 {
-        searcher.id_cur_depth = id_depth;
+        shell_var.searcher.id_cur_depth = id_depth;
 
         // 指し手を選ぶ。
         // min_value (負値) を - にすると正数があふれてしまうので、正の最大数に - を付ける。
-        let (id_best_movement_hash, best_evaluation) = search(searcher, &mut callback_catalog, id_depth, id_depth, -<i16>::max_value(), <i16>::max_value(), &mut display_information);
+        let (id_best_movement_hash, best_evaluation) = search(&mut shell_var.searcher, &mut callback_catalog, id_depth, id_depth, -<i16>::max_value(), <i16>::max_value(), &mut display_information);
 
-        searcher.id_evaluation = best_evaluation;
+        shell_var.searcher.id_evaluation = best_evaluation;
 
         // 反復深化探索の打ち切り。
-        let end = searcher.stopwatch.elapsed(); // 計測時間。
-        if is_thought_timeout(&searcher, end) {
+        let end = shell_var.searcher.stopwatch.elapsed(); // 計測時間。
+        if is_thought_timeout(&shell_var.searcher, end) {
             // 指定時間以上考えていたら、すべての探索打切り。
             break;
         }
@@ -103,14 +102,14 @@ pub fn think(searcher: &mut Searcher, milliseconds: i32) -> Movement{
     }
 
     // 手を決めたときにも情報表示。
-    g_writeln(&format!("info score cp {}", searcher.id_evaluation));
+    g_writeln(&format!("info score cp {}", shell_var.searcher.id_evaluation));
     // VERBOSE
     g_writeln(&format!("info string score: {}, nodes: {}, bestmove: {},  incremental_komawari: {}",
-        searcher.id_evaluation, display_information.nodes, Movement::from_hash(best_movement_hash), searcher.incremental_komawari));
+        shell_var.searcher.id_evaluation, display_information.nodes, Movement::from_hash(best_movement_hash), shell_var.searcher.incremental_komawari));
 
 
     // 計測時間。
-    let end = searcher.stopwatch.elapsed();
+    let end = shell_var.searcher.stopwatch.elapsed();
     g_writeln(&format!("info string {}.{:03}sec.", end.as_secs(), end.subsec_nanos() / 1_000_000));
 
     // 返却

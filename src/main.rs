@@ -52,9 +52,6 @@ use shell_impl::*;
 use std::sync::RwLock;
 lazy_static! {
     static ref UCHU_WRAP: RwLock<Uchu> = RwLock::new(Uchu::new());
-
-    // エンジン設定。
-    static ref ENGINE_SETTINGS_WRAP: RwLock<EngineSettings> = RwLock::new(EngineSettings::new());
 }
 
 
