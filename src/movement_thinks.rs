@@ -6,7 +6,6 @@ use kifuwarabe_position::*;
 use movement_picker::*;
 use searcher_impl::*;
 use std::collections::HashSet;
-use teigi::conv::*;
 use thinks::results::komatori_result::*;
 
 /**
@@ -97,7 +96,7 @@ pub fn insert_ss_by_ms_km_on_da(searcher: &Searcher, ms_dst:umasu, km_dst:&Koma,
     // +----+
 
     let mut da_kms_hashset : HashSet<usize> = HashSet::new();
-    insert_da_kms_by_ms_km(&searcher, ms_dst, &km_dst, &mut da_kms_hashset);
+    insert_da_kms_by_ms_km(&searcher.cur_position, ms_dst, &km_dst, &mut da_kms_hashset);
     // 打
     for num_kms_da in da_kms_hashset.iter() {
         let kms_da = num_to_kms( *num_kms_da );

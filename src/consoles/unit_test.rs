@@ -43,7 +43,7 @@ pub fn test(searcher: &Searcher, line:&String, starts:&mut usize, len:usize) {
         let mut da_kms_hashset : HashSet<usize> = HashSet::new();
         insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
         insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
-        insert_da_kms_by_ms_km      (&searcher, ms_dst, &km, &mut da_kms_hashset);
+        insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, &km, &mut da_kms_hashset);
         hyoji_ms_hashset    ( &mv_src_hashset);
         hyoji_kms_hashset   ( &da_kms_hashset);
 
@@ -88,7 +88,7 @@ pub fn test(searcher: &Searcher, line:&String, starts:&mut usize, len:usize) {
             let mut da_kms_hashset : HashSet<usize> = HashSet::new();
             insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
             insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
-            insert_da_kms_by_ms_km      (&searcher, ms_dst, &km, &mut da_kms_hashset);
+            insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, &km, &mut da_kms_hashset);
             hyoji_ms_hashset    ( &mv_src_hashset);
             hyoji_kms_hashset   ( &da_kms_hashset);
         }
@@ -102,7 +102,7 @@ pub fn test(searcher: &Searcher, line:&String, starts:&mut usize, len:usize) {
             let mut da_kms_hashset : HashSet<usize> = HashSet::new();
             insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
             insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
-            insert_da_kms_by_ms_km      (&searcher, ms_dst, &km, &mut da_kms_hashset);
+            insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, &km, &mut da_kms_hashset);
             hyoji_ms_hashset    ( &mv_src_hashset);
             hyoji_kms_hashset   ( &da_kms_hashset);
         }
@@ -116,7 +116,7 @@ pub fn test(searcher: &Searcher, line:&String, starts:&mut usize, len:usize) {
             let mut da_kms_hashset : HashSet<usize> = HashSet::new();
             insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
             insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
-            insert_da_kms_by_ms_km      (&searcher, ms_dst, &km, &mut da_kms_hashset);
+            insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, &km, &mut da_kms_hashset);
             hyoji_ms_hashset    ( &mv_src_hashset);
             hyoji_kms_hashset   ( &da_kms_hashset);
         }
@@ -130,7 +130,7 @@ pub fn test(searcher: &Searcher, line:&String, starts:&mut usize, len:usize) {
             let mut da_kms_hashset : HashSet<usize> = HashSet::new();
             insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
             insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
-            insert_da_kms_by_ms_km      (&searcher, ms_dst, &km, &mut da_kms_hashset);
+            insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, &km, &mut da_kms_hashset);
             hyoji_ms_hashset    ( &mv_src_hashset);
             hyoji_kms_hashset   ( &da_kms_hashset);
         }

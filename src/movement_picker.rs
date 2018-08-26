@@ -4,14 +4,10 @@
  * 現局面を使った指し手生成
  */
 
-// use consoles::asserts::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-use searcher_impl::*;
 use std::collections::HashSet;
 use std::fmt;
-// use teigi::shogi_syugo::*;
-use teigi::conv::*;
 
 
 
@@ -123,6 +119,58 @@ pub const KM_UGOKI : KmUgoki = KmUgoki{
     ]
 };
 
+ /**
+  * 上下反転
+  */
+pub fn hanten_kmdir_joge(kmdir:&KmDir)->KmDir{
+    use movement_picker::KmDir::*;
+    match *kmdir{
+        // 東
+        E(b)  => E(b),
+        // 北東
+        NE(b) => SE(b),
+        // 北北東（桂馬が戻る動き）
+        NNE   => SSE,
+        // 北
+        N(b)  => S(b),
+        // 北北西（桂馬が戻る動き）
+        NNW   => SSW,
+        // 北西
+        NW(b) => SW(b),
+        // 西
+        W(b)  => W(b),
+        // 南西
+        SW(b) => NW(b),
+        // 南南西（桂馬の動き）
+        SSW   => NNW,
+        // 南
+        S(b)  => N(b),
+        // 南南東（桂馬の動き）
+        SSE   => NNE,
+        // 南東
+        SE(b) => NE(b),
+        // 要素数より1小さい数。エラー値用に使っても可
+        Owari => Owari,
+    }
+}
+/*
+pub fn kmdir_id(kmdir:&KmDir) -> usize{
+    use teigi::shogi_syugo::KmDir::*;
+    match *kmdir {
+        E  (b)=>if b { 0}else{ 1},
+        NE (b)=>if b { 2}else{ 3},
+        N  (b)=>if b { 4}else{ 5},
+        NW (b)=>if b { 6}else{ 7},
+        W  (b)=>if b { 8}else{ 9},
+        SW (b)=>if b {10}else{11},
+        SSW   =>12,
+        S  (b)=>if b {13}else{14},
+        SSE   =>15,
+        SE (b)=>if b {16}else{17},
+        Owari =>18,
+    }
+}
+*/
 
 
 
@@ -150,7 +198,7 @@ pub const KM_UGOKI : KmUgoki = KmUgoki{
  *
  * 王手回避漏れや、千日手などのチェックは行っていない
  */
-pub fn insert_picked_movement(searcher: &Searcher, ss_hashset:&mut HashSet<u64>) {
+pub fn insert_picked_movement(cur_position: &Position, game_record: &GameRecord, ss_hashset:&mut HashSet<u64>) {
     // +----------------+
     // | 盤上の駒の移動 |
     // +----------------+
@@ -160,10 +208,10 @@ pub fn insert_picked_movement(searcher: &Searcher, ss_hashset:&mut HashSet<u64>)
         for suji_src in 1..10 {
 
             let ms_src = suji_dan_to_ms( suji_src, dan_src );
-            let km_src = searcher.cur_position.get_km_by_ms( ms_src );
+            let km_src = cur_position.get_km_by_ms( ms_src );
             let sn = km_to_sn(&km_src);
 
-            let sn1 = searcher.game_record.get_teban(&Jiai::Ji);
+            let sn1 = game_record.get_teban(&Jiai::Ji);
 
             if match_sn(&sn, &sn1) {
                 // 手番の駒
@@ -175,7 +223,7 @@ pub fn insert_picked_movement(searcher: &Searcher, ss_hashset:&mut HashSet<u64>)
                 insert_dst_by_ms_km(ms_src, &km_src,
                     false, // 成らず
                     &mut dst_hashset,
-                    &searcher.cur_position);
+                    &cur_position);
 
                 // g_writeln("テスト ポテンシャルムーブ insert_dst_by_ms_km(成らず).");
                 // use consoles::visuals::dumps::*;
@@ -197,7 +245,7 @@ pub fn insert_picked_movement(searcher: &Searcher, ss_hashset:&mut HashSet<u64>)
                 insert_dst_by_ms_km(ms_src, &km_src,
                     true, // 成り
                     &mut dst_hashset,
-                    &searcher.cur_position);
+                    &cur_position);
 
                 for ms_dst in &dst_hashset {
                     // 自-->至 の arrow を作成。
@@ -218,7 +266,7 @@ pub fn insert_picked_movement(searcher: &Searcher, ss_hashset:&mut HashSet<u64>)
     for dan_dst in 1..10 {
         for suji_dst in 1..10 {
             let ms_dst = suji_dan_to_ms( suji_dst, dan_dst );
-            let km_dst = searcher.cur_position.get_km_by_ms( ms_dst );
+            let km_dst = cur_position.get_km_by_ms( ms_dst );
             match km_dst {
                 Koma::Kara => {
                     // 駒が無いところに打つ
@@ -226,12 +274,12 @@ pub fn insert_picked_movement(searcher: &Searcher, ss_hashset:&mut HashSet<u64>)
                     let mut da_kms_hashset = HashSet::new();
                     for kms_motigoma in MGS_ARRAY.iter() {
 
-                        let sn1 = searcher.game_record.get_teban(&Jiai::Ji);
+                        let sn1 = game_record.get_teban(&Jiai::Ji);
                         let km_motigoma = sn_kms_to_km( &sn1, kms_motigoma );
 
-                        if 0<searcher.cur_position.get_mg( &km_motigoma ) {
+                        if 0<cur_position.get_mg( &km_motigoma ) {
                             // 駒を持っていれば
-                            insert_da_kms_by_ms_km(&searcher, ms_dst, &km_motigoma, &mut da_kms_hashset);
+                            insert_da_kms_by_ms_km(&cur_position, ms_dst, &km_motigoma, &mut da_kms_hashset);
                         }
                     }
                     for num_kms_da in da_kms_hashset {
@@ -258,7 +306,7 @@ pub fn insert_picked_movement(searcher: &Searcher, ss_hashset:&mut HashSet<u64>)
  *
  * そこに打てる駒種類を返す。
  */
-pub fn insert_da_kms_by_ms_km(searcher: &Searcher, ms_dst:umasu, km_dst:&Koma, result_kms:&mut HashSet<usize>){
+pub fn insert_da_kms_by_ms_km(cur_position: &Position, ms_dst:umasu, km_dst:&Koma, result_kms:&mut HashSet<usize>){
     // assert_banjo_ms(ms_dst,"Ｉnsert_da_kms_by_ms_km");
 
     let kms_dst = km_to_kms(&km_dst);
@@ -269,7 +317,7 @@ pub fn insert_da_kms_by_ms_km(searcher: &Searcher, ms_dst:umasu, km_dst:&Koma, r
     // +------------------------+
     // | 打ちたいところは空升か |
     // +------------------------+
-    let km_banjo = searcher.cur_position.get_km_by_ms( ms_dst );
+    let km_banjo = cur_position.get_km_by_ms( ms_dst );
     match km_banjo {
         Koma::Kara => {},
         _ => { return; },// 駒があるところに打つ手は終了
@@ -279,7 +327,7 @@ pub fn insert_da_kms_by_ms_km(searcher: &Searcher, ms_dst:umasu, km_dst:&Koma, r
     // +------------------+
     // | 持っている駒か？ |
     // +------------------+
-    if searcher.cur_position.get_mg( &km_dst ) < 1 {
+    if cur_position.get_mg( &km_dst ) < 1 {
         return; // 持っていない駒は打てない
     }
 
@@ -314,7 +362,7 @@ pub fn insert_da_kms_by_ms_km(searcher: &Searcher, ms_dst:umasu, km_dst:&Koma, r
         },
         H0 => {
             // ▼ひよこ　は２歩できない
-            if dy < DAN_2 || searcher.cur_position.exists_fu_by_sn_suji( &sn, suji ) {return;}
+            if dy < DAN_2 || cur_position.exists_fu_by_sn_suji( &sn, suji ) {return;}
         },
         U1 => {
             // △うさぎ　は８、９段目には進めない
@@ -324,7 +372,7 @@ pub fn insert_da_kms_by_ms_km(searcher: &Searcher, ms_dst:umasu, km_dst:&Koma, r
         S1 => { if DAN_8 < dy {return;} },
         H1 => {
             // △ひよこ　は２歩できない
-            if DAN_8 < dy || searcher.cur_position.exists_fu_by_sn_suji( &sn, suji ) {return;}
+            if DAN_8 < dy || cur_position.exists_fu_by_sn_suji( &sn, suji ) {return;}
         },
         _ => {}
     }

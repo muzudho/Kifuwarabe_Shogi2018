@@ -101,7 +101,7 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
 
 
     // 駒の動き方
-    insert_picked_movement(&searcher, &mut hashset_movement);
+    insert_picked_movement(&searcher.cur_position, &searcher.game_record, &mut hashset_movement);
     // g_writeln("テスト ポテンシャルムーブ.");
     // use consoles::visuals::dumps::*;
     // hyoji_ss_hashset( &hashset_movement );

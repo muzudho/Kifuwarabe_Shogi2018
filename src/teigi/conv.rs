@@ -5,7 +5,6 @@
 
 use consoles::asserts::*;
 use kifuwarabe_position::*;
-use movement_picker::*;
 use teigi::geometries::geo_teigi::*;
 use teigi::shogi_syugo::*;
 
@@ -97,66 +96,3 @@ pub fn p_to_ms(p:&Point)->umasu{
 
     (p.x*10 + p.y) as umasu    
 }
-
-
-
-
-
-
-
-/************
- * 駒の動き *
- ************/
-
- /**
-  * 上下反転
-  */
-pub fn hanten_kmdir_joge(kmdir:&KmDir)->KmDir{
-    use movement_picker::KmDir::*;
-    match *kmdir{
-        // 東
-        E(b)  => E(b),
-        // 北東
-        NE(b) => SE(b),
-        // 北北東（桂馬が戻る動き）
-        NNE   => SSE,
-        // 北
-        N(b)  => S(b),
-        // 北北西（桂馬が戻る動き）
-        NNW   => SSW,
-        // 北西
-        NW(b) => SW(b),
-        // 西
-        W(b)  => W(b),
-        // 南西
-        SW(b) => NW(b),
-        // 南南西（桂馬の動き）
-        SSW   => NNW,
-        // 南
-        S(b)  => N(b),
-        // 南南東（桂馬の動き）
-        SSE   => NNE,
-        // 南東
-        SE(b) => NE(b),
-        // 要素数より1小さい数。エラー値用に使っても可
-        Owari => Owari,
-    }
-}
-/*
-pub fn kmdir_id(kmdir:&KmDir) -> usize{
-    use teigi::shogi_syugo::KmDir::*;
-    match *kmdir {
-        E  (b)=>if b { 0}else{ 1},
-        NE (b)=>if b { 2}else{ 3},
-        N  (b)=>if b { 4}else{ 5},
-        NW (b)=>if b { 6}else{ 7},
-        W  (b)=>if b { 8}else{ 9},
-        SW (b)=>if b {10}else{11},
-        SSW   =>12,
-        S  (b)=>if b {13}else{14},
-        SSE   =>15,
-        SE (b)=>if b {16}else{17},
-        Owari =>18,
-    }
-}
-*/
