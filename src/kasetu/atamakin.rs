@@ -16,7 +16,7 @@ use searcher_impl::*;
  */
 pub fn is_s(searcher: &Searcher) -> bool {
     // 相手玉の位置
-    let ms_r = searcher.cur_position.ms_r[ sn_to_num(&searcher.game_record.get_teban(&Jiai::Ai)) ];
+    let ms_r = searcher.cur_position.ms_r[searcher.game_record.get_teban(&Jiai::Ai) as usize];
 
     let p_r = ms_to_p( ms_r );
     let p_south_r = p_r.to_south();
@@ -28,7 +28,7 @@ pub fn is_s(searcher: &Searcher) -> bool {
     {
         jiai_km = searcher.game_record.get_jiai_by_km( &km );
     }
-    if !match_jiai( &jiai_km, &Jiai::Ji ) { return true; }
+    if jiai_km != Jiai::Ji { return true; }
 
     // g_writeln(&format!("info string south of My raion {} = {}. jiai_km={}.", ms_r, km, jiai_km ));
 
@@ -87,7 +87,7 @@ pub fn is_atamakin(
 ) -> bool {
 
     // 相手らいおんのマス
-    let ms_ai_r = searcher.cur_position.ms_r[ sn_to_num(&searcher.game_record.get_teban(&Jiai::Ai)) ];
+    let ms_ai_r = searcher.cur_position.ms_r[searcher.game_record.get_teban(&Jiai::Ai) as usize];
 
     // らいおん以外の相手の駒種類
     let mut kms_set_ai_c_r = KmsSyugo::new_all();

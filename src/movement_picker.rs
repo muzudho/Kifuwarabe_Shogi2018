@@ -55,7 +55,7 @@ pub enum KmDir{
     // 南東
     SE(bool),
     // 要素数より1小さい数。エラー値用に使っても可
-    Owari
+    Num
 }
 impl fmt::Display for KmDir{
     fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
@@ -74,7 +74,7 @@ impl fmt::Display for KmDir{
             S(b)        => if b { write!(f,"長南")  }else{ write!(f,"南")  },
             SSE         => { write!(f,"南南東")},
             SE(b)       => if b { write!(f,"長南東")}else{ write!(f,"南東")},
-            Owari       => { write!(f,"×")},
+            Num       => { write!(f,"×")},
         }
     }
 }
@@ -87,7 +87,7 @@ impl fmt::Display for KmDir{
 #[allow(dead_code)]
 pub struct KmUgoki{
     // 駒種類ごとに、駒の動きを保持。動ける方向は、駒ごとに可変長配列
-    pub back:[[KmDir;KM_UGOKI_LN];KMS_LN]
+    pub back:[[KmDir; KM_UGOKI_LN]; KmSyurui::Num as usize]
 }
 /**
  * 駒が戻る動き。投了図から現局面へ逆向きに指す思想。
@@ -100,22 +100,21 @@ pub struct KmUgoki{
 pub const KM_UGOKI : KmUgoki = KmUgoki{
     back:[
         // 東,北東,北,北西,西,南西,南南西,南,南南東,南東,終わり
-        /*ら  */ [KmDir::E(false),KmDir::NE(false),           KmDir::N(false),           KmDir::NW(false),KmDir::W(false),KmDir::SW(false),KmDir::S(false),KmDir::SE(false),KmDir::Owari],
-        /*き  */ [KmDir::E(true ),                            KmDir::N(true ),                            KmDir::W(true ),                 KmDir::S(true ),                 KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari],
-        /*ぞ  */ [                KmDir::NE(true ),                                      KmDir::NW(true ),                KmDir::SW(true ),                KmDir::SE(true ),KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari],
-        /*い  */ [KmDir::E(false),KmDir::NE(false),           KmDir::N(false),           KmDir::NW(false),KmDir::W(false),                 KmDir::S(false),                 KmDir::Owari,KmDir::Owari,KmDir::Owari],
-        /*ね  */ [                KmDir::NE(false),           KmDir::N(false),           KmDir::NW(false),                KmDir::SW(false),                KmDir::SE(false),KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari],
-        /*う  */ [                                 KmDir::NNE,                KmDir::NNW                 ,                                                                  KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari],
-        /*し  */ [                                            KmDir::N(true )                            ,                                                                  KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari],
-        /*ひ  */ [                                            KmDir::N(false)                            ,                                                                  KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari],
-        /*ぱき*/ [KmDir::E(true ),KmDir::NE(false),           KmDir::N(true ),           KmDir::NW(false),KmDir::W(true ),KmDir::SW(false),KmDir::S(true ),KmDir::SE(false),KmDir::Owari],
-        /*ぱぞ*/ [KmDir::E(false),KmDir::NE(true ),           KmDir::N(false),           KmDir::NW(true ),KmDir::W(false),KmDir::SW(true ),KmDir::S(false),KmDir::SE(true ),KmDir::Owari],
-        /*ぱね*/ [KmDir::E(false),KmDir::NE(false),           KmDir::N(false),           KmDir::NW(false),KmDir::W(false),                 KmDir::S(false),                 KmDir::Owari,KmDir::Owari,KmDir::Owari],
-        /*ぱう*/ [KmDir::E(false),KmDir::NE(false),           KmDir::N(false),           KmDir::NW(false),KmDir::W(false),                 KmDir::S(false),                 KmDir::Owari,KmDir::Owari,KmDir::Owari],
-        /*ぱし*/ [KmDir::E(false),KmDir::NE(false),           KmDir::N(false),           KmDir::NW(false),KmDir::W(false),                 KmDir::S(false),                 KmDir::Owari,KmDir::Owari,KmDir::Owari],
-        /*ぱひ*/ [KmDir::E(false),KmDir::NE(false),           KmDir::N(false),           KmDir::NW(false),KmDir::W(false),                 KmDir::S(false),                 KmDir::Owari,KmDir::Owari,KmDir::Owari],
-        /*空升*/ [                                                                                                                                                          KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari],
-        /*終り*/ [                                                                                                                                                          KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari,KmDir::Owari],
+        /*ら  */ [KmDir::E(false),KmDir::NE(false),           KmDir::N(false),           KmDir::NW(false),KmDir::W(false),KmDir::SW(false),KmDir::S(false),KmDir::SE(false),KmDir::Num],
+        /*き  */ [KmDir::E(true ),                            KmDir::N(true ),                            KmDir::W(true ),                 KmDir::S(true ),                 KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num],
+        /*ぞ  */ [                KmDir::NE(true ),                                      KmDir::NW(true ),                KmDir::SW(true ),                KmDir::SE(true ),KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num],
+        /*い  */ [KmDir::E(false),KmDir::NE(false),           KmDir::N(false),           KmDir::NW(false),KmDir::W(false),                 KmDir::S(false),                 KmDir::Num,KmDir::Num,KmDir::Num],
+        /*ね  */ [                KmDir::NE(false),           KmDir::N(false),           KmDir::NW(false),                KmDir::SW(false),                KmDir::SE(false),KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num],
+        /*う  */ [                                 KmDir::NNE,                KmDir::NNW                 ,                                                                  KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num],
+        /*し  */ [                                            KmDir::N(true )                            ,                                                                  KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num],
+        /*ひ  */ [                                            KmDir::N(false)                            ,                                                                  KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num],
+        /*ぱき*/ [KmDir::E(true ),KmDir::NE(false),           KmDir::N(true ),           KmDir::NW(false),KmDir::W(true ),KmDir::SW(false),KmDir::S(true ),KmDir::SE(false),KmDir::Num],
+        /*ぱぞ*/ [KmDir::E(false),KmDir::NE(true ),           KmDir::N(false),           KmDir::NW(true ),KmDir::W(false),KmDir::SW(true ),KmDir::S(false),KmDir::SE(true ),KmDir::Num],
+        /*ぱね*/ [KmDir::E(false),KmDir::NE(false),           KmDir::N(false),           KmDir::NW(false),KmDir::W(false),                 KmDir::S(false),                 KmDir::Num,KmDir::Num,KmDir::Num],
+        /*ぱう*/ [KmDir::E(false),KmDir::NE(false),           KmDir::N(false),           KmDir::NW(false),KmDir::W(false),                 KmDir::S(false),                 KmDir::Num,KmDir::Num,KmDir::Num],
+        /*ぱし*/ [KmDir::E(false),KmDir::NE(false),           KmDir::N(false),           KmDir::NW(false),KmDir::W(false),                 KmDir::S(false),                 KmDir::Num,KmDir::Num,KmDir::Num],
+        /*ぱひ*/ [KmDir::E(false),KmDir::NE(false),           KmDir::N(false),           KmDir::NW(false),KmDir::W(false),                 KmDir::S(false),                 KmDir::Num,KmDir::Num,KmDir::Num],
+        /*空升*/ [                                                                                                                                                          KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num,KmDir::Num],
     ]
 };
 
@@ -150,7 +149,7 @@ pub fn hanten_kmdir_joge(kmdir:&KmDir)->KmDir{
         // 南東
         SE(b) => NE(b),
         // 要素数より1小さい数。エラー値用に使っても可
-        Owari => Owari,
+        Num => Num,
     }
 }
 /*
@@ -167,7 +166,7 @@ pub fn kmdir_id(kmdir:&KmDir) -> usize{
         S  (b)=>if b {13}else{14},
         SSE   =>15,
         SE (b)=>if b {16}else{17},
-        Owari =>18,
+        Num =>18,
     }
 }
 */
@@ -225,7 +224,7 @@ pub fn insert_picked_movement(
 
             let sn1 = game_record.get_teban(&Jiai::Ji);
 
-            if match_sn(&sn, &sn1) {
+            if sn == sn1 {
                 // 手番の駒
 
                 // [成らず]
@@ -322,7 +321,12 @@ pub fn insert_picked_movement(
  *
  * そこに打てる駒種類を返す。
  */
-pub fn insert_da_kms_by_ms_km(cur_position: &Position, ms_dst:umasu, km_dst:&Koma, result_kms:&mut HashSet<usize>){
+pub fn insert_da_kms_by_ms_km(
+    cur_position: &Position,
+    ms_dst: umasu,
+    km_dst: &Koma,
+    result_kms: &mut HashSet<usize>
+){
     // assert_banjo_ms(ms_dst,"Ｉnsert_da_kms_by_ms_km");
 
     let kms_dst = km_to_kms(&km_dst);
@@ -392,7 +396,7 @@ pub fn insert_da_kms_by_ms_km(cur_position: &Position, ms_dst:umasu, km_dst:&Kom
         },
         _ => {}
     }
-    result_kms.insert( kms_to_num(&kms_dst) );
+    result_kms.insert(kms_dst as usize);
 }
 /// 移動先升生成
 ///
@@ -436,13 +440,13 @@ pub fn insert_dst_by_ms_km(
         return; // 成れる駒でないなら、成りの動きはしない。
     }
     
-    let kms_num = kms_to_num(&kms_src);
+    let kms_num = kms_src as usize;
 
     // 駒の動き。
     for i_dir in 0..KM_UGOKI_LN{ // 指定の駒種類の、全ての逆向きに動ける方向
         let _kmdir;
         let p_kmdir : &KmDir;
-        if match_sn( &Sengo::Sen, &sn ) {
+        if Sengo::Sen == sn {
             _kmdir = hanten_kmdir_joge(&KM_UGOKI.back[kms_num][i_dir]);
             p_kmdir = &_kmdir;
         } else {
@@ -459,8 +463,8 @@ pub fn insert_dst_by_ms_km(
                             if dx+i_east<SUJI_10 {
                                 let ms_src = suji_dan_to_ms(dx+i_east, dy);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
-                                if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
+                                if sn_ms != sn { hashset_work.insert( ms_src); }
+                                if sn_ms != Sengo::Num { break; } 
                             }
                         }
                     }else{
@@ -468,7 +472,7 @@ pub fn insert_dst_by_ms_km(
                         if dx+1<SUJI_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
+                            if sn_ms != sn { hashset_work.insert( ms_src); }
                         }
                     },
             // 北東
@@ -478,8 +482,8 @@ pub fn insert_dst_by_ms_km(
                             if dx+i_ne<SUJI_10 && dy+i_ne<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx+i_ne, dy+i_ne);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
-                                if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
+                                if sn_ms != sn { hashset_work.insert( ms_src); }
+                                if sn_ms != Sengo::Num { break; } 
                             }
                         }
                     }else{
@@ -487,7 +491,7 @@ pub fn insert_dst_by_ms_km(
                         if dx+1<SUJI_10 && dy+1<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy+1);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
+                            if sn_ms != sn { hashset_work.insert( ms_src); }
                         }
                     },
             // 北北東
@@ -495,7 +499,7 @@ pub fn insert_dst_by_ms_km(
                         if dx+1<SUJI_10 && dy+2<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx+1, dy+2);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
+                            if sn_ms != sn { hashset_work.insert( ms_src); }
                         }
                     },
             // 北
@@ -505,8 +509,8 @@ pub fn insert_dst_by_ms_km(
                             if dy+i_south<DAN_10{
                                 let ms_src = suji_dan_to_ms(dx, dy+i_south);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
-                                if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
+                                if sn_ms != sn { hashset_work.insert( ms_src); }
+                                if sn_ms != Sengo::Num { break; } 
                             }
                         }
                     }else{
@@ -514,7 +518,7 @@ pub fn insert_dst_by_ms_km(
                         if dy+1<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx, dy+1);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
+                            if sn_ms != sn { hashset_work.insert( ms_src); }
                         }
                     },
             // 北北西
@@ -522,7 +526,7 @@ pub fn insert_dst_by_ms_km(
                         if SUJI_0<dx-1 && dy+2<DAN_10 {
                             let ms_src = suji_dan_to_ms(dx-1, dy+2);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
+                            if sn_ms != sn { hashset_work.insert( ms_src); }
                         }
                     },
             // 北西
@@ -532,8 +536,8 @@ pub fn insert_dst_by_ms_km(
                             if SUJI_0<dx-i_se && dy+i_se<DAN_10 {
                                 let ms_src = suji_dan_to_ms(dx-i_se, dy+i_se);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
-                                if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
+                                if sn_ms != sn { hashset_work.insert( ms_src); }
+                                if sn_ms != Sengo::Num { break; } 
                             }
                         }
                     }else{
@@ -541,7 +545,7 @@ pub fn insert_dst_by_ms_km(
                         if dx-1>SUJI_0 && DAN_10>dy+1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy+1);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
+                            if sn_ms != sn { hashset_work.insert( ms_src); }
                         }
                     },
             // 西
@@ -551,8 +555,8 @@ pub fn insert_dst_by_ms_km(
                             if SUJI_0<dx-i_east{
                                 let ms_src = suji_dan_to_ms(dx-i_east, dy);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
-                                if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
+                                if sn_ms != sn { hashset_work.insert( ms_src); }
+                                if sn_ms != Sengo::Num { break; } 
                             }
                         }
                     }else{
@@ -560,7 +564,7 @@ pub fn insert_dst_by_ms_km(
                         if SUJI_0<dx-1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
+                            if sn_ms != sn { hashset_work.insert( ms_src); }
                         }
                     },
             // 南西
@@ -570,8 +574,8 @@ pub fn insert_dst_by_ms_km(
                             if SUJI_0<dx-i_ne && DAN_0<dy-i_ne {
                                 let ms_src = suji_dan_to_ms(dx-i_ne, dy-i_ne);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
-                                if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
+                                if sn_ms != sn { hashset_work.insert( ms_src); }
+                                if sn_ms != Sengo::Num { break; } 
                             }
                         }
                     }else{
@@ -579,7 +583,7 @@ pub fn insert_dst_by_ms_km(
                         if SUJI_0<dx-1 && DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx-1, dy-1);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
+                            if sn_ms != sn { hashset_work.insert( ms_src); }
                         }
                     },
             // 南南西
@@ -587,7 +591,7 @@ pub fn insert_dst_by_ms_km(
                         if SUJI_0<dx-1 && DAN_0<dy-2 {
                             let ms_src = suji_dan_to_ms(dx-1, dy-2);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
+                            if sn_ms != sn { hashset_work.insert( ms_src); }
                         }
                     },
             // 南
@@ -597,8 +601,8 @@ pub fn insert_dst_by_ms_km(
                             if DAN_0<dy-i_north {
                                 let ms_src = suji_dan_to_ms(dx, dy-i_north);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
-                                if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
+                                if sn_ms != sn { hashset_work.insert( ms_src); }
+                                if sn_ms != Sengo::Num { break; } 
                             }
                         }
                     }else{
@@ -606,7 +610,7 @@ pub fn insert_dst_by_ms_km(
                         if DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx, dy-1);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
+                            if sn_ms != sn { hashset_work.insert( ms_src); }
                         }
                     },
             // 南南東
@@ -614,7 +618,7 @@ pub fn insert_dst_by_ms_km(
                         if dx+1<SUJI_10 && DAN_0<dy-2 {
                             let ms_src = suji_dan_to_ms(dx+1, dy-2);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
+                            if sn_ms != sn { hashset_work.insert( ms_src); }
                         }
                     },
             // 南東
@@ -624,8 +628,8 @@ pub fn insert_dst_by_ms_km(
                             if dx+i_nw<SUJI_10 && DAN_0<dy-i_nw {
                                 let ms_src = suji_dan_to_ms(dx+i_nw, dy-i_nw);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
-                                if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
-                                if !match_sn( &sn_ms, &Sengo::Owari )  { break; } 
+                                if sn_ms != sn { hashset_work.insert( ms_src); }
+                                if sn_ms != Sengo::Num { break; } 
                             }
                         }
                     }else{
@@ -633,10 +637,10 @@ pub fn insert_dst_by_ms_km(
                         if dx+1<SUJI_10 && DAN_0<dy-1 {
                             let ms_src = suji_dan_to_ms(dx+1, dy-1);
                             let sn_ms = position1.get_sn_by_ms( ms_src );
-                            if !match_sn( &sn_ms, &sn )  { hashset_work.insert( ms_src); }
+                            if sn_ms != sn { hashset_work.insert( ms_src); }
                         }
                     },
-            Owari =>{ break },
+            Num =>{ break },
         }                
     }
 
@@ -740,7 +744,12 @@ pub fn insert_dst_by_ms_km(
  * その升に到達できる駒が居る升を取得☆（＾～＾）
  * TODO 成りの動きも考えたい。升だけではなく、成りの有無☆（＾～＾）
  */
-pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<umasu>, position1: &Position) {
+pub fn insert_narazu_src_by_sn_ms(
+    sn: &Sengo,
+    ms_dst: umasu,
+    hashset_result: &mut HashSet<umasu>,
+    position1: &Position
+) {
     // assert_banjo_ms(ms_dst,"Ｉnsert_narazu_src_by_sn_ms");
 
     // 移動先の筋、段
@@ -772,11 +781,11 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
             _ => {}
         }
 
-        let kms_num = kms_to_num( &kms );
+        let kms_num = *kms as usize;
         for i_dir in 0..KM_UGOKI_LN{ // 指定の駒種類の、全ての逆向きに動ける方向
             let _kmdir;
             let p_kmdir : &KmDir;
-            if match_sn( &Sengo::Sen, &sn ) {
+            if Sengo::Sen == *sn {
                 p_kmdir = &KM_UGOKI.back[kms_num][i_dir];
                 // g_writeln(&format!("get_src_by_sn_ms 先手なら kms={} kms_num={} p_kmdir={}",
                 //     kms, kms_num, p_kmdir
@@ -801,8 +810,8 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                     let ms_src = suji_dan_to_ms(dx+i_east, dy);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -811,7 +820,7 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                 let ms_src = suji_dan_to_ms(dx+1, dy);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 北東
@@ -822,8 +831,8 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                     let ms_src = suji_dan_to_ms(dx+i_ne, dy+i_ne);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -832,7 +841,7 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                 let ms_src = suji_dan_to_ms(dx+1, dy+1);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 北北東
@@ -841,7 +850,7 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                 let ms_src = suji_dan_to_ms(dx+1, dy+2);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 北
@@ -852,8 +861,8 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                     let ms_src = suji_dan_to_ms(dx, dy+i_south);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -862,10 +871,7 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                 let ms_src = suji_dan_to_ms(dx, dy+1);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                // g_writeln(&format!("get_src_by_sn_ms 北 ms_src={} sn_ms=>{} kms_ms={} match_sn={} match_kms={}",
-                                //     ms_src, sn_ms, kms_ms, match_sn( &sn_ms, &sn ), match_kms( &kms_ms, &kms )
-                                // ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 北北西
@@ -874,7 +880,7 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                 let ms_src = suji_dan_to_ms(dx-1, dy+2);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 北西
@@ -885,8 +891,8 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                     let ms_src = suji_dan_to_ms(dx-i_se, dy+i_se);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -895,7 +901,7 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                 let ms_src = suji_dan_to_ms(dx-1, dy+1);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 西
@@ -906,8 +912,8 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                     let ms_src = suji_dan_to_ms(dx-i_east, dy);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -916,7 +922,7 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                 let ms_src = suji_dan_to_ms(dx-1, dy);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 南西
@@ -927,8 +933,8 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                     let ms_src = suji_dan_to_ms(dx-i_ne, dy-i_ne);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -937,7 +943,7 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                 let ms_src = suji_dan_to_ms(dx-1, dy-1);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 南南西
@@ -946,7 +952,7 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                 let ms_src = suji_dan_to_ms(dx-1, dy-2);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 南
@@ -957,8 +963,8 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                     let ms_src = suji_dan_to_ms(dx, dy-i_north);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -967,10 +973,7 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                 let ms_src = suji_dan_to_ms(dx, dy-1);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                // g_writeln(&format!("get_src_by_sn_ms 南 kms={} kms_num={} ms_src={} sn_ms=>{} kms_ms={} match_sn={} match_kms={}",
-                                //     kms, kms_num, ms_src, sn_ms, kms_ms, match_sn( &sn_ms, &sn ), match_kms( &kms_ms, &kms )
-                                // ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 南南東
@@ -979,7 +982,7 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                 let ms_src = suji_dan_to_ms(dx+1, dy-2);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 南東
@@ -990,8 +993,8 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                     let ms_src = suji_dan_to_ms(dx+i_nw, dy-i_nw);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -1000,10 +1003,10 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
                                 let ms_src = suji_dan_to_ms(dx+1, dy-1);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
-                Owari =>{ break },
+                Num =>{ break },
             }
         }
     }
@@ -1011,7 +1014,12 @@ pub fn insert_narazu_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<u
 /**
  * 移動元升生成（成る前）
  */
-pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<umasu>, position1: &Position) {
+pub fn insert_narumae_src_by_sn_ms(
+    sn: &Sengo,
+    ms_dst: umasu,
+    hashset_result: &mut HashSet<umasu>,
+    position1: &Position
+) {
     // assert_banjo_ms(ms_dst,"Ｉnsert_narumae_src_by_sn_ms");
 
     // 移動先の筋、段
@@ -1037,11 +1045,11 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
 
         // 成り駒に、行先の無いところは無いぜ☆
 
-        let kms_num = kms_to_num( &kms );
+        let kms_num = *kms as usize;
         for i_dir in 0..KM_UGOKI_LN{ // 指定の駒種類の、全ての逆向きに動ける方向
             let _kmdir;
             let p_kmdir : &KmDir;
-            if match_sn( &Sengo::Sen, &sn ) {
+            if Sengo::Sen == *sn {
                 p_kmdir = &KM_UGOKI.back[kms_num][i_dir];
                 // g_writeln(&format!("get_src_by_sn_ms 先手なら kms={} kms_num={} p_kmdir={}",
                 //     kms, kms_num, p_kmdir
@@ -1066,8 +1074,8 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                     let ms_src = suji_dan_to_ms(dx+i_east, dy);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -1076,7 +1084,7 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                 let ms_src = suji_dan_to_ms(dx+1, dy);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 北東
@@ -1087,8 +1095,8 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                     let ms_src = suji_dan_to_ms(dx+i_ne, dy+i_ne);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -1097,7 +1105,7 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                 let ms_src = suji_dan_to_ms(dx+1, dy+1);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 北北東
@@ -1106,7 +1114,7 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                 let ms_src = suji_dan_to_ms(dx+1, dy+2);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 北
@@ -1117,8 +1125,8 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                     let ms_src = suji_dan_to_ms(dx, dy+i_south);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -1127,10 +1135,7 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                 let ms_src = suji_dan_to_ms(dx, dy+1);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                // g_writeln(&format!("get_src_by_sn_ms 北 ms_src={} sn_ms=>{} kms_ms={} match_sn={} match_kms={}",
-                                //     ms_src, sn_ms, kms_ms, match_sn( &sn_ms, &sn ), match_kms( &kms_ms, &kms )
-                                // ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 北北西
@@ -1139,7 +1144,7 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                 let ms_src = suji_dan_to_ms(dx-1, dy+2);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 北西
@@ -1150,8 +1155,8 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                     let ms_src = suji_dan_to_ms(dx-i_se, dy+i_se);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -1160,7 +1165,7 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                 let ms_src = suji_dan_to_ms(dx-1, dy+1);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 西
@@ -1171,8 +1176,8 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                     let ms_src = suji_dan_to_ms(dx-i_east, dy);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -1181,7 +1186,7 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                 let ms_src = suji_dan_to_ms(dx-1, dy);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 南西
@@ -1192,8 +1197,8 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                     let ms_src = suji_dan_to_ms(dx-i_ne, dy-i_ne);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -1202,7 +1207,7 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                 let ms_src = suji_dan_to_ms(dx-1, dy-1);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 南南西
@@ -1211,7 +1216,7 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                 let ms_src = suji_dan_to_ms(dx-1, dy-2);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 南
@@ -1222,8 +1227,8 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                     let ms_src = suji_dan_to_ms(dx, dy-i_north);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -1232,10 +1237,7 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                 let ms_src = suji_dan_to_ms(dx, dy-1);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                // g_writeln(&format!("get_src_by_sn_ms 南 kms={} kms_num={} ms_src={} sn_ms=>{} kms_ms={} match_sn={} match_kms={}",
-                                //     kms, kms_num, ms_src, sn_ms, kms_ms, match_sn( &sn_ms, &sn ), match_kms( &kms_ms, &kms )
-                                // ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 南南東
@@ -1244,7 +1246,7 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                 let ms_src = suji_dan_to_ms(dx+1, dy-2);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
                 // 南東
@@ -1255,8 +1257,8 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                     let ms_src = suji_dan_to_ms(dx+i_nw, dy-i_nw);
                                     let sn_ms = position1.get_sn_by_ms( ms_src );
                                     let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                    if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
-                                    if !match_sn( &sn_ms, &Sengo::Owari ) { break; } 
+                                    if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
+                                    if sn_ms != Sengo::Num { break; } 
                                 }
                             }
                         }else{
@@ -1265,10 +1267,10 @@ pub fn insert_narumae_src_by_sn_ms(sn:&Sengo, ms_dst:umasu, result:&mut HashSet<
                                 let ms_src = suji_dan_to_ms(dx+1, dy-1);
                                 let sn_ms = position1.get_sn_by_ms( ms_src );
                                 let kms_ms = km_to_kms( &position1.get_km_by_ms( ms_src ));
-                                if match_sn( &sn_ms, &sn ) && match_kms( &kms_ms, &kms ) { result.insert( ms_src); }
+                                if sn_ms == *sn && kms_ms == *kms { hashset_result.insert( ms_src); }
                             }
                 },
-                Owari =>{ break },
+                Num =>{ break },
             }
         }
     }
@@ -1307,7 +1309,7 @@ pub fn get_ms_vec_as_aigoma(
             // 南東方向
         },
         S => {
-            if match_sn(&Sengo::Sen, &sn_atk) {
+            if Sengo::Sen == sn_atk {
                 // 北方向
 
             } else {

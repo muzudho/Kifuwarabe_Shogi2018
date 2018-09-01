@@ -16,23 +16,23 @@ use std::collections::HashSet;
  * TODO: 差分更新にしたい。
  */
 pub fn refresh_kikisu(gen_ky: &Position) -> (
-    [NumberBoard; SN_LN],
-    [NumberBoard; KM_LN]
+    [NumberBoard; Sengo::Num as usize],
+    [NumberBoard; Koma::Num as usize]
 ){
     // 利き数（先後別）
-    let mut local_kiki_su_by_sn : [NumberBoard; SN_LN] = [
-        NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
+    let mut local_kiki_su_by_sn : [NumberBoard; Sengo::Num as usize] = [
+        NumberBoard::new(), NumberBoard::new(),
     ];
 
     // 利きの数（先後付き駒別）
     // 利き数（駒別なので３０個ある）
-    let mut local_kiki_su_by_km : [NumberBoard; KM_LN] = [
+    let mut local_kiki_su_by_km : [NumberBoard; Koma::Num as usize] = [
         NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
         NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
         NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
         NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
         NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
-        NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
+        NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
     ];
 
     // カウント    
@@ -56,10 +56,10 @@ pub fn refresh_kikisu(gen_ky: &Position) -> (
                 let sn = km_to_sn( &km_dst);
 
                 // 駒別
-                local_kiki_su_by_km[km_to_num(&km_dst)].add_su_by_ms( ms_dst, kikisu as i8 );
+                local_kiki_su_by_km[*km_dst as usize].add_su_by_ms( ms_dst, kikisu as i8 );
 
                 // 先後別
-                local_kiki_su_by_sn[sn_to_num(&sn)].add_su_by_ms( ms_dst, kikisu as i8 );
+                local_kiki_su_by_sn[sn as usize].add_su_by_ms( ms_dst, kikisu as i8 );
             }
         }
     }

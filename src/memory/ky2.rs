@@ -17,7 +17,7 @@ impl KmSyugo {
     pub fn new_all() -> KmSyugo {
         let mut num_syugo1 : HashSet<usize> = HashSet::new();
         for km in KM_ARRAY.iter() {
-            num_syugo1.insert( km_to_num(km) );
+            num_syugo1.insert(*km as usize);
         }
         let km_syugo = KmSyugo {
             num_syugo : num_syugo1,
@@ -31,8 +31,8 @@ impl KmSyugo {
         let mut num_syugo1 : HashSet<usize> = HashSet::new();
         for km in KM_ARRAY.iter() {
             let (sn1,_kms) = km_to_sn_kms( km );
-            if match_sn( &sn0, &sn1 ) {
-                num_syugo1.insert( km_to_num(km) );
+            if sn0 == sn1 {
+                num_syugo1.insert(*km as usize);
             }
         }
         let km_syugo = KmSyugo {
@@ -42,6 +42,6 @@ impl KmSyugo {
     }
     #[allow(dead_code)]
     pub fn remove( &mut self, km:&Koma ) {
-        self.num_syugo.remove( &km_to_num(km) );
+        self.num_syugo.remove( &(*km as usize) );
     }
 }

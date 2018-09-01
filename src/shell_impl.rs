@@ -56,7 +56,8 @@ pub fn do_do(shell_var: &mut ShellVar, request: &Request, response:&mut Response
 
     if successful {
         // 入っている指し手の通り指すぜ☆（＾～＾）
-        makemove(&mut shell_var.searcher, movement.to_hash());
+        let mut dummy_alpha = 0;
+        makemove(&mut shell_var.searcher, movement.to_hash(), &mut dummy_alpha);
     }
 }
 
@@ -71,8 +72,8 @@ pub fn do_do(shell_var: &mut ShellVar, request: &Request, response:&mut Response
 /// go btime 60000 wtime 50000 byoyomi 10000
 pub fn do_go(shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
     // 指定しなければ無制限。
-    shell_var.player_milliseconds_array[SN_SEN] = <i32>::max_value();
-    shell_var.player_milliseconds_array[SN_GO] = <i32>::max_value();
+    shell_var.player_milliseconds_array[Sengo::Sen as usize] = <i32>::max_value();
+    shell_var.player_milliseconds_array[Sengo::Go as usize] = <i32>::max_value();
 
     // 行終了時に実行されるコールバック関数を１つ設定できる。
     set_linebreak_controller(response, do_go_linebreak);
@@ -125,7 +126,7 @@ pub fn do_go_wincvar(shell_var: &mut ShellVar, _request: &Request, response:&mut
 
 pub fn do_go_linebreak(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     // 自分の手番
-    let turn_num = sn_to_num( &shell_var.searcher.game_record.get_teban(&Jiai::Ji));
+    let turn_num = shell_var.searcher.game_record.get_teban(&Jiai::Ji) as usize;
 
     // 自分の持ち時間。
     let milliseconds = shell_var.player_milliseconds_array[turn_num];
@@ -194,7 +195,8 @@ pub fn do_hirate(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
 
             if successful {
                 // 入っている指し手の通り指すぜ☆（＾～＾）
-                makemove(&mut searcher, movement.to_hash());
+                let mut dummy_alpha = 0;
+                makemove(&mut searcher, movement.to_hash(), &mut dummy_alpha);
             }
         }
     );
@@ -340,7 +342,8 @@ pub fn do_position(shell_var: &mut ShellVar, request: &Request, response:&mut Re
 
             if successful {
                 // 指し手が付いていれば、指し手を指すぜ☆（＾～＾）
-                makemove(&mut searcher, movement.to_hash());
+                let mut dummy_alpha = 0;
+                makemove(&mut searcher, movement.to_hash(), &mut dummy_alpha);
             }
         }
     );

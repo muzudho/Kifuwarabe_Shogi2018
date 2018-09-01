@@ -21,7 +21,7 @@ pub fn insert_ss_by_ms_km_on_banjo(searcher: &Searcher, ms_dst:umasu, km_dst:&Ko
     let (sn,_kms_dst) = km_to_sn_kms( &km_dst );
 
     // 移動先に自駒があれば、指し手は何もない。終わり。
-    if match_sn(&searcher.cur_position.get_sn_by_ms(ms_dst), &sn) {
+    if searcher.cur_position.get_sn_by_ms(ms_dst) == sn {
         return;
     }
 
@@ -79,7 +79,7 @@ pub fn insert_ss_by_ms_km_on_da(searcher: &Searcher, ms_dst:umasu, km_dst:&Koma,
     let (sn,_kms_dst) = km_to_sn_kms( &km_dst );
 
     // 移動先に自駒があれば、指し手は何もない。終わり。
-    if match_sn( &searcher.cur_position.get_sn_by_ms(ms_dst), &sn ) {
+    if searcher.cur_position.get_sn_by_ms(ms_dst) == sn {
         return;
     }
 
@@ -146,7 +146,7 @@ pub fn insert_narazu_src_by_ms_km(
     let (dx,dy) = ms_to_suji_dan(ms_dst);
     let sn = km_to_sn( km_dst );
     let kms_dst = km_to_kms(&km_dst);
-    let kms_num = kms_to_num(&kms_dst);
+    let kms_num = kms_dst as usize;
 
     // 行先の無いところに駒を進めることの禁止☆（＾～＾）
     use kifuwarabe_position::Koma::*;
@@ -173,7 +173,7 @@ pub fn insert_narazu_src_by_ms_km(
     for i_dir in 0..KM_UGOKI_LN{ // 指定の駒種類の、全ての逆向きに動ける方向
         let _kmdir;
         let p_kmdir : &KmDir;
-        if match_sn( &Sengo::Sen, &sn ) {
+        if Sengo::Sen == sn {
             p_kmdir = &KM_UGOKI.back[kms_num][i_dir]
         } else {
             _kmdir = hanten_kmdir_joge(&KM_UGOKI.back[kms_num][i_dir]);
@@ -396,7 +396,7 @@ pub fn insert_narazu_src_by_ms_km(
                             }
                         }
                     },
-            Owari =>{ break },
+            Num =>{ break },
         }
     }
 }
@@ -456,12 +456,12 @@ pub fn insert_narumae_src_by_ms_km(
         _       => {},// 成れる駒は、成る前の駒の動きも調べる
     }
 
-    let kms_narumae_num = kms_to_num(&kms_src_narumae);
+    let kms_narumae_num = kms_src_narumae as usize;
 
     for i_dir in 0..KM_UGOKI_LN{ // 指定の駒種類の、全ての逆向きに動ける方向
         let _kmdir;
         let p_kmdir : &KmDir;
-        if match_sn( &Sengo::Sen, &sn ) {
+        if Sengo::Sen == sn {
             p_kmdir = &KM_UGOKI.back[kms_narumae_num][i_dir]
         } else {
             _kmdir = hanten_kmdir_joge(&KM_UGOKI.back[kms_narumae_num][i_dir]);
@@ -685,7 +685,7 @@ pub fn insert_narumae_src_by_ms_km(
                             }
                         }
                     },
-            Owari =>{ break },
+            Num =>{ break },
         }
     }
 }
@@ -717,7 +717,7 @@ pub fn filtering_ss_except_oute(
     ss_hashset_input:&mut HashSet<u64>
 ) {
     // 自玉の位置
-    let ms_r = searcher.cur_position.ms_r[sn_to_num(&searcher.game_record.get_teban(&Jiai::Ji))];
+    let ms_r = searcher.cur_position.ms_r[searcher.game_record.get_teban(&Jiai::Ji) as usize];
     // g_writeln(&format!("info string My raion {}.", ms_r ));
 
     // 王手の一覧を取得
@@ -792,7 +792,7 @@ pub fn filtering_ss_except_jisatusyu(
 
     // 自玉の位置
     let sn1 = searcher.game_record.get_teban(&Jiai::Ji);
-    let ms_r = searcher.cur_position.ms_r[ sn_to_num(&sn1) ];
+    let ms_r = searcher.cur_position.ms_r[sn1 as usize];
 
 
     // 王手回避カードを発行する
@@ -803,7 +803,8 @@ pub fn filtering_ss_except_jisatusyu(
         let ss_potential = Movement::from_hash( *hash_ss_potential );
 
         // その手を指してみる
-        makemove(searcher, ss_potential.to_hash());
+        let mut dummy_alpha = 0;
+        makemove(searcher, ss_potential.to_hash(), &mut dummy_alpha);
         // // 現局面表示
         // let s1 = kaku_ky(&KyNums::Current);
         // g_writeln( &s1 );            
@@ -888,7 +889,8 @@ pub fn filtering_ss_except_sennitite(
             //ss_hashset.insert( *hash_ss_potential );
 
         // その手を指してみる
-        makemove(searcher, ss.to_hash());
+        let mut dummy_alpha = 0;
+        makemove(searcher, ss.to_hash(), &mut dummy_alpha);
         
         // 現局面表示
         // let s1 = kaku_ky(&KyNums::Current);

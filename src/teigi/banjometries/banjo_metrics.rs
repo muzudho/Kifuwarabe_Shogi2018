@@ -8,7 +8,7 @@ use searcher_impl::*;
 pub fn is_ji_km_by_ms(searcher: &Searcher, ms:umasu) -> bool {
     let km = searcher.cur_position.get_km_by_ms( ms );
     let (sn,_kms) = km_to_sn_kms( &km );
-    match_sn( &sn, &searcher.game_record.get_teban(&Jiai::Ji) )
+    sn == searcher.game_record.get_teban(&Jiai::Ji)
 }
 
 // TODO

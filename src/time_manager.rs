@@ -3,14 +3,14 @@ use std::time::Duration;
 
 /// マージン 1000ミリ秒。
 const MARGIN_MILLISECONDS : i32 = 1_000;
-const LIMIT_MILLISECONDS : i32 = 20_000;
+const LIMIT_MILLISECONDS : i32 = 30_000;
 const MIN_MILLISECONDS : i32 = 1_000;
 
 /// 思考時間の上限。
 pub fn get_thought_max_milliseconds(milliseconds: i32) -> i32 {
     // 全体の 30分の1 を思考時間に充てる☆（＾ｑ＾）
     // 10分なら 600秒なので 1手20秒☆（＾～＾）
-    let mut a = milliseconds / 30;
+    let mut a = milliseconds / 15;//30;
 
     // マージン1秒として、 20秒以内に収める。
     if LIMIT_MILLISECONDS - MARGIN_MILLISECONDS < a {

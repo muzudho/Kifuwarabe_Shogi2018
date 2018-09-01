@@ -38,12 +38,12 @@ pub fn think(shell_var: &mut ShellVar, milliseconds: i32) -> Movement{
         // ゼロ・リセット
         // 駒別に用意した盤を使った、利き数。
         for km in KM_ARRAY.iter() {
-            uchu.kiki_su_by_km[km_to_num(km)].clear();
+            uchu.kiki_su_by_km[*km as usize].clear();
         }
 
         // 先後別に用意した盤を使った、利き数。
         for sn in SN_ARRAY.iter() {
-            uchu.kiki_su_by_sn[sn_to_num(sn)].clear();
+            uchu.kiki_su_by_sn[*sn as usize].clear();
         }
 
         // 相手の利き升調べ（自殺手防止のため）

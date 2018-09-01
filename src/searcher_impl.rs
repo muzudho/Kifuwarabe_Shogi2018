@@ -108,8 +108,14 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
     }
 
     // 駒の動き方
-    insert_picked_movement(&searcher.cur_position, &searcher.game_record, &mut hashset_movement,
-        &mut searcher.movepicker_hashset_work, &mut searcher.movepicker_hashset_result, &mut searcher.movepicker_hashset_drop);
+    insert_picked_movement(
+        &searcher.cur_position,
+        &searcher.game_record,
+        &mut hashset_movement,
+        &mut searcher.movepicker_hashset_work,
+        &mut searcher.movepicker_hashset_result,
+        &mut searcher.movepicker_hashset_drop
+        );
     // g_writeln("テスト ポテンシャルムーブ.");
     // use consoles::visuals::dumps::*;
     // hyoji_ss_hashset( &hashset_movement );
@@ -132,8 +138,14 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
 ///
 /// # Arguments.
 ///
+/// * `t` - 任意のオブジェクト。
 /// * `movement_hash` - 指し手のハッシュ値。
-pub fn makemove(searcher: &mut Searcher, movement_hash: u64) {
+/// * `alpha` - 評価値を更新することができる。
+///
+/// # Returns.
+///
+/// 0. cutoff - 探索を打ち切るなら真。玉を取る手など。
+pub fn makemove(searcher: &mut Searcher, movement_hash: u64, alpha: &mut i16) -> (bool) {
 
     let movement = Movement::from_hash(movement_hash);
     let cap_kms = searcher.game_record.make_movement2(&movement, &mut searcher.cur_position);
@@ -147,6 +159,14 @@ pub fn makemove(searcher: &mut Searcher, movement_hash: u64) {
         g_writeln(kaku_ky(&searcher.cur_position));
     }
     // */
+
+    // 玉を取ったとき。
+    if cap_kms == KmSyurui::R {
+        *alpha = 15000;// TODO 勝った時の評価値にしたい。
+        return true;
+    }
+
+    false
 }
 
 pub fn unmakemove(searcher: &mut Searcher) -> (bool, KmSyurui) {

@@ -70,19 +70,19 @@ fn main() {
     {
         // 盤上の駒
         for i_ms in MASU_0..BAN_SIZE {
-            for i_km in 0..KM_LN {
+            for i_km in 0..Koma::Num as usize {
                 // FIXME 18446744073709551615 が含まれないだろ、どうなってるんだぜ☆（＾～＾）！？
                 shell_var.searcher.game_record.ky_hash_seed.km[i_ms][i_km] = rand::thread_rng().gen_range(0,18446744073709551615);
             }
         }
         // 持ち駒
-        for i_km in 0..KM_LN {
+        for i_km in 0..Koma::Num as usize {
             for i_mg in 0..MG_MAX {
                 shell_var.searcher.game_record.ky_hash_seed.mg[i_km][i_mg] = rand::thread_rng().gen_range(0,18446744073709551615);
             }
         }
         // 先後
-        for i_sn in 0..SN_LN {
+        for i_sn in 0..Sengo::Num as usize {
             shell_var.searcher.game_record.ky_hash_seed.sn[i_sn] = rand::thread_rng().gen_range(0,18446744073709551615);
         }
     }

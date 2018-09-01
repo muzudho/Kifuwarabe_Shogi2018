@@ -18,7 +18,7 @@ pub fn is_jisatusyu(searcher: &Searcher, ss:&Movement)->bool{
     let sn_aite = hanten_sn( &sn_teban );
 
     // 升の利き数だが、指した後で再計算が要るはず
-    let kikisu = UCHU_WRAP.try_read().unwrap().kiki_su_by_sn[ sn_to_num( &sn_aite) ].get_su_by_ms( ss.destination );
+    let kikisu = UCHU_WRAP.try_read().unwrap().kiki_su_by_sn[sn_aite as usize].get_su_by_ms( ss.destination );
     let result = 0<kikisu;
     // g_writeln(&format!(
     //     "info string is_jisatusyu={} km_src={} sn_teban={} kms={} sn_aite={} ss.destination={} kikisu={}"

@@ -28,7 +28,7 @@ pub fn kms_to_pt (kms: &KmSyurui) -> PieceType {
         PS => PieceType::PL,
         PH => PieceType::PP,
         Kara => PieceType::Space,
-        Owari => PieceType::Num,
+        Num => PieceType::Num,
     }
 }
 
@@ -51,7 +51,7 @@ pub fn pt_to_kms (pt: &PieceType) -> KmSyurui {
         PieceType::PL => KmSyurui::PS,
         PieceType::PP => KmSyurui::PH,
         PieceType::Space => KmSyurui::Kara,
-        PieceType::Num => KmSyurui::Owari,
+        PieceType::Num => KmSyurui::Num,
     }
 }
 
@@ -89,7 +89,7 @@ pub fn km_to_pc (km: &Koma) -> Piece {
         PS1 => Piece::PL1,
         PH1 => Piece::PP1,
         Kara => Piece::Space,
-        Owari => Piece::Num,
+        Num => Piece::Num,
     }
 }
 
@@ -126,7 +126,7 @@ pub fn pc_to_km (pc: &Piece) -> Koma {
         PL1 => Koma::PS1,
         PP1 => Koma::PH1,
         Space => Koma::Kara,
-        Num => Koma::Owari,
+        Num => Koma::Num,
     }
 }
 

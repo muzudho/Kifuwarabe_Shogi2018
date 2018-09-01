@@ -78,17 +78,17 @@ pub struct Uchu{
     // 対話モード
     pub dialogue_mode : bool,
     // 利きの数（先後別）
-    pub kiki_su_by_sn : [NumberBoard; SN_LN],
+    pub kiki_su_by_sn : [NumberBoard; Sengo::Num as usize],
     // 利きの数（先後付き駒別）
-    pub kiki_su_by_km : [NumberBoard; KM_LN],
+    pub kiki_su_by_km : [NumberBoard; Koma::Num as usize],
     // ビジョン・ツリー
-    pub vision_tree_by_sn : [VisionTree; SN_LN],
+    pub vision_tree_by_sn : [VisionTree; Sengo::Num as usize],
 }
 impl Uchu{
-    pub fn set_kiki_su_by_sn(&mut self, kiki_su_by_sn:[NumberBoard; SN_LN]){
+    pub fn set_kiki_su_by_sn(&mut self, kiki_su_by_sn:[NumberBoard; Sengo::Num as usize]){
         self.kiki_su_by_sn = kiki_su_by_sn
     }
-    pub fn set_kiki_su_by_km(&mut self, kiki_su_by_km:[NumberBoard; KM_LN]){
+    pub fn set_kiki_su_by_km(&mut self, kiki_su_by_km:[NumberBoard; Koma::Num as usize]){
         self.kiki_su_by_km = kiki_su_by_km
     }
     pub fn new()->Uchu{
@@ -96,7 +96,7 @@ impl Uchu{
             dialogue_mode : false,
             // 利き数（先後別）
             kiki_su_by_sn : [
-                NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
+                NumberBoard::new(), NumberBoard::new(),
             ],
             // 利き数（駒別なので３０個ある）
             kiki_su_by_km : [
@@ -105,10 +105,10 @@ impl Uchu{
                 NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
                 NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
                 NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
-                NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
+                NumberBoard::new(), NumberBoard::new(), NumberBoard::new(), NumberBoard::new(),
             ],
             vision_tree_by_sn : [
-                VisionTree::new(), VisionTree::new(), VisionTree::new(),
+                VisionTree::new(), VisionTree::new(),
             ],
         }
     }
@@ -124,8 +124,8 @@ impl Uchu{
     pub fn kaku_number_board(&self, sn:&Sengo, km:&Koma)->String{
 
         let nb = match *sn {
-            Sengo::Owari    => { &self.kiki_su_by_km[km_to_num(&km)] },
-            _               => { &self.kiki_su_by_sn[sn_to_num(&sn)] },
+            Sengo::Num    => { &self.kiki_su_by_km[*km as usize] },
+            _             => { &self.kiki_su_by_sn[*sn as usize] },
         };
 
         // 数盤表示
@@ -171,9 +171,9 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
         }
     }
     pub fn hyoji_kmugoki_dir(&self, kms:&KmSyurui ){
-        for kmdir in KM_UGOKI.back[kms_to_num(kms)].iter() {
+        for kmdir in KM_UGOKI.back[*kms as usize].iter() {
             match *kmdir {
-                KmDir::Owari => break,
+                KmDir::Num => break,
                 _ => g_write(&format!( "{},", kmdir))
             }
         }
@@ -184,7 +184,7 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
     pub fn remake_visions(&mut self) {
         for sn in SN_ARRAY.iter() {
             // 全部忘れる☆（＾～＾）
-            self.vision_tree_by_sn[sn_to_num(sn)].clear();
+            self.vision_tree_by_sn[*sn as usize].clear();
         }
     }
 }
