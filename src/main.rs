@@ -15,6 +15,7 @@ extern crate kifuwarabe_position;
 use kifuwarabe_position::*;
 
 extern crate kifuwarabe_movement;
+extern crate kifuwarabe_movement_picker;
 extern crate kifuwarabe_alpha_beta_search;
 
 ///
@@ -32,7 +33,6 @@ mod meidai;
 mod mediators;
 mod memory;
 mod misc;
-mod movement_picker;
 mod movement_thinks;
 mod searcher_impl;
 mod shell_impl;

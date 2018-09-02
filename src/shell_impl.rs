@@ -10,7 +10,7 @@ use consoles::visuals::title::*;
 use display_impl::*;
 use kifuwarabe_usi::*;
 use memory::uchu::*;
-use movement_picker::*;
+use kifuwarabe_movement_picker::*;
 use rand::Rng;
 use searcher_impl::*;
 use std::collections::HashSet;

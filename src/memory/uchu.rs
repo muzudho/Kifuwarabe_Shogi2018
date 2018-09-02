@@ -9,7 +9,7 @@ extern crate rand;
 use config::*;
 use kifuwarabe_position::*;
 use memory::number_board::*;
-use movement_picker::*;
+use kifuwarabe_movement_picker::*;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;

@@ -2,7 +2,7 @@ use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use memory::uchu::*;
-use movement_picker::*;
+use kifuwarabe_movement_picker::*;
 use movement_thinks::*;
 use std::collections::HashSet;
 use std::time::Instant;
@@ -159,6 +159,8 @@ pub fn makemove(searcher: &mut Searcher, movement_hash: u64, alpha: &mut i16) ->
         g_writeln(kaku_ky(&searcher.cur_position));
     }
     // */
+
+    // TODO SEE。 それが駒を取る手で、末端局面のとき、駒の取り返しがなくなるまで　すべて読みたい。
 
     // 玉を取ったとき。
     if cap_kms == KmSyurui::R {

@@ -8,7 +8,7 @@ use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use memory::uchu::*;
 use meidai::math_meidai::*;
-use movement_picker::*;
+use kifuwarabe_movement_picker::*;
 use movement_thinks::*;
 use searcher_impl::*;
 use std::collections::HashSet;
