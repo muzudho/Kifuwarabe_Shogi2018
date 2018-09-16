@@ -16,7 +16,7 @@ use searcher_impl::*;
  */
 pub fn is_s(searcher: &Searcher) -> bool {
     // 相手玉の位置
-    let ms_r = searcher.cur_position.ms_r[searcher.game_record.get_teban(&Jiai::Ai) as usize];
+    let ms_r = searcher.cur_position.ms_r[searcher.game_record.get_teban(Jiai::Ai) as usize];
 
     let p_r = ms_to_p( ms_r );
     let p_south_r = p_r.to_south();
@@ -26,13 +26,13 @@ pub fn is_s(searcher: &Searcher) -> bool {
     let km = searcher.cur_position.get_km_by_ms( ms_south_r );
     let jiai_km;
     {
-        jiai_km = searcher.game_record.get_jiai_by_km( &km );
+        jiai_km = searcher.game_record.get_jiai_by_km( km );
     }
     if jiai_km != Jiai::Ji { return true; }
 
     // g_writeln(&format!("info string south of My raion {} = {}. jiai_km={}.", ms_r, km, jiai_km ));
 
-    let kms = km_to_kms( &km );
+    let kms = km_to_kms( km );
 
     use kifuwarabe_position::KmSyurui::*;
     match kms {
@@ -87,11 +87,11 @@ pub fn is_atamakin(
 ) -> bool {
 
     // 相手らいおんのマス
-    let ms_ai_r = searcher.cur_position.ms_r[searcher.game_record.get_teban(&Jiai::Ai) as usize];
+    let ms_ai_r = searcher.cur_position.ms_r[searcher.game_record.get_teban(Jiai::Ai) as usize];
 
     // らいおん以外の相手の駒種類
     let mut kms_set_ai_c_r = KmsSyugo::new_all();
-    kms_set_ai_c_r.remove( &KmSyurui::R );
+    kms_set_ai_c_r.remove( KmSyurui::R );
 
     // kの下段左中右＝移動不可升　※現局面２手先の動き？
     // A が移動することで、利きは変わるか？　玉の下３つは変わらない

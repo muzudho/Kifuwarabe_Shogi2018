@@ -10,24 +10,24 @@ clippy = { version = "*", optional = true }
 
 [dependencies.kifuwarabe_shell]
 git = "https://github.com/muzudho/rust_kifuwarabe_shell.git"
-rev = "617eae960ba8e6b199abc8edf83052c4e220d53e"
+rev = "6ed8b4b5ac8bcd1ea60579d1d95011e9f1ee9d5d"
 
 [dependencies.kifuwarabe_usi]
 git = "https://github.com/muzudho/rust_kifuwarabe_usi.git"
-rev = "096ebbb384319a74b831ba5405b723ae4f26071d"
+rev = "0132274d5b5ade6c95b1e3dfa546192a7424bdc6"
 
 [dependencies.kifuwarabe_position]
 git = "https://github.com/muzudho/rust_kifuwarabe_position.git"
-rev = "0f43771fd890e9881e8d470b84f54177fe29a7ca"
+rev = "787e037bba474541ef74e05f34e0d890c6350427"
 
 [dependencies.kifuwarabe_movement]
 git = "https://github.com/muzudho/rust_kifuwarabe_movement.git"
-rev = "a5444fe7b495c86a02b38822b15456a42eeba8ad"
+rev = "6bfc143660ab39f8141630df94da9adf83bf0d3a"
 
 [dependencies.kifuwarabe_alpha_beta_search]
 git = "https://github.com/muzudho/rust_kifuwarabe_alpha_beta_search.git"
-rev = "3e53e1915de1e6ac9ddee47ee263113137b72da4"
+rev = "a2ab8c791d0abb8a22bef87a6f3d833571814a9c"
 
 [dependencies.kifuwarabe_movement_picker]
 git = "https://github.com/muzudho/rust_kifuwarabe_movement_picker.git"
-rev = "0c5e7992b997ea4cffd721e86c05013593b33ed5"
+rev = "c82db5326e39fddec8897019525a56e942127619"

@@ -47,7 +47,7 @@ impl fmt::Display for KomatoriResult{
         write!(f,"KmTori:{}{}{}{}"
             ,self.ms_attacker
             ,self.km_attacker
-            ,if km_is_nagaikiki(&self.km_attacker){ "-->" } else { "->" }
+            ,if km_is_nagaikiki(self.km_attacker){ "-->" } else { "->" }
             ,self.ms_target
         )
     }
@@ -62,7 +62,7 @@ impl KomatoriResult{
         // 正順で取り出すことを考えて、逆順で押し込む☆（＾～＾）
         hash = push_ms_to_hash(hash, self.ms_target);
         hash = push_ms_to_hash(hash, self.ms_attacker);
-        push_km_to_hash(hash, &self.km_attacker)
+        push_km_to_hash(hash, self.km_attacker)
     }
     pub fn from_hash(hash:u64)->KomatoriResult{
         // 逆順で押し込んであるんで、正順に引き出す☆（＾～＾）
@@ -93,7 +93,7 @@ impl KomatoriResult{
         }
 
         // (2-1)
-        if km_is_nagaikiki( &self.km_attacker ) {
+        if km_is_nagaikiki( self.km_attacker ) {
             assert_banjo_ms(ss.destination,             "(205b2)Ｇet_result");
             assert_banjo_ms(self.ms_attacker,   "(205b3)Ｇet_result");
             assert_banjo_ms(self.ms_target,     "(205b4)Ｇet_result");
@@ -168,7 +168,7 @@ pub fn lookup_banjo_catch(searcher: &Searcher, sn:Sengo, ms_target_cap:umasu) ->
 
     for kms_dst in &KMS_ARRAY {
         // 移動した後の相手の駒
-        let km_dst = sn_kms_to_km( &sn, kms_dst );
+        let km_dst = sn_kms_to_km( sn, *kms_dst );
         //let km_dst = sn_kms_to_km( &sn, rnd_kms() );
         // 指定マスに移動できるか
         // 打は除く

@@ -152,14 +152,14 @@ pub fn usi_to_movement(successful: bool, mv: UsiMovement) -> Movement { // mv: &
         }
     } else {
         // 投了。
-        Movement::new()
+        Movement::default()
     }
 }
 
 pub fn movement_to_usi(mv: &Movement) -> UsiMovement {
     // 先に投了判定を行う。
     if mv.destination==0 {
-        return UsiMovement::new();
+        return UsiMovement::default();
     }
     
     let (dst_file, dst_rank) = ms_to_suji_dan(mv.destination);

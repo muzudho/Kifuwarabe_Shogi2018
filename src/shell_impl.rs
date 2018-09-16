@@ -126,7 +126,7 @@ pub fn do_go_wincvar(shell_var: &mut ShellVar, _request: &Request, response:&mut
 
 pub fn do_go_linebreak(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     // 自分の手番
-    let turn_num = shell_var.searcher.game_record.get_teban(&Jiai::Ji) as usize;
+    let turn_num = shell_var.searcher.game_record.get_teban(Jiai::Ji) as usize;
 
     // 自分の持ち時間。
     let milliseconds = shell_var.player_milliseconds_array[turn_num];

@@ -35,7 +35,7 @@ pub fn test(searcher: &Searcher, line:&str, starts:&mut usize, len:usize) {
         let kms = randommove::rnd_kms();
         let km;
         {
-            km = sn_kms_to_km( &searcher.game_record.get_teban(&Jiai::Ji), kms );
+            km = sn_kms_to_km( searcher.game_record.get_teban(Jiai::Ji), *kms );
         }
         let ms_dst = randommove::rnd_ms();
         g_writeln( &format!("kms={} km={} ms_dst={}",kms,km,ms_dst) );
@@ -43,7 +43,7 @@ pub fn test(searcher: &Searcher, line:&str, starts:&mut usize, len:usize) {
         let mut da_kms_hashset : HashSet<usize> = HashSet::new();
         insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, km, &mut mv_src_hashset);
         insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, km, &mut mv_src_hashset);
-        insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, &km, &mut da_kms_hashset);
+        insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, km, &mut da_kms_hashset);
         hyoji_ms_hashset    ( &mv_src_hashset);
         hyoji_kms_hashset   ( &da_kms_hashset);
 
@@ -53,12 +53,12 @@ pub fn test(searcher: &Searcher, line:&str, starts:&mut usize, len:usize) {
         let kms = randommove::rnd_kms();
         let km;
         {
-            km = sn_kms_to_km( &searcher.game_record.get_teban(&Jiai::Ji), &kms );
+            km = sn_kms_to_km( searcher.game_record.get_teban(Jiai::Ji), *kms );
         }
         // 移動先の升、および　不成駒／成駒
         let ms_dst = randommove::rnd_ms();
         let pro_dst = randommove::rnd_bool();
-        let mut ss = Movement::new();
+        let mut ss = Movement::default();
         // 移動可能な元升
         let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
         //let mut da_kms_hashset : HashSet<usize> = HashSet::new();
@@ -82,56 +82,56 @@ pub fn test(searcher: &Searcher, line:&str, starts:&mut usize, len:usize) {
         {
             g_writeln( "利きテスト1");
             let kms = KmSyurui::PH; // ぱわーあっぷひよこ
-            let km = sn_kms_to_km( &Sengo::Go, &kms );// △ph
+            let km = sn_kms_to_km( Sengo::Go, kms );// △ph
             let ms_dst = 79;
             g_writeln( &format!("kms={} km={} ms_dst={}",kms,km,ms_dst) );
             let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
             let mut da_kms_hashset : HashSet<usize> = HashSet::new();
             insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, km, &mut mv_src_hashset);
             insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, km, &mut mv_src_hashset);
-            insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, &km, &mut da_kms_hashset);
+            insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, km, &mut da_kms_hashset);
             hyoji_ms_hashset    ( &mv_src_hashset);
             hyoji_kms_hashset   ( &da_kms_hashset);
         }
         {
             g_writeln( "利きテスト2");
             let kms = KmSyurui::PH; // ぱわーあっぷひよこ
-            let km = sn_kms_to_km( &Sengo::Go, &kms );// △ph
+            let km = sn_kms_to_km( Sengo::Go, kms );// △ph
             let ms_dst = 68;
             g_writeln( &format!("kms={} km={} ms_dst={}",kms,km,ms_dst) );
             let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
             let mut da_kms_hashset : HashSet<usize> = HashSet::new();
             insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, km, &mut mv_src_hashset);
             insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, km, &mut mv_src_hashset);
-            insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, &km, &mut da_kms_hashset);
+            insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, km, &mut da_kms_hashset);
             hyoji_ms_hashset    ( &mv_src_hashset);
             hyoji_kms_hashset   ( &da_kms_hashset);
         }
         {
             g_writeln( "利きテスト3");
             let kms = KmSyurui::PH; // ぱわーあっぷひよこ
-            let km = sn_kms_to_km( &Sengo::Go, &kms );// △ph
+            let km = sn_kms_to_km( Sengo::Go, kms );// △ph
             let ms_dst = 77;
             g_writeln( &format!("kms={} km={} ms_dst={}",kms,km,ms_dst) );
             let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
             let mut da_kms_hashset : HashSet<usize> = HashSet::new();
             insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, km, &mut mv_src_hashset);
             insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, km, &mut mv_src_hashset);
-            insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, &km, &mut da_kms_hashset);
+            insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, km, &mut da_kms_hashset);
             hyoji_ms_hashset    ( &mv_src_hashset);
             hyoji_kms_hashset   ( &da_kms_hashset);
         }
         {
             g_writeln( "利きテスト2");
             let kms = KmSyurui::R; // らいおん
-            let km = sn_kms_to_km( &Sengo::Sen, &kms );// ▼ら
+            let km = sn_kms_to_km( Sengo::Sen, kms );// ▼ら
             let ms_dst = 58;
             g_writeln( &format!("kms={} km={} ms_dst={}",kms,km,ms_dst) );
             let mut mv_src_hashset : HashSet<umasu> = HashSet::new();
             let mut da_kms_hashset : HashSet<usize> = HashSet::new();
             insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, km, &mut mv_src_hashset);
             insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, km, &mut mv_src_hashset);
-            insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, &km, &mut da_kms_hashset);
+            insert_da_kms_by_ms_km      (&searcher.cur_position, ms_dst, km, &mut da_kms_hashset);
             hyoji_ms_hashset    ( &mv_src_hashset);
             hyoji_kms_hashset   ( &da_kms_hashset);
         }

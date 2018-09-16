@@ -53,7 +53,7 @@ pub fn refresh_kikisu(gen_ky: &Position) -> (
                 // 打は考えない。盤上の利き数なので
                 let kikisu = mv_src_hashset.len();
 
-                let sn = km_to_sn( &km_dst);
+                let sn = km_to_sn( *km_dst);
 
                 // 駒別
                 local_kiki_su_by_km[*km_dst as usize].add_su_by_ms( ms_dst, kikisu as i8 );

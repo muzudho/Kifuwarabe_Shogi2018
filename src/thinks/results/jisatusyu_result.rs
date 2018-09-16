@@ -13,9 +13,9 @@ use UCHU_WRAP;
 pub fn is_jisatusyu(searcher: &Searcher, ss:&Movement)->bool{
     // 移動元升、動かした駒の先後、駒種類、
     let km_src = searcher.cur_position.get_km_by_ms( ss.source );
-    let (sn_teban,_kms) = km_to_sn_kms( &km_src );
+    let (sn_teban,_kms) = km_to_sn_kms( km_src );
     // 相手番の先後
-    let sn_aite = hanten_sn( &sn_teban );
+    let sn_aite = hanten_sn( sn_teban );
 
     // 升の利き数だが、指した後で再計算が要るはず
     let kikisu = UCHU_WRAP.try_read().unwrap().kiki_su_by_sn[sn_aite as usize].get_su_by_ms( ss.destination );

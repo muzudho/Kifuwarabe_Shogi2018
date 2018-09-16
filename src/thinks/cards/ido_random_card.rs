@@ -35,7 +35,7 @@ pub fn get_ido_ss_by_km_random(searcher: &Searcher, km_dst:Koma) -> Movement {
         if ss.exists(){ return ss;}
     }
     // 投了
-    Movement::new()
+    Movement::default()
 }
 
 /**
@@ -54,9 +54,9 @@ pub fn get_ss_by_random(searcher: &Searcher)->Movement{
         // 手番の、移動した先の駒
         let sn1;
         {
-            sn1 = searcher.game_record.get_teban(&Jiai::Ji);
+            sn1 = searcher.game_record.get_teban(Jiai::Ji);
         }
-        let km_dst = sn_kms_to_km( &sn1, randommove::rnd_kms() );
+        let km_dst = sn_kms_to_km( sn1, *randommove::rnd_kms() );
 
         ss_hashset.clear();
         insert_ss_by_ms_km_on_banjo (&searcher, ms_dst, km_dst, &mut ss_hashset);
@@ -71,5 +71,5 @@ pub fn get_ss_by_random(searcher: &Searcher)->Movement{
         if ss.exists(){ return ss;}
     }
     // 投了
-    Movement::new()
+    Movement::default()
 }

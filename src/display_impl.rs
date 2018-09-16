@@ -42,7 +42,7 @@ pub fn kaku_kifu(game_record: &GameRecord) -> String {
 pub fn kaku_ky(position: &Position, game_record: &GameRecord) -> String {
 
     let teme = game_record.get_teme();
-    let teban = game_record.get_teban(&Jiai::Ji);
+    let teban = game_record.get_teban(Jiai::Ji);
     let same = game_record.count_same_ky();
 
     let ky = position;
