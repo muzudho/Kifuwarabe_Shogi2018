@@ -22,14 +22,14 @@ pub fn get_ido_ss_by_km_random(searcher: &Searcher, km_dst:Koma) -> Movement {
     let mut ss_hashset = HashSet::new();
 
     // 数回リトライ
-    for _i_retry in 0..1000000 {
+    for _i_retry in 0..1_000_000 {
         // 移動したい先の升
         let ms_dst = randommove::rnd_ms();
         assert_banjo_ms(ms_dst, "get_ido_ss_by_km_random");
 
         ss_hashset.clear();
-        insert_ss_by_ms_km_on_banjo (&searcher, ms_dst, &km_dst, &mut ss_hashset);
-        insert_ss_by_ms_km_on_da    (&searcher, ms_dst, &km_dst, &mut ss_hashset);
+        insert_ss_by_ms_km_on_banjo (&searcher, ms_dst, km_dst, &mut ss_hashset);
+        insert_ss_by_ms_km_on_da    (&searcher, ms_dst, km_dst, &mut ss_hashset);
         let ss = choice_1ss_by_hashset(&ss_hashset);
 
         if ss.exists(){ return ss;}
@@ -46,7 +46,7 @@ pub fn get_ss_by_random(searcher: &Searcher)->Movement{
     let mut ss_hashset = HashSet::new();
 
     // 数回リトライ
-    'random: for _i_retry in 0..1000000 {
+    'random: for _i_retry in 0..1_000_000 {
         // 移動したい先の升
         let ms_dst = randommove::rnd_ms();
         assert_banjo_ms(ms_dst, "Ｇet_ss_by_random");
@@ -59,8 +59,8 @@ pub fn get_ss_by_random(searcher: &Searcher)->Movement{
         let km_dst = sn_kms_to_km( &sn1, randommove::rnd_kms() );
 
         ss_hashset.clear();
-        insert_ss_by_ms_km_on_banjo (&searcher, ms_dst, &km_dst, &mut ss_hashset);
-        insert_ss_by_ms_km_on_da    (&searcher, ms_dst, &km_dst, &mut ss_hashset);
+        insert_ss_by_ms_km_on_banjo (&searcher, ms_dst, km_dst, &mut ss_hashset);
+        insert_ss_by_ms_km_on_da    (&searcher, ms_dst, km_dst, &mut ss_hashset);
         let ss = choice_1ss_by_hashset( &ss_hashset );
 
         // 移動後は、玉が利きに飛び込まないか？

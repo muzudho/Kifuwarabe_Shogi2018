@@ -13,13 +13,13 @@ use UCHU_WRAP;
 pub fn cmd_kikisu(){
     for km in &KM_ARRAY {
         g_writeln(&format!("利き数：{}", km));
-        let s = UCHU_WRAP.try_read().unwrap().kaku_number_board(&Sengo::Num, &km);
+        let s = UCHU_WRAP.try_read().unwrap().kaku_number_board(Sengo::Num, *km);
         g_writeln( &s );
     }
 
     for sn in &SN_ARRAY {
         g_writeln(&format!("利き数：{}", sn));
-        let s = UCHU_WRAP.try_read().unwrap().kaku_number_board(&sn, &Koma::Num);
+        let s = UCHU_WRAP.try_read().unwrap().kaku_number_board(*sn, Koma::Num);
         g_writeln( &s );        
     }
 }

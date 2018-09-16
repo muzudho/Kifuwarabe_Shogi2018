@@ -36,7 +36,8 @@ pub fn refresh_kikisu(gen_ky: &Position) -> (
     ];
 
     // カウント    
-    for km_dst in &KM_ARRAY {
+    for km_dst in &KM_ARRAY
+    {
         for x in SUJI_1..SUJI_10 {// 9..0 みたいに降順に書いても動かない？
             for y in DAN_1..DAN_10 {
                 let ms_dst = suji_dan_to_ms( x, y );
@@ -45,9 +46,9 @@ pub fn refresh_kikisu(gen_ky: &Position) -> (
                 // 移動元の升
                 let mut mv_src_hashset : HashSet<umasu>     = HashSet::new();
 
-                insert_narazu_src_by_ms_km  (&gen_ky, ms_dst, &km_dst, &mut mv_src_hashset);
+                insert_narazu_src_by_ms_km  (&gen_ky, ms_dst, *km_dst, &mut mv_src_hashset);
 
-                insert_narumae_src_by_ms_km (&gen_ky, ms_dst, &km_dst, &mut mv_src_hashset);
+                insert_narumae_src_by_ms_km (&gen_ky, ms_dst, *km_dst, &mut mv_src_hashset);
 
                 // 打は考えない。盤上の利き数なので
                 let kikisu = mv_src_hashset.len();
@@ -63,5 +64,5 @@ pub fn refresh_kikisu(gen_ky: &Position) -> (
         }
     }
 
-    return (local_kiki_su_by_sn, local_kiki_su_by_km);
+    (local_kiki_su_by_sn, local_kiki_su_by_km)
 }

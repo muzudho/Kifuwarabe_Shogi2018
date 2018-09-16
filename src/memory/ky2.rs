@@ -19,14 +19,13 @@ impl KmSyugo {
         for km in &KM_ARRAY {
             num_syugo1.insert(*km as usize);
         }
-        let km_syugo = KmSyugo {
+        KmSyugo {
             num_syugo : num_syugo1,
-        };
-        km_syugo
+        }
     }
     /// 自分相手
     #[allow(dead_code)]
-    pub fn new_jiai(&self, jiai:&Jiai, game_record: &GameRecord) -> KmSyugo {
+    pub fn new_jiai(&self, jiai:Jiai, game_record: &GameRecord) -> KmSyugo {
         let sn0 = game_record.get_teban(&jiai);
         let mut num_syugo1 : HashSet<usize> = HashSet::new();
         for km in &KM_ARRAY {
@@ -35,13 +34,12 @@ impl KmSyugo {
                 num_syugo1.insert(*km as usize);
             }
         }
-        let km_syugo = KmSyugo {
+        KmSyugo {
             num_syugo : num_syugo1,
-        };
-        km_syugo
+        }
     }
     #[allow(dead_code)]
-    pub fn remove( &mut self, km:&Koma ) {
-        self.num_syugo.remove( &(*km as usize) );
+    pub fn remove( &mut self, km:Koma ) {
+        self.num_syugo.remove( &(km as usize) );
     }
 }

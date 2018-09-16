@@ -133,9 +133,9 @@ impl KomatoriResult{
                 }
             }
 
-        } else {
+        } else if self.ms_target == ss.source {
             // (3-2) 狙われている駒を、とりあえず動かす
-            if self.ms_target == ss.source { return KomatoriResultResult::NoneMoved; }
+            return KomatoriResultResult::NoneMoved;
         }
 
         // TODO 逃げた先の自殺手判定
@@ -174,7 +174,7 @@ pub fn lookup_banjo_catch(searcher: &Searcher, sn:Sengo, ms_target_cap:umasu) ->
         // 打は除く
 
         ss_hashset.clear();
-        insert_ss_by_ms_km_on_banjo(&searcher, ms_target_cap, &km_dst, &mut ss_hashset);
+        insert_ss_by_ms_km_on_banjo(&searcher, ms_target_cap, km_dst, &mut ss_hashset);
 
         // g_writeln( &format!("テスト lookup_banjo_catch insert_ss_by_ms_km_on_banjo kms_dst={}.",kms_dst) );
         // use consoles::visuals::dumps::*;

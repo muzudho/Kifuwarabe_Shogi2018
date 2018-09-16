@@ -50,20 +50,24 @@ pub fn g_write(s:&str){
     println!("{}",s);
     if LOG_ENABLE {
         // write_allメソッドを使うには use std::io::Write; が必要
+        if let Err(_why) = LOGFILE.lock().unwrap().write_all(s.as_bytes()) {}
+        // 大会向けに、ログ書き込み失敗は出力しないことにする
+        //panic!("couldn't write log. : {}",Error::description(&why)),
+        /*
+        // write_allメソッドを使うには use std::io::Write; が必要
         match LOGFILE.lock().unwrap().write_all(s.as_bytes()) {
             // 大会向けに、ログ書き込み失敗は出力しないことにする
             Err(_why) => {},//panic!("couldn't write log. : {}",Error::description(&why)),
             Ok(_) => {},
         }
+         */
     }
 }
 #[allow(dead_code)]
 pub fn g_writeln(s:&str){
     println!("{}",s);
     if LOG_ENABLE {
-        match LOGFILE.lock().unwrap().write_all(format!("{}\n",s).as_bytes()) {
-            Err(_why) => {},
-            Ok(_) => {},
+        if let Err(_why) = LOGFILE.lock().unwrap().write_all(format!("{}\n",s).as_bytes()) {
         }
     }
 }
@@ -121,11 +125,11 @@ impl Uchu{
     /**
      * 表示
      */
-    pub fn kaku_number_board(&self, sn:&Sengo, km:&Koma)->String{
+    pub fn kaku_number_board(&self, sn:Sengo, km:Koma)->String{
 
-        let nb = match *sn {
-            Sengo::Num    => { &self.kiki_su_by_km[*km as usize] },
-            _             => { &self.kiki_su_by_sn[*sn as usize] },
+        let nb = match sn {
+            Sengo::Num    => { &self.kiki_su_by_km[km as usize] },
+            _             => { &self.kiki_su_by_sn[sn as usize] },
         };
 
         // 数盤表示
@@ -166,13 +170,13 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
     pub fn hyoji_kmugoki(&self){
         for kms in &KMS_ARRAY {
             g_write(&format!( "{} ", kms ));
-            self.hyoji_kmugoki_dir( &kms );
+            self.hyoji_kmugoki_dir( *kms );
             g_writeln("");//改行
         }
     }
-    pub fn hyoji_kmugoki_dir(&self, kms:&KmSyurui ){
-        for kmdir in &KM_UGOKI.back[*kms as usize] {
-            match *kmdir {
+    pub fn hyoji_kmugoki_dir(&self, kms:KmSyurui ){
+        for kmdir in &KM_UGOKI.back[kms as usize] {
+            match kmdir {
                 KmDir::Num => break,
                 _ => g_write(&format!( "{},", kmdir))
             }

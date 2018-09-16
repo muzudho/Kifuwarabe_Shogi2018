@@ -163,8 +163,12 @@ pub fn do_hirate(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
         {
             // 持ち駒数コピー。
             for (i, item) in HAND_PIECE_ARRAY.iter().enumerate() {
+            //let mut i=0;
+            //for item in &HAND_PIECE_ARRAY { // for item in HAND_PIECE_ARRAY.iter() {
                 let km = pc_to_km(*item);
+
                 searcher.ini_position.set_mg(km, hand_count_arr[i]);
+                // i += 1;
             }
         },
         |searcher, ban: [Piece;100]|
@@ -239,7 +243,7 @@ pub fn do_kmugokidir(_shell_var: &mut ShellVar, _request: &Request, _response:&m
     // 駒の動きの移動元として有りえる方角
     let kms = thinks::randommove::rnd_kms();
     g_writeln(&format!("{}のムーブ元", &kms));
-    uchu_r.hyoji_kmugoki_dir( kms );
+    uchu_r.hyoji_kmugoki_dir(*kms);
     g_writeln("");//改行
 }
 

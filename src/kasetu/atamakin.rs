@@ -40,7 +40,7 @@ pub fn is_s(searcher: &Searcher) -> bool {
         _ => {},
     }
 
-    return true;
+    true
 }
 
 

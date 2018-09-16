@@ -25,9 +25,8 @@ pub fn intersect_point_on_line_segment( p:&Point, a:&Point, b:&Point ) -> bool {
         // 角度を持たない点は、一致と判定
         let angle4ab = get_argangle4_p_p( &a, &b );
         let angle4pa = get_argangle4_p_p( &p, &a );
-        match match_argangle4( &angle4pa, &angle4ab ) {
-            MatchingResult::Matched => return true,
-            _ => {},
+        if let MatchingResult::Matched = match_argangle4( &angle4pa, &angle4ab ) {
+            return true
         }
     }
     false

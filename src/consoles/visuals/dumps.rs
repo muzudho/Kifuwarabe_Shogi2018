@@ -29,7 +29,7 @@ pub fn hyoji_ms_hashset(ms_hashset:&HashSet<umasu>){
 /**
  * 升を表示
  */
-pub fn hyoji_ms_vec(ms_vec:&Vec<umasu>){
+pub fn hyoji_ms_vec(ms_vec:&[umasu]){
     g_writeln(&format!( "ms_vec.len()={}", ms_vec.len()));
     
     for ms in ms_vec {
@@ -95,10 +95,8 @@ pub fn hyoji_ss_hashset( ss_hashset:&HashSet<u64> ){
     });
     vec_ss_str.reverse();
 
-    let mut i = 0;
-    for ss_str in vec_ss_str {
+    for (i, ss_str) in vec_ss_str.iter().enumerate() {
         g_writeln(&format!( "[{}] {}", i, ss_str ));
-        i += 1;
     }
 }
 

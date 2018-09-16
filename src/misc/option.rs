@@ -13,11 +13,11 @@ impl EngineSettings {
             buffer_value: "".to_string(),
         }
     }
-    pub fn contains(&self, key: &String) -> bool {
+    pub fn contains(&self, key: &str) -> bool {
         self.map.contains_key(key)
     }
-    pub fn get(&self, key: &String) -> &String {
-        self.map.get(key).unwrap()
+    pub fn get(&self, key: &str) -> &String {
+        &self.map[key]
     }
     pub fn flush(&mut self) {
         self.map.insert(
