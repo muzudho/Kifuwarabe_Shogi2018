@@ -57,9 +57,9 @@ pub fn pt_to_kms (pt: &PieceType) -> KmSyurui {
 
 
 
-pub fn km_to_pc (km: &Koma) -> Piece {
+pub fn km_to_pc (km: Koma) -> Piece { // km: &Koma
     use kifuwarabe_usi::Piece;
-    match *km{
+    match km{
         R0 => Piece::K0,
         K0 => Piece::R0,
         Z0 => Piece::B0,
@@ -93,10 +93,10 @@ pub fn km_to_pc (km: &Koma) -> Piece {
     }
 }
 
-pub fn pc_to_km (pc: &Piece) -> Koma {
+pub fn pc_to_km (pc: Piece) -> Koma { // pc: &Piece
     use kifuwarabe_usi::Piece::*;
     use kifuwarabe_position::Koma;
-    match *pc{
+    match pc{
         K0 => Koma::R0,
         R0 => Koma::K0,
         B0 => Koma::Z0,
@@ -132,23 +132,23 @@ pub fn pc_to_km (pc: &Piece) -> Koma {
 
 
 /// USIの指し手表記を、きふわらべの指し手に変換する。
-pub fn usi_to_movement(successful: bool, mv: &UsiMovement) -> Movement {
+pub fn usi_to_movement(successful: bool, mv: UsiMovement) -> Movement { // mv: &UsiMovement
     if successful {
-        let source : umasu = match mv.drop {
+        let source2 : umasu = match mv.drop {
             PieceType::Space => suji_dan_to_ms(mv.source_file, mv.source_rank),
             _ => 0,
         };
 
-        let drop : KmSyurui = match mv.drop {
+        let drop2 : KmSyurui = match mv.drop {
             PieceType::Space => KmSyurui::Kara,
             _ => pt_to_kms(&mv.drop),
         };
 
         Movement {
-            source : source,
+            source : source2,
             destination : suji_dan_to_ms(mv.destination_file, mv.destination_rank),
             promotion : mv.promotion,
-            drop : drop,
+            drop : drop2,
         }
     } else {
         // 投了。
@@ -164,7 +164,7 @@ pub fn movement_to_usi(mv: &Movement) -> UsiMovement {
     
     let (dst_file, dst_rank) = ms_to_suji_dan(mv.destination);
 
-    let (src_file, src_rank, drop) = match mv.drop {
+    let (src_file, src_rank, drop2) = match mv.drop {
         KmSyurui::Kara => {
             let (src_file, src_rank) = ms_to_suji_dan(mv.source);
             (src_file, src_rank, PieceType::Space)
@@ -176,7 +176,7 @@ pub fn movement_to_usi(mv: &Movement) -> UsiMovement {
     UsiMovement{
         source_file : src_file,
         source_rank : src_rank,
-        drop : drop,
+        drop : drop2,
         destination_file : dst_file,
         destination_rank : dst_rank,
         promotion : mv.promotion,

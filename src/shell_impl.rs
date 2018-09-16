@@ -50,7 +50,7 @@ pub fn do_do(shell_var: &mut ShellVar, request: &Request, response:&mut Response
 
     // コマンド読取。棋譜に追加され、手目も増える
     let (successful, umov) = parse_movement(&request.line, &mut response.caret, request.line_len);
-    let movement = usi_to_movement(successful, &umov);
+    let movement = usi_to_movement(successful, umov);// &umov
 
     shell_var.searcher.game_record.set_movement(movement);
 
@@ -163,8 +163,8 @@ pub fn do_hirate(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
         {
             // 持ち駒数コピー。
             let mut i=0;
-            for item in HAND_PIECE_ARRAY.iter() {
-                let km = pc_to_km(item);
+            for item in &HAND_PIECE_ARRAY { // for item in HAND_PIECE_ARRAY.iter() {
+                let km = pc_to_km(*item);
 
                 searcher.ini_position.set_mg(km, hand_count_arr[i]);
                 i += 1;
@@ -175,7 +175,7 @@ pub fn do_hirate(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
             // 盤面コピー
             for file in SUJI_1..SUJI_10 {
                 for rank in DAN_1..DAN_10 {
-                    searcher.ini_position.set_km_by_ms(suji_dan_to_ms(file, rank), pc_to_km(&ban[file_rank_to_cell(file,rank)]));
+                    searcher.ini_position.set_km_by_ms(suji_dan_to_ms(file, rank), pc_to_km(ban[file_rank_to_cell(file,rank)]));
                 }
             }
 
@@ -189,7 +189,7 @@ pub fn do_hirate(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
         },
         |mut searcher, successful, usi_movement|
         {
-            let movement = usi_to_movement(successful, &usi_movement);
+            let movement = usi_to_movement(successful, usi_movement); //&usi_movement
 
             searcher.game_record.set_movement(movement);
 
@@ -310,7 +310,7 @@ pub fn do_position(shell_var: &mut ShellVar, request: &Request, response:&mut Re
         |searcher, hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|{
             let mut i=0;
             for item in HAND_PIECE_ARRAY.iter() {
-                let km = pc_to_km(item);
+                let km = pc_to_km(*item);
 
                 searcher.ini_position.set_mg(km, hand_count_arr[i]);
                 i+=1;
@@ -321,7 +321,7 @@ pub fn do_position(shell_var: &mut ShellVar, request: &Request, response:&mut Re
             // 局面のクローンを作成。
             for file in SUJI_1..SUJI_10 {
                 for rank in DAN_1..DAN_10 {
-                    searcher.ini_position.set_km_by_ms(suji_dan_to_ms(file, rank), pc_to_km(&ban[file_rank_to_cell(file,rank)]));
+                    searcher.ini_position.set_km_by_ms(suji_dan_to_ms(file, rank), pc_to_km(ban[file_rank_to_cell(file,rank)]));
                 }
             }
 
@@ -335,7 +335,7 @@ pub fn do_position(shell_var: &mut ShellVar, request: &Request, response:&mut Re
         },
         // 指し手読取。
         |mut searcher, successful, usi_movement|{
-            let movement = usi_to_movement(successful, &usi_movement);
+            let movement = usi_to_movement(successful, usi_movement); // &usi_movement
 
             // 棋譜に書き込み。
             searcher.game_record.set_movement(movement);

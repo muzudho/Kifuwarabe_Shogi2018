@@ -1,3 +1,6 @@
+#![cfg_attr(feature="clippy", feature(plugin))]
+#![cfg_attr(feature="clippy", plugin(clippy))]
+
 ///
 /// きふわらべ将棋2018
 ///
@@ -48,7 +51,6 @@ use shell_impl::*;
 
 
 use rand::Rng;
-
 
 
 // グローバル変数。

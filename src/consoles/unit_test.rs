@@ -65,13 +65,14 @@ pub fn test(searcher: &Searcher, line:&String, starts:&mut usize, len:usize) {
         insert_narazu_src_by_ms_km  (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
         insert_narumae_src_by_ms_km (&searcher.cur_position, ms_dst, &km, &mut mv_src_hashset);
         //insert_da_kms_by_ms_km      ( ms_dst, &km, &mut da_kms_hashset );
+        #[allow(never_loop)]
         for ms_src in mv_src_hashset {
             ss.source = ms_src;
             g_writeln( &format!( "移動可能な駒がある升={}", ms_src) );
             ss.destination = ms_dst;
             ss.promotion = pro_dst;
             ss.drop = KmSyurui::Kara;
-            break;
+            break; // Clippyが「this loop never actually loops」とエラーにする。
         }
         g_writeln( &format!( "指し手にすると={}", movement_to_usi(&ss) ) );
 
