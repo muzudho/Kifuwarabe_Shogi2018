@@ -17,7 +17,7 @@ use thinks::results::jisatusyu_result::*;
  *
  * km_dst : 移動した先の駒
  */
-pub fn get_ido_ss_by_km_random(searcher: &Searcher, km_dst:&Koma) -> Movement {
+pub fn get_ido_ss_by_km_random(searcher: &Searcher, km_dst:Koma) -> Movement {
     
     let mut ss_hashset = HashSet::new();
 

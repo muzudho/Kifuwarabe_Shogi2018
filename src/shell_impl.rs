@@ -57,7 +57,7 @@ pub fn do_do(shell_var: &mut ShellVar, request: &Request, response:&mut Response
     if successful {
         // 入っている指し手の通り指すぜ☆（＾～＾）
         let mut dummy_alpha = 0;
-        makemove(&mut shell_var.searcher, movement.to_hash(), &mut dummy_alpha);
+        userdefined_makemove(&mut shell_var.searcher, movement.to_hash(), &mut dummy_alpha);
     }
 }
 
@@ -162,12 +162,13 @@ pub fn do_hirate(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
         |mut searcher, hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|
         {
             // 持ち駒数コピー。
-            let mut i=0;
-            for item in &HAND_PIECE_ARRAY { // for item in HAND_PIECE_ARRAY.iter() {
+            for (i, item) in HAND_PIECE_ARRAY.iter().enumerate() {
+            //let mut i=0;
+            //for item in &HAND_PIECE_ARRAY { // for item in HAND_PIECE_ARRAY.iter() {
                 let km = pc_to_km(*item);
 
                 searcher.ini_position.set_mg(km, hand_count_arr[i]);
-                i += 1;
+                // i += 1;
             }
         },
         |searcher, ban: [Piece;100]|
@@ -196,7 +197,7 @@ pub fn do_hirate(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
             if successful {
                 // 入っている指し手の通り指すぜ☆（＾～＾）
                 let mut dummy_alpha = 0;
-                makemove(&mut searcher, movement.to_hash(), &mut dummy_alpha);
+                userdefined_makemove(&mut searcher, movement.to_hash(), &mut dummy_alpha);
             }
         }
     );
@@ -308,12 +309,10 @@ pub fn do_position(shell_var: &mut ShellVar, request: &Request, response:&mut Re
         &request.line,
         // 持ち駒数読取。
         |searcher, hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|{
-            let mut i=0;
-            for item in HAND_PIECE_ARRAY.iter() {
+            for (i, item) in HAND_PIECE_ARRAY.iter().enumerate() {
                 let km = pc_to_km(*item);
 
                 searcher.ini_position.set_mg(km, hand_count_arr[i]);
-                i+=1;
             }
         },
         // 盤面読取。
@@ -343,7 +342,7 @@ pub fn do_position(shell_var: &mut ShellVar, request: &Request, response:&mut Re
             if successful {
                 // 指し手が付いていれば、指し手を指すぜ☆（＾～＾）
                 let mut dummy_alpha = 0;
-                makemove(&mut searcher, movement.to_hash(), &mut dummy_alpha);
+                userdefined_makemove(&mut searcher, movement.to_hash(), &mut dummy_alpha);
             }
         }
     );

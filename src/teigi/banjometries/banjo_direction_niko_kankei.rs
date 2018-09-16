@@ -19,7 +19,7 @@ use teigi::shogi_syugo::*;
  */
 pub fn get_dir8_to_slider_from_target(
     ms_slider:umasu,
-    km_slider:&Koma,
+    km_slider:Koma, // km_slider:&Koma
     ms_target:umasu
 ) -> Dir8 {
     debug_assert!( ms_slider != ms_target, "dosn't ms{}!={}",ms_slider,ms_target);

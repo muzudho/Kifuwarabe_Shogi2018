@@ -37,12 +37,12 @@ pub fn think(shell_var: &mut ShellVar, milliseconds: i32) -> Movement{
 
         // ゼロ・リセット
         // 駒別に用意した盤を使った、利き数。
-        for km in KM_ARRAY.iter() {
+        for km in &KM_ARRAY {
             uchu.kiki_su_by_km[*km as usize].clear();
         }
 
         // 先後別に用意した盤を使った、利き数。
-        for sn in SN_ARRAY.iter() {
+        for sn in &SN_ARRAY {
             uchu.kiki_su_by_sn[*sn as usize].clear();
         }
 
@@ -59,11 +59,11 @@ pub fn think(shell_var: &mut ShellVar, milliseconds: i32) -> Movement{
 
     // 任意の構造体を受け取る、コールバック カタログを作成する。
     let mut callback_catalog = CallbackCatalog::<Searcher> {
-        visit_leaf_callback: visit_leaf_callback,
-        makemove_callback: makemove,
-        unmakemove_callback: unmakemove_not_return,
-        pick_movements_callback: pick_movements_callback,
-        compare_best_callback: compare_best_callback,
+        visit_leaf_callback: userdefined_visit_leaf_callback,
+        makemove_callback: userdefined_makemove,
+        unmakemove_callback: userdefined_unmakemove_not_return,
+        pick_movements_callback: userdefined_pick_movements_callback,
+        compare_best_callback: userdefined_compare_best_callback,
     };
 
     // ノード数を累計していく。
@@ -111,7 +111,7 @@ pub fn think(shell_var: &mut ShellVar, milliseconds: i32) -> Movement{
 
     // 計測時間。
     let end = shell_var.searcher.stopwatch.elapsed();
-    g_writeln(&format!("info string {}.{:03}sec.", end.as_secs(), end.subsec_nanos() / 1_000_000));
+    g_writeln(&format!("info string {}.{:03}sec.", end.as_secs(), end.subsec_millis())); // end.subsec_nanos() / 1_000_000
 
     // 返却
     Movement::from_hash(best_movement_hash)

@@ -126,15 +126,10 @@ impl KomatoriResult{
                 let argangle4b = get_argangle4_p_p( &p_dst, &p_src );
 
                 // スライダーのいる筋の上で動いても、逃げたことにはならないぜ☆（＾～＾）
-                match match_argangle4( &argangle4a, &argangle4b ) {
-                    MatchingResult::Unmatched => {
-                        // g_writeln(&format!("info string ss={} evaluated in slider.", movement_to_usi(ss) ));
-                        // スライダーから逃げても、ひよこの利きに飛び込むことはあるが……☆
-                        return KomatoriResultResult::NoneMoved
-                    },
-                    _ => {
-                        // g_writeln(&format!("info string ss={} in slider attack.", movement_to_usi(ss) ));                    
-                    },
+                if let MatchingResult::Unmatched = match_argangle4( &argangle4a, &argangle4b ) {
+                    // g_writeln(&format!("info string ss={} evaluated in slider.", movement_to_usi(ss) ));
+                    // スライダーから逃げても、ひよこの利きに飛び込むことはあるが……☆
+                    return KomatoriResultResult::NoneMoved
                 }
             }
 
@@ -158,20 +153,20 @@ impl KomatoriResult{
  *
  * return u64 : KomatoriResult のハッシュ
  */
-pub fn lookup_banjo_catch(searcher: &Searcher, sn:&Sengo, ms_target:umasu) -> HashSet<u64> {
+pub fn lookup_banjo_catch(searcher: &Searcher, sn:Sengo, ms_target_cap:umasu) -> HashSet<u64> { // sn:&Sengo
     assert_banjo_ms(
-        ms_target,
-        &format!("(119)Ｌookup_banjo_catch sn={} ms_target={}"
-            ,sn ,ms_target)
+        ms_target_cap,
+        &format!("(119)Ｌookup_banjo_catch sn={} ms_target_cap={}"
+            ,sn ,ms_target_cap)
     );
 
     let mut hash = HashSet::new();
 
-    if ms_target==MASU_0 {return hash;}
+    if ms_target_cap==MASU_0 {return hash;}
 
     let mut ss_hashset = HashSet::new();
 
-    for kms_dst in KMS_ARRAY.iter(){
+    for kms_dst in &KMS_ARRAY {
         // 移動した後の相手の駒
         let km_dst = sn_kms_to_km( &sn, kms_dst );
         //let km_dst = sn_kms_to_km( &sn, rnd_kms() );
@@ -179,7 +174,7 @@ pub fn lookup_banjo_catch(searcher: &Searcher, sn:&Sengo, ms_target:umasu) -> Ha
         // 打は除く
 
         ss_hashset.clear();
-        insert_ss_by_ms_km_on_banjo(&searcher, ms_target, &km_dst, &mut ss_hashset);
+        insert_ss_by_ms_km_on_banjo(&searcher, ms_target_cap, &km_dst, &mut ss_hashset);
 
         // g_writeln( &format!("テスト lookup_banjo_catch insert_ss_by_ms_km_on_banjo kms_dst={}.",kms_dst) );
         // use consoles::visuals::dumps::*;
@@ -189,8 +184,8 @@ pub fn lookup_banjo_catch(searcher: &Searcher, sn:&Sengo, ms_target:umasu) -> Ha
         if ss.exists() {
             assert_banjo_ms(
                 ss.source,
-                &format!("(123)Ｌookup_banjo_catch ss.source /  ms_target={} km_dst={} ss={}"
-                    , ms_target, km_dst,
+                &format!("(123)Ｌookup_banjo_catch ss.source /  ms_target_cap={} km_dst={} ss={}"
+                    , ms_target_cap, km_dst,
                     movement_to_usi(&ss)
                     )
             );
@@ -198,7 +193,7 @@ pub fn lookup_banjo_catch(searcher: &Searcher, sn:&Sengo, ms_target:umasu) -> Ha
             let oute_result = KomatoriResult{
                 km_attacker : km_dst,
                 ms_attacker : ss.source, // FIXME 打だと 0 になるのでは
-                ms_target   : ms_target,
+                ms_target   : ms_target_cap,
             };
 
             // 重複がいっぱい

@@ -725,7 +725,7 @@ pub fn filtering_ss_except_oute(
     {
         sn1 = searcher.game_record.get_teban(&Jiai::Ai);
     }
-    let komatori_result_hashset : HashSet<u64> = lookup_banjo_catch(&searcher, &sn1, ms_r);
+    let komatori_result_hashset : HashSet<u64> = lookup_banjo_catch(&searcher, sn1, ms_r);
     if 0<komatori_result_hashset.len() {
         // 王手されていれば
 
@@ -804,7 +804,7 @@ pub fn filtering_ss_except_jisatusyu(
 
         // その手を指してみる
         let mut dummy_alpha = 0;
-        makemove(searcher, ss_potential.to_hash(), &mut dummy_alpha);
+        userdefined_makemove(searcher, ss_potential.to_hash(), &mut dummy_alpha);
         // // 現局面表示
         // let s1 = kaku_ky(&KyNums::Current);
         // g_writeln( &s1 );            
@@ -890,7 +890,7 @@ pub fn filtering_ss_except_sennitite(
 
         // その手を指してみる
         let mut dummy_alpha = 0;
-        makemove(searcher, ss.to_hash(), &mut dummy_alpha);
+        userdefined_makemove(searcher, ss.to_hash(), &mut dummy_alpha);
         
         // 現局面表示
         // let s1 = kaku_ky(&KyNums::Current);

@@ -54,7 +54,7 @@ impl Searcher {
     }
 }
 
-pub fn visit_leaf_callback(searcher: &mut Searcher, display_information: &DisplayInformation) -> (i16) {
+pub fn userdefined_visit_leaf_callback(searcher: &mut Searcher, display_information: &DisplayInformation) -> (i16) {
 
     // 評価値は駒割り。
     let komawari = searcher.incremental_komawari;
@@ -75,9 +75,9 @@ pub fn visit_leaf_callback(searcher: &mut Searcher, display_information: &Displa
 }
 
 /// 駒割り。
-fn get_koma_score(km: &KmSyurui) -> i16 {
+fn get_koma_score(km: KmSyurui) -> i16 {
     use kifuwarabe_position::KmSyurui;
-    match *km {
+    match km {
         KmSyurui::R => {15000},
         KmSyurui::Z => {  800},
         KmSyurui::K => { 1100},
@@ -97,7 +97,7 @@ fn get_koma_score(km: &KmSyurui) -> i16 {
 }
 
 /// 指し手生成。
-pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_depth: i16) -> (HashSet<u64>, bool) {
+pub fn userdefined_pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_depth: i16) -> (HashSet<u64>, bool) {
 
     let mut hashset_movement : HashSet<u64> = HashSet::new();
     // 反復深化探索の打ち切り。
@@ -145,13 +145,13 @@ pub fn pick_movements_callback(searcher: &mut Searcher, max_depth: i16, cur_dept
 /// # Returns.
 ///
 /// 0. cutoff - 探索を打ち切るなら真。玉を取る手など。
-pub fn makemove(searcher: &mut Searcher, movement_hash: u64, alpha: &mut i16) -> (bool) {
+pub fn userdefined_makemove(searcher: &mut Searcher, movement_hash: u64, alpha: &mut i16) -> (bool) {
 
     let movement = Movement::from_hash(movement_hash);
     let cap_kms = searcher.game_record.make_movement2(&movement, &mut searcher.cur_position);
 
     // 駒割の差分更新。
-    searcher.incremental_komawari += get_koma_score(&cap_kms);
+    searcher.incremental_komawari += get_koma_score(cap_kms);
 
     /*
     // VERBOSE 現局面表示
@@ -177,7 +177,7 @@ pub fn unmakemove(searcher: &mut Searcher) -> (bool, KmSyurui) {
 
     if successful {
         // 駒割り
-        searcher.incremental_komawari -= get_koma_score(&cap_kms);
+        searcher.incremental_komawari -= get_koma_score(cap_kms);
     }
 
     /*
@@ -189,7 +189,7 @@ pub fn unmakemove(searcher: &mut Searcher) -> (bool, KmSyurui) {
 
     (successful, cap_kms)
 }
-pub fn unmakemove_not_return(searcher: &mut Searcher) {
+pub fn userdefined_unmakemove_not_return(searcher: &mut Searcher) {
     unmakemove(searcher);
 }
 
@@ -208,7 +208,7 @@ pub fn unmakemove_not_return(searcher: &mut Searcher) {
 ///
 /// 1. 探索を打ち切るなら真。（ベータカット）
 /// 2. 探索をすみやかに安全に終了するなら真。
-pub fn compare_best_callback(searcher: &mut Searcher, best_movement_hash: &mut u64, alpha: &mut i16, beta: i16, movement_hash: u64, child_evaluation: i16) -> (bool, bool) {
+pub fn userdefined_compare_best_callback(searcher: &mut Searcher, best_movement_hash: &mut u64, alpha: &mut i16, beta: i16, movement_hash: u64, child_evaluation: i16) -> (bool, bool) {
 
     // 比較して、一番良い手を選ぶ。（アップデート アルファ）
     if *alpha < child_evaluation {

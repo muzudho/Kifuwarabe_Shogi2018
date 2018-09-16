@@ -9,10 +9,10 @@ use kifuwarabe_usi::*;
 
 
 
-pub fn kms_to_pt (kms: &KmSyurui) -> PieceType {
+pub fn kms_to_pt (kms: KmSyurui) -> PieceType { // kms: &KmSyurui
     use kifuwarabe_position::KmSyurui::*;
     use kifuwarabe_usi::PieceType;
-    match *kms{
+    match kms{
         R => PieceType::K,
         K => PieceType::R,
         Z => PieceType::B,
@@ -32,10 +32,10 @@ pub fn kms_to_pt (kms: &KmSyurui) -> PieceType {
     }
 }
 
-pub fn pt_to_kms (pt: &PieceType) -> KmSyurui {
+pub fn pt_to_kms (pt: PieceType) -> KmSyurui { // pt: &PieceType
     use kifuwarabe_usi::PieceType;
     use kifuwarabe_position::KmSyurui;
-    match *pt{
+    match pt{
         PieceType::K => KmSyurui::R,
         PieceType::R => KmSyurui::K,
         PieceType::B => KmSyurui::Z,
@@ -141,7 +141,7 @@ pub fn usi_to_movement(successful: bool, mv: UsiMovement) -> Movement { // mv: &
 
         let drop2 : KmSyurui = match mv.drop {
             PieceType::Space => KmSyurui::Kara,
-            _ => pt_to_kms(&mv.drop),
+            _ => pt_to_kms(mv.drop),
         };
 
         Movement {
@@ -170,7 +170,7 @@ pub fn movement_to_usi(mv: &Movement) -> UsiMovement {
             (src_file, src_rank, PieceType::Space)
         },
         // 打なら
-        _ => (SUJI_0, DAN_0, kms_to_pt(&mv.drop)),
+        _ => (SUJI_0, DAN_0, kms_to_pt(mv.drop)),
     };
 
     UsiMovement{
