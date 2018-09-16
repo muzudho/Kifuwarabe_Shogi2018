@@ -164,14 +164,14 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
 
     // 駒の動きを出力
     pub fn hyoji_kmugoki(&self){
-        for kms in KMS_ARRAY.iter() {
+        for kms in &KMS_ARRAY {
             g_write(&format!( "{} ", kms ));
             self.hyoji_kmugoki_dir( &kms );
             g_writeln("");//改行
         }
     }
     pub fn hyoji_kmugoki_dir(&self, kms:&KmSyurui ){
-        for kmdir in KM_UGOKI.back[*kms as usize].iter() {
+        for kmdir in &KM_UGOKI.back[*kms as usize] {
             match *kmdir {
                 KmDir::Num => break,
                 _ => g_write(&format!( "{},", kmdir))
@@ -182,7 +182,7 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
 
     #[allow(dead_code)]
     pub fn remake_visions(&mut self) {
-        for sn in SN_ARRAY.iter() {
+        for sn in &SN_ARRAY {
             // 全部忘れる☆（＾～＾）
             self.vision_tree_by_sn[*sn as usize].clear();
         }

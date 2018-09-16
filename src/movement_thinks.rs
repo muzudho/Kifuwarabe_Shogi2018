@@ -919,7 +919,7 @@ pub fn filtering_ss_except_sennitite(
 
     // 振り替え
     ss_hashset_input.clear();
-    for hash_ss in ss_hashset_pickup.iter() {
+    for hash_ss in &ss_hashset_pickup {
         ss_hashset_input.insert( *hash_ss );
     }    
 }

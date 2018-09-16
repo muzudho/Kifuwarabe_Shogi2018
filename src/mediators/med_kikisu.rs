@@ -36,8 +36,7 @@ pub fn refresh_kikisu(gen_ky: &Position) -> (
     ];
 
     // カウント    
-    for km_dst in KM_ARRAY.iter()
-    {
+    for km_dst in &KM_ARRAY {
         for x in SUJI_1..SUJI_10 {// 9..0 みたいに降順に書いても動かない？
             for y in DAN_1..DAN_10 {
                 let ms_dst = suji_dan_to_ms( x, y );
