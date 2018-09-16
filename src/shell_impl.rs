@@ -40,6 +40,67 @@ impl ShellVar {
     }
 }
 
+/*****
+ * C *
+ *****/
+
+/// 詰んでいたら真。
+pub fn sub_cmate0(shell_var: &mut ShellVar) -> bool {
+    // 探索時間は無制限(最大時間)。
+    shell_var.player_milliseconds_array[Sengo::Sen as usize] = <i32>::max_value();
+    shell_var.player_milliseconds_array[Sengo::Go as usize] = <i32>::max_value();
+
+    // 自分の手番
+    let turn_num = shell_var.searcher.game_record.get_teban(Jiai::Ji) as usize;
+
+    // 自分の持ち時間。
+    let milliseconds = shell_var.player_milliseconds_array[turn_num];
+
+    // 思考する。
+    let bestmove = think(shell_var, milliseconds, 1);
+
+    if bestmove.exists() {
+        false
+    } else {
+        true
+    }
+}
+
+/// すでに詰んでいるかを調べる。
+/// １手探索して投了すれば、すでに詰んでいると分かる。
+///
+pub fn do_cmate0(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+    g_writeln("すでに詰んでいるかを調べる。");
+    if sub_cmate0(shell_var) {
+        g_writeln("詰んでるぜ☆（＾～＾）ｖ");
+    } else {
+        g_writeln("詰んでないぜ☆（ー＿－）");
+    }
+}
+
+
+/// do_cmate0 を、ずっと続ける。
+/// FIXME 強制終了する方法が今のところない。
+///
+pub fn do_cmate0auto(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+    // let old_info_off = shell_var.searcher.info_off;
+    shell_var.searcher.info_off = true;
+
+    let mut trial : i64 = 0;
+    loop {
+        sub_rndpos(shell_var);
+        if sub_cmate0(shell_var) {
+            sub_ky(shell_var);
+            g_writeln(&format!("詰んでるぜ☆（＾～＾）ｖ trial: {}.", trial));
+            trial = 0;
+        } else {
+            // 詰んでなければ無視。
+            trial += 1;
+        }
+    }
+
+    // shell_var.searcher.info_off = old_info_off;
+}
 
 /*****
  * D *
@@ -139,7 +200,8 @@ pub fn do_go_linebreak(shell_var: &mut ShellVar, _request: &Request, _response:&
     let milliseconds = shell_var.player_milliseconds_array[turn_num];
 
     // 思考する。
-    let bestmove = think(shell_var, milliseconds);
+    let max_depth = get_max_depth(shell_var);
+    let bestmove = think(shell_var, milliseconds, max_depth);
 
     // 例： bestmove 7g7f
     g_writeln(&format!("bestmove {}", movement_to_usi(&bestmove)));
@@ -269,10 +331,13 @@ pub fn do_ky0(shell_var: &mut ShellVar, _request: &Request, _response:&mut Respo
     g_writeln( &s );
 }
 
+pub fn sub_ky(shell_var: &mut ShellVar){
+    let s = kaku_ky(&shell_var.searcher.cur_position, &shell_var.searcher.game_record);
+    g_writeln( &s );
+}
 /// 現局面表示。
 pub fn do_ky(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    let s = kaku_ky(&shell_var.searcher.cur_position, &shell_var.searcher.game_record);
-    g_writeln( &s );            
+    sub_ky(shell_var);
 }
 
 
@@ -388,9 +453,7 @@ pub fn do_rndms(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
     g_writeln( &format!( "乱升={}", ms) );
 }
 
-/// ランダムな初期局面を作る。
-pub fn do_rndpos(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    g_writeln( &"ランダムな初期局面を作る。" );
+pub fn sub_rndpos(shell_var: &mut ShellVar) {
     // 手目を 0 に戻す。
     shell_var.searcher.game_record.set_teme(0);
 
@@ -417,6 +480,12 @@ pub fn do_rndpos(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
 
     // 初期局面を、現局面に写す。
     shell_var.searcher.cur_position.set_all(&pos);
+}
+
+/// ランダムな初期局面を作る。
+pub fn do_rndpos(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+    g_writeln( &"ランダムな初期局面を作る。" );
+    sub_rndpos(shell_var);
 }
 
 /*****

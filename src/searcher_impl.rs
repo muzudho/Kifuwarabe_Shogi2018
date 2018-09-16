@@ -14,6 +14,7 @@ use time_manager::*;
 /// 任意の構造体を作成する。
 pub struct Searcher {
     pub stopwatch: Instant,
+    pub info_off: bool,
     pub info_stopwatch: Instant,
     /// 最大思考時間(秒)。
     pub thought_max_milliseconds: i32,
@@ -39,6 +40,7 @@ impl Searcher {
     pub fn new() -> Searcher {
         Searcher {
             stopwatch: Instant::now(),
+            info_off: false,
             info_stopwatch: Instant::now(),
             thought_max_milliseconds: 0,
             id_cur_depth: 0,
@@ -54,6 +56,7 @@ impl Searcher {
     }
 }
 
+/// 末端局面。
 pub fn userdefined_visit_leaf_callback(searcher: &mut Searcher, display_information: &DisplayInformation) -> (i16) {
 
     // 評価値は駒割り。
@@ -61,7 +64,7 @@ pub fn userdefined_visit_leaf_callback(searcher: &mut Searcher, display_informat
     // g_writeln(&format!("info string DEBUG komawari {}", komawari));
 
     // 読み筋表示。
-    {
+    if !searcher.info_off {
         let end = searcher.info_stopwatch.elapsed();
         if 3 < end.as_secs() {
             // 3秒以上考えていたら、情報表示。
@@ -171,6 +174,7 @@ pub fn userdefined_makemove(searcher: &mut Searcher, movement_hash: u64, alpha: 
     false
 }
 
+/// １手戻す。
 pub fn unmakemove(searcher: &mut Searcher) -> (bool, KmSyurui) {
 
     let (successful, cap_kms) = searcher.game_record.unmake_movement2(&mut searcher.cur_position);
@@ -208,7 +212,8 @@ pub fn userdefined_unmakemove_not_return(searcher: &mut Searcher) {
 ///
 /// 1. 探索を打ち切るなら真。（ベータカット）
 /// 2. 探索をすみやかに安全に終了するなら真。
-pub fn userdefined_compare_best_callback(searcher: &mut Searcher, best_movement_hash: &mut u64, alpha: &mut i16, beta: i16, movement_hash: u64, child_evaluation: i16) -> (bool, bool) {
+pub fn userdefined_compare_best_callback(searcher: &mut Searcher, best_movement_hash: &mut u64,
+    alpha: &mut i16, beta: i16, movement_hash: u64, child_evaluation: i16) -> (bool, bool) {
 
     // 比較して、一番良い手を選ぶ。（アップデート アルファ）
     if *alpha < child_evaluation {

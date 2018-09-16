@@ -96,6 +96,11 @@ fn main() {
     set_complementary_controller(&mut shell, do_other);
 
     // コマンド トークン構成。
+
+    // [C]
+    insert_node(&mut shell, "ND_cmate0", "cmate0", do_cmate0);
+    insert_node(&mut shell, "ND_cmate0auto", "cmate0auto", do_cmate0auto);
+
     // [D]
     insert_node(&mut shell, "ND_do", "do ", do_do);
 
@@ -160,7 +165,8 @@ fn main() {
     insert_node(&mut shell, "ND_usi", "usi", do_usi);
 
     // 開始ノードを選択する。
-    set_next(&mut shell, "ND_do,
+    set_next(&mut shell, "ND_cmate0, ND_cmate0auto,
+    ND_do,
     ND_getmate,
     ND_go,
     ND_hash,ND_hirate,ND_isready,

@@ -14,14 +14,23 @@ use UCHU_WRAP;
 
 
 
-
+/// どの深さまで潜るか。
+pub fn get_max_depth(shell_var: &mut ShellVar) -> i16 {
+    // 指定がなければ 5。
+    let mut max_depth = 5;
+    // 深さ 3 ぐらいなら 0.015秒ぐらい。
+    if shell_var.engine_settings.contains(&"depth".to_string()) {
+        max_depth = shell_var.engine_settings.get(&"depth".to_string()).parse::<i16>().unwrap();
+    }
+    max_depth
+}
 
 /// 現局面での最善手を返すぜ☆（*＾～＾*）
 ///
 /// # Arguments.
 ///
 /// * `milliseconds` - 残り思考時間(ミリ秒)
-pub fn think(shell_var: &mut ShellVar, milliseconds: i32) -> Movement{
+pub fn think(shell_var: &mut ShellVar, milliseconds: i32, max_depth: i16) -> Movement{
 
     // 思考時間設定。
     shell_var.searcher.thought_max_milliseconds = get_thought_max_milliseconds(milliseconds);
@@ -70,15 +79,9 @@ pub fn think(shell_var: &mut ShellVar, milliseconds: i32) -> Movement{
     let mut display_information = DisplayInformation::new();
 
     // 探索を開始する。
-    // どの深さまで潜るか。
-    // 深さ 3 ぐらいなら 0.015秒ぐらい。
-    let mut max_depth = 5;
-    {
-        if shell_var.engine_settings.contains(&"depth".to_string()) {
-            max_depth = shell_var.engine_settings.get(&"depth".to_string()).parse::<i16>().unwrap();
-        }
+    if !shell_var.searcher.info_off {
+        g_writeln(&format!("info string thought seconds: {}/{}, max_depth:{}.", shell_var.searcher.thought_max_milliseconds, milliseconds, max_depth));
     }
-    g_writeln(&format!("info string thought seconds: {}/{}, max_depth:{}.", shell_var.searcher.thought_max_milliseconds, milliseconds, max_depth));
 
     // 反復深化探索 iteration deeping.
     let mut best_movement_hash = RESIGN_HASH;
@@ -102,16 +105,18 @@ pub fn think(shell_var: &mut ShellVar, milliseconds: i32) -> Movement{
         best_movement_hash = id_best_movement_hash;
     }
 
-    // 手を決めたときにも情報表示。
-    g_writeln(&format!("info score cp {}", shell_var.searcher.id_evaluation));
-    // VERBOSE
-    g_writeln(&format!("info string score: {}, nodes: {}, bestmove: {},  incremental_komawari: {}",
-        shell_var.searcher.id_evaluation, display_information.nodes, Movement::from_hash(best_movement_hash), shell_var.searcher.incremental_komawari));
+    if !shell_var.searcher.info_off {
+        // 手を決めたときにも情報表示。
+        g_writeln(&format!("info score cp {}", shell_var.searcher.id_evaluation));
+        // VERBOSE
+        g_writeln(&format!("info string score: {}, nodes: {}, bestmove: {},  incremental_komawari: {}",
+            shell_var.searcher.id_evaluation, display_information.nodes, Movement::from_hash(best_movement_hash), shell_var.searcher.incremental_komawari));
 
 
-    // 計測時間。
-    let end = shell_var.searcher.stopwatch.elapsed();
-    g_writeln(&format!("info string {}.{:03}sec.", end.as_secs(), end.subsec_millis())); // end.subsec_nanos() / 1_000_000
+        // 計測時間。
+        let end = shell_var.searcher.stopwatch.elapsed();
+        g_writeln(&format!("info string {}.{:03}sec.", end.as_secs(), end.subsec_millis())); // end.subsec_nanos() / 1_000_000
+    }
 
     // 返却
     Movement::from_hash(best_movement_hash)
