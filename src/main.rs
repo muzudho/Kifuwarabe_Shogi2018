@@ -96,7 +96,11 @@ fn main() {
     set_complementary_controller(&mut shell, do_other);
 
     // コマンド トークン構成。
+    // [D]
     insert_node(&mut shell, "ND_do", "do ", do_do);
+
+    // [G]
+    insert_node(&mut shell, "ND_getmate", "getmate", do_getmate);
 
     insert_node(&mut shell, "ND_go", "go", do_go);
     insert_node(&mut shell, "ND_go_btime", "btime", do_go_btime);
@@ -108,9 +112,14 @@ fn main() {
     insert_node(&mut shell, "ND_go_winc", "winc", do_go_winc);
     insert_node_re(&mut shell, "ND_go_wincvar", r"(\d+)", do_go_wincvar);
 
+    // [H]
     insert_node(&mut shell, "ND_hash", "hash", do_hash);
     insert_node(&mut shell, "ND_hirate", "hirate", do_hirate);
+
+    // [I]
     insert_node(&mut shell, "ND_isready", "isready", do_isready);
+
+    // [K]
     insert_node(&mut shell, "ND_kifu", "kifu", do_kifu);
     insert_node(&mut shell, "ND_kikisu", "kikisu", do_kikisu);
     insert_node(&mut shell, "ND_kmmove", "kmmove", do_kmmove);
@@ -119,11 +128,19 @@ fn main() {
     insert_node(&mut shell, "ND_ky0", "ky0", do_ky0);
     insert_node(&mut shell, "ND_ky", "ky", do_ky);
 
+    // [P]
     insert_node(&mut shell, "ND_position", "position", do_position);
+
+    // [Q]
     insert_node(&mut shell, "ND_quit", "quit", do_quit);
+
+    // [R]
     insert_node(&mut shell, "ND_rand", "rand", do_rand);
     insert_node(&mut shell, "ND_rndkms", "rndkms", do_rndkms);
     insert_node(&mut shell, "ND_rndms", "rndms", do_rndms);
+    insert_node(&mut shell, "ND_rndpos", "rndpos", do_rndpos);
+
+    // [S]
     insert_node(&mut shell, "ND_same", "same", do_same);
     insert_node(&mut shell, "ND_sasite", "sasite", do_sasite);
 
@@ -133,20 +150,27 @@ fn main() {
     insert_node(&mut shell, "ND_setoption_value", "value", do_setoption_value);
     insert_node_re(&mut shell, "ND_setoption_valuevar", r"(\w+)", do_setoption_valuevar);
 
+    // [T]
     insert_node(&mut shell, "ND_teigi_conv", "teigi::conv", do_teigi_conv);
     insert_node(&mut shell, "ND_test", "test", do_test);
+
+    // [U]
     insert_node(&mut shell, "ND_usinewgame", "usinewgame", do_usinewgame);
     insert_node(&mut shell, "ND_undo", "undo", do_undo);
     insert_node(&mut shell, "ND_usi", "usi", do_usi);
 
     // 開始ノードを選択する。
-    set_next(&mut shell, "ND_do,ND_go,ND_hash,ND_hirate,ND_isready,
+    set_next(&mut shell, "ND_do,
+    ND_getmate,
+    ND_go,
+    ND_hash,ND_hirate,ND_isready,
     ND_kifu,ND_kikisu,ND_kmugokidir,ND_kmugoki,ND_ky0,ND_ky,
 
     ND_setoption, ND_setoption_name, ND_setoption_namevar, ND_setoption_value, ND_setoption_valuevar,
 
     ND_position,ND_quit,
-    ND_rand,ND_rndkms,ND_rndms,ND_same,ND_sasite,ND_teigi_conv,
+    ND_rand,ND_rndkms,ND_rndms,ND_rndpos,
+    ND_same,ND_sasite,ND_teigi_conv,
     ND_test,ND_usinewgame,ND_undo,ND_usi");
 
     // [Ctrl]+[C] で強制終了

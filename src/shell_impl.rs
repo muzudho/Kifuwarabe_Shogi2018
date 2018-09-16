@@ -66,6 +66,13 @@ pub fn do_do(shell_var: &mut ShellVar, request: &Request, response:&mut Response
  * G *
  *****/
 
+/// 何手詰めかを調べる。
+///
+pub fn do_getmate(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+    let mate = -1;
+    g_writeln(&format!("{}手詰め。", mate));
+}
+
 /// 思考を開始する。bestmoveコマンドを返却する。
 ///
 /// ### 例。
@@ -325,9 +332,8 @@ pub fn do_position(shell_var: &mut ShellVar, request: &Request, response:&mut Re
             }
 
             // 初期局面ハッシュを作り直す
-            let ky_hash = searcher.game_record.create_ky0_hash(&searcher.ini_position);
-
-            searcher.game_record.set_ky0_hash(ky_hash);
+            let hash_pos = searcher.game_record.create_ky0_hash(&searcher.ini_position);
+            searcher.game_record.set_ky0_hash(hash_pos);
 
             // 初期局面を、現局面に写す。
             searcher.cur_position.set_all(&searcher.ini_position);
@@ -380,6 +386,37 @@ pub fn do_rndkms(_shell_var: &mut ShellVar, _request: &Request, _response:&mut R
 pub fn do_rndms(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     let ms = thinks::randommove::rnd_ms();
     g_writeln( &format!( "乱升={}", ms) );
+}
+
+/// ランダムな初期局面を作る。
+pub fn do_rndpos(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+    g_writeln( &"ランダムな初期局面を作る。" );
+    // 手目を 0 に戻す。
+    shell_var.searcher.game_record.set_teme(0);
+
+    let mut pos = shell_var.searcher.ini_position;
+    // 盤上の駒をシャッフルする。
+    for _i in 0..1000 {
+        // ランダムな升を２つ。
+        let ms_dst = thinks::randommove::rnd_ms();
+        let ms_src = thinks::randommove::rnd_ms();
+
+        // その駒が２つ。
+        let km_dst = pos.get_km_by_ms(ms_dst);
+        let km_src = pos.get_km_by_ms(ms_src);
+        // g_writeln( &format!( "{}{}<---->{}{}", ms_src, km_src, ms_dst, km_dst) );
+
+        // 入れ替え。
+        pos.set_km_by_ms(ms_dst, km_src);
+        pos.set_km_by_ms(ms_src, km_dst);
+    }
+
+    // 初期局面ハッシュを作り直す
+    let hash_pos = shell_var.searcher.game_record.create_ky0_hash(&pos);
+    shell_var.searcher.game_record.set_ky0_hash(hash_pos);
+
+    // 初期局面を、現局面に写す。
+    shell_var.searcher.cur_position.set_all(&pos);
 }
 
 /*****
