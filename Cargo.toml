@@ -7,6 +7,7 @@ authors = ["muzudho <muzudho1@gmail.com>"]
 rand="0.3.0"
 lazy_static = "1.1.0"
 clippy = { version = "*", optional = true }
+chrono = "0.4"
 
 [dependencies.kifuwarabe_shell]
 git = "https://github.com/muzudho/rust_kifuwarabe_shell.git"

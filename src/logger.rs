@@ -1,5 +1,6 @@
 /// ロガー。
-use config::*;
+// use config::*;
+use chrono::prelude::*; // DateTime<Local>
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
@@ -43,28 +44,50 @@ lazy_static! {
 
 
 pub struct Logger {
+    pub base_file_name: String,
+    pub extension: String,
     pub file_path: String,
-    pub log_file: File
+    pub chrono: DateTime<Local>,
+    pub log_file: File,
+    pub enable: bool,
 }
 impl Logger {
     // FIXME 初回に要らないファイルを作ってしまう。
     pub fn new()->Logger {
         Logger {
-            file_path: "log-kw2018-default.log".to_string(),
-            log_file: File::create(Path::new(&"log-kw2018-default.log".to_string())).unwrap()
+            base_file_name: "log-default".to_string(),
+            extension: ".log".to_string(),
+            file_path: "log-default-YYYY-MM-DD.log".to_string(),
+            chrono: Local::now(),
+            log_file: File::create(Path::new(&"log-default-YYYY-MM-DD.log".to_string())).unwrap(),
+            enable: true,
         }
     }
 
-    pub fn set_file_path(&mut self, file_path2: &str) {
-        self.file_path = file_path2.to_string();
+    pub fn set_file_path(&mut self, base_file_name2: &str, extension2: &str) {
+        self.base_file_name = base_file_name2.to_string();
+        self.extension = extension2.to_string();
+        self.chrono = Local::now();
         // File::createの返り値は`io::Result<File>` なので .unwrap() で中身を取り出す
+        self.file_path = format!("log-kw-{:04}-{:02}-{:02}.log", self.chrono.year(), self.chrono.month(), self.chrono.day()).to_string();
         self.log_file = File::create(Path::new(&self.file_path)).unwrap();
     }    
+
+    pub fn refresh_filepath(&mut self) {
+        let local = Local::now();
+        if self.chrono.day() != local.day() || self.chrono.month() != local.month() || self.chrono.year() == local.year() {
+            // 日付が変わっていれば更新。
+            self.chrono = local;
+            self.file_path = format!("log-kw-{:04}-{:02}-{:02}.log", self.chrono.year(), self.chrono.month(), self.chrono.day()).to_string();
+        }
+        self.log_file = File::create(Path::new(&self.file_path)).unwrap();
+    }
 
     #[allow(dead_code)]
     pub fn write(&mut self, s:&str){
         println!("{}",s);
-        if LOG_ENABLE {
+        if self.enable {
+            self.refresh_filepath();
             // write_allメソッドを使うには use std::io::Write; が必要
             if let Err(_why) = self.log_file.write_all(s.as_bytes()) {}
             // 大会向けに、ログ書き込み失敗は出力しないことにする
@@ -82,7 +105,8 @@ impl Logger {
 
     pub fn writeln(&mut self, s:&str){
         println!("{}",s);
-        if LOG_ENABLE {
+        if self.enable {
+            self.refresh_filepath();
             if let Err(_why) = self.log_file.write_all(format!("{}\n",s).as_bytes()) {
             }
         }

@@ -7,6 +7,7 @@
 /// 外部クレートを利用しているので、cargo build でコンパイルすること。rustc main.rs ではコンパイルが成功しない。
 /// 実行ファイルは target/debug/kifuwarabe_shogi2018.exe だぜ☆
 ///
+extern crate chrono;
 extern crate rand;
 #[macro_use]
 extern crate lazy_static;
@@ -46,6 +47,7 @@ mod teigi;
 //mod teiri;
 mod tusin;
 
+// use chrono::prelude::*; // DateTime<Local>
 use logger::LOGGER;
 use memory::uchu::*;
 use misc::option::*;
@@ -65,7 +67,9 @@ lazy_static! {
 fn main() {
     
     // ロガー
-    LOGGER.try_write().unwrap().set_file_path(&"log-kw-2018-MM-DD.log".to_string());
+    {
+        LOGGER.try_write().unwrap().set_file_path(&"log-kw", &".log");
+    }
 
     // 任意の構造体を作成する。
     let mut shell_var = ShellVar::new();
