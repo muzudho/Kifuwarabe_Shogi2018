@@ -9,7 +9,7 @@ extern crate rand;
 // use config::*;
 use kifuwarabe_position::*;
 use kifuwarabe_movement_picker::*;
-use logger::*;
+use LOGGER;
 use memory::number_board::*;
 // use std::fs::File;
 // use std::io::Write;
@@ -113,16 +113,16 @@ a1  |{72:4}|{73:4}|{74:4}|{75:4}|{76:4}|{77:4}|{78:4}|{79:4}|{80:4}|
     // 駒の動きを出力
     pub fn hyoji_kmugoki(&self){
         for kms in &KMS_ARRAY {
-            g_write(&format!( "{} ", kms ));
+            LOGGER.try_write().unwrap().write(&format!( "{} ", kms ));
             self.hyoji_kmugoki_dir( *kms );
-            g_writeln("");//改行
+            LOGGER.try_write().unwrap().writeln("");//改行
         }
     }
     pub fn hyoji_kmugoki_dir(&self, kms:KmSyurui ){
         for kmdir in &KM_UGOKI.back[kms as usize] {
             match kmdir {
                 KmDir::Num => break,
-                _ => g_write(&format!( "{},", kmdir))
+                _ => LOGGER.try_write().unwrap().write(&format!( "{},", kmdir))
             }
         }
     }

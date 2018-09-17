@@ -33,6 +33,11 @@ lazy_static! {
     };
       */
 
+    /// # Examples.
+    /// 
+    /// ```
+    /// LOGGER.try_write().unwrap().writeln("Hello!");
+    /// ```
     pub static ref LOGGER: RwLock<Logger> = RwLock::new(Logger::new());
 }
 
@@ -55,31 +60,32 @@ impl Logger {
         // File::createの返り値は`io::Result<File>` なので .unwrap() で中身を取り出す
         self.log_file = File::create(Path::new(&self.file_path)).unwrap();
     }    
+
+    #[allow(dead_code)]
+    pub fn write(&mut self, s:&str){
+        println!("{}",s);
+        if LOG_ENABLE {
+            // write_allメソッドを使うには use std::io::Write; が必要
+            if let Err(_why) = self.log_file.write_all(s.as_bytes()) {}
+            // 大会向けに、ログ書き込み失敗は出力しないことにする
+            //panic!("couldn't write log. : {}",Error::description(&why)),
+            /*
+            // write_allメソッドを使うには use std::io::Write; が必要
+            match LOGFILE.lock().unwrap().write_all(s.as_bytes()) {
+                // 大会向けに、ログ書き込み失敗は出力しないことにする
+                Err(_why) => {},//panic!("couldn't write log. : {}",Error::description(&why)),
+                Ok(_) => {},
+            }
+            */
+        }
+    }
+
+    pub fn writeln(&mut self, s:&str){
+        println!("{}",s);
+        if LOG_ENABLE {
+            if let Err(_why) = self.log_file.write_all(format!("{}\n",s).as_bytes()) {
+            }
+        }
+    }
 } 
 
-#[allow(dead_code)]
-pub fn g_write(s:&str){
-    println!("{}",s);
-    if LOG_ENABLE {
-        // write_allメソッドを使うには use std::io::Write; が必要
-        if let Err(_why) = LOGGER.try_write().unwrap().log_file.write_all(s.as_bytes()) {}
-        // 大会向けに、ログ書き込み失敗は出力しないことにする
-        //panic!("couldn't write log. : {}",Error::description(&why)),
-        /*
-        // write_allメソッドを使うには use std::io::Write; が必要
-        match LOGFILE.lock().unwrap().write_all(s.as_bytes()) {
-            // 大会向けに、ログ書き込み失敗は出力しないことにする
-            Err(_why) => {},//panic!("couldn't write log. : {}",Error::description(&why)),
-            Ok(_) => {},
-        }
-         */
-    }
-}
-#[allow(dead_code)]
-pub fn g_writeln(s:&str){
-    println!("{}",s);
-    if LOG_ENABLE {
-        if let Err(_why) = LOGGER.try_write().unwrap().log_file.write_all(format!("{}\n",s).as_bytes()) {
-        }
-    }
-}

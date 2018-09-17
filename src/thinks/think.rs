@@ -5,7 +5,7 @@ use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use mediators::med_kikisu::*;
-use logger::*;
+use LOGGER;
 use searcher_impl::*;
 use shell_impl::*;
 use std::time::{Instant};
@@ -80,7 +80,7 @@ pub fn think(shell_var: &mut ShellVar, milliseconds: i32, max_depth: i16) -> Mov
 
     // 探索を開始する。
     if !shell_var.searcher.info_off {
-        g_writeln(&format!("info string thought seconds: {}/{}, max_depth:{}.", shell_var.searcher.thought_max_milliseconds, milliseconds, max_depth));
+        LOGGER.try_write().unwrap().writeln(&format!("info string thought seconds: {}/{}, max_depth:{}.", shell_var.searcher.thought_max_milliseconds, milliseconds, max_depth));
     }
 
     // 反復深化探索 iteration deeping.
@@ -107,15 +107,15 @@ pub fn think(shell_var: &mut ShellVar, milliseconds: i32, max_depth: i16) -> Mov
 
     if !shell_var.searcher.info_off {
         // 手を決めたときにも情報表示。
-        g_writeln(&format!("info score cp {}", shell_var.searcher.id_evaluation));
+        LOGGER.try_write().unwrap().writeln(&format!("info score cp {}", shell_var.searcher.id_evaluation));
         // VERBOSE
-        g_writeln(&format!("info string score: {}, nodes: {}, bestmove: {},  incremental_komawari: {}",
+        LOGGER.try_write().unwrap().writeln(&format!("info string score: {}, nodes: {}, bestmove: {},  incremental_komawari: {}",
             shell_var.searcher.id_evaluation, display_information.nodes, Movement::from_hash(best_movement_hash), shell_var.searcher.incremental_komawari));
 
 
         // 計測時間。
         let end = shell_var.searcher.stopwatch.elapsed();
-        g_writeln(&format!("info string {}.{:03}sec.", end.as_secs(), end.subsec_millis())); // end.subsec_nanos() / 1_000_000
+        LOGGER.try_write().unwrap().writeln(&format!("info string {}.{:03}sec.", end.as_secs(), end.subsec_millis())); // end.subsec_nanos() / 1_000_000
     }
 
     // 返却

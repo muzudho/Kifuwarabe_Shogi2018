@@ -1,7 +1,7 @@
 use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-use logger::*;
+use LOGGER;
 use kifuwarabe_movement_picker::*;
 use movement_thinks::*;
 use std::collections::HashSet;
@@ -61,14 +61,14 @@ pub fn userdefined_visit_leaf_callback(searcher: &mut Searcher, display_informat
 
     // 評価値は駒割り。
     let komawari = searcher.incremental_komawari;
-    // g_writeln(&format!("info string DEBUG komawari {}", komawari));
+    // LOGGER.try_write().unwrap().writeln(&format!("info string DEBUG komawari {}", komawari));
 
     // 読み筋表示。
     if !searcher.info_off {
         let end = searcher.info_stopwatch.elapsed();
         if 3 < end.as_secs() {
             // 3秒以上考えていたら、情報表示。
-            g_writeln(&format!("info depth {} seldepth 0 time 0 nodes {} score cp {} nps 0 pv", searcher.id_cur_depth, display_information.nodes, searcher.id_evaluation));
+            LOGGER.try_write().unwrap().writeln(&format!("info depth {} seldepth 0 time 0 nodes {} score cp {} nps 0 pv", searcher.id_cur_depth, display_information.nodes, searcher.id_evaluation));
             searcher.info_stopwatch = Instant::now();
         }
     }
@@ -119,7 +119,7 @@ pub fn userdefined_pick_movements_callback(searcher: &mut Searcher, max_depth: i
         &mut searcher.movepicker_hashset_result,
         &mut searcher.movepicker_hashset_drop
         );
-    // g_writeln("テスト ポテンシャルムーブ.");
+    // LOGGER.try_write().unwrap().writeln("テスト ポテンシャルムーブ.");
     // use consoles::visuals::dumps::*;
     // hyoji_ss_hashset( &hashset_movement );
 
@@ -159,7 +159,7 @@ pub fn userdefined_makemove(searcher: &mut Searcher, movement_hash: u64, alpha: 
     /*
     // VERBOSE 現局面表示
     {
-        g_writeln(kaku_ky(&searcher.cur_position));
+        LOGGER.try_write().unwrap().writeln(kaku_ky(&searcher.cur_position));
     }
     // */
 
@@ -187,7 +187,7 @@ pub fn unmakemove(searcher: &mut Searcher) -> (bool, KmSyurui) {
     /*
     // VERBOSE 現局面表示
     {
-        g_writeln(kaku_ky(&searcher.cur_position));
+        LOGGER.try_write().unwrap().writeln(kaku_ky(&searcher.cur_position));
     }
     // */
 

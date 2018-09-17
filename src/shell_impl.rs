@@ -10,7 +10,7 @@ use consoles::visuals::title::*;
 use display_impl::*;
 use kifuwarabe_usi::*;
 use kifuwarabe_movement_picker::*;
-use logger::*;
+use LOGGER;
 use rand::Rng;
 use searcher_impl::*;
 use std::collections::HashSet;
@@ -65,11 +65,11 @@ pub fn sub_cmate0(shell_var: &mut ShellVar) -> bool {
 /// １手探索して投了すれば、すでに詰んでいると分かる。
 ///
 pub fn do_cmate0(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    g_writeln("すでに詰んでいるかを調べる。");
+    LOGGER.try_write().unwrap().writeln("すでに詰んでいるかを調べる。");
     if sub_cmate0(shell_var) {
-        g_writeln("詰んでるぜ☆（＾～＾）ｖ");
+        LOGGER.try_write().unwrap().writeln("詰んでるぜ☆（＾～＾）ｖ");
     } else {
-        g_writeln("詰んでないぜ☆（ー＿－）");
+        LOGGER.try_write().unwrap().writeln("詰んでないぜ☆（ー＿－）");
     }
 }
 
@@ -86,7 +86,7 @@ pub fn do_cmate0auto(shell_var: &mut ShellVar, _request: &Request, _response:&mu
         sub_rndpos(shell_var);
         if sub_cmate0(shell_var) {
             sub_ky(shell_var);
-            g_writeln(&format!("詰んでるぜ☆（＾～＾）ｖ trial: {}.", trial));
+            LOGGER.try_write().unwrap().writeln(&format!("詰んでるぜ☆（＾～＾）ｖ trial: {}.", trial));
             trial = 0;
         } else {
             // 詰んでなければ無視。
@@ -126,7 +126,7 @@ pub fn do_do(shell_var: &mut ShellVar, request: &Request, response:&mut Response
 ///
 pub fn do_getmate(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     let mate = -1;
-    g_writeln(&format!("{}手詰め。", mate));
+    LOGGER.try_write().unwrap().writeln(&format!("{}手詰め。", mate));
 }
 
 /// 思考を開始する。bestmoveコマンドを返却する。
@@ -199,7 +199,7 @@ pub fn do_go_linebreak(shell_var: &mut ShellVar, _request: &Request, _response:&
     let bestmove = think(shell_var, milliseconds, max_depth);
 
     // 例： bestmove 7g7f
-    g_writeln(&format!("bestmove {}", movement_to_usi(&bestmove)));
+    LOGGER.try_write().unwrap().writeln(&format!("bestmove {}", movement_to_usi(&bestmove)));
 }
 
 /*****
@@ -209,7 +209,7 @@ pub fn do_go_linebreak(shell_var: &mut ShellVar, _request: &Request, _response:&
 /// 局面ハッシュ表示。
 pub fn do_hash(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     let s = kaku_ky_hash(&shell_var.searcher.game_record);
-    g_writeln( &s );
+    LOGGER.try_write().unwrap().writeln( &s );
 }
 
 /// 平手初期局面にする。
@@ -273,7 +273,7 @@ pub fn do_hirate(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
 
 /// USIプロトコル参照。
 pub fn do_isready(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    g_writeln("readyok");
+    LOGGER.try_write().unwrap().writeln("readyok");
 }
 
 /*****
@@ -283,7 +283,7 @@ pub fn do_isready(_shell_var: &mut ShellVar, _request: &Request, _response:&mut 
 /// 棋譜表示。
 pub fn do_kifu(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     let s = kaku_kifu(&shell_var.searcher.game_record);
-    g_writeln( &s );
+    LOGGER.try_write().unwrap().writeln( &s );
 }
 
 /// 利き数表示。
@@ -306,9 +306,9 @@ pub fn do_kmugokidir(_shell_var: &mut ShellVar, _request: &Request, _response:&m
 
     // 駒の動きの移動元として有りえる方角
     let kms = thinks::randommove::rnd_kms();
-    g_writeln(&format!("{}のムーブ元", &kms));
+    LOGGER.try_write().unwrap().writeln(&format!("{}のムーブ元", &kms));
     uchu_r.hyoji_kmugoki_dir(*kms);
-    g_writeln("");//改行
+    LOGGER.try_write().unwrap().writeln("");//改行
 }
 
 /// 駒の動き確認用。
@@ -323,12 +323,12 @@ pub fn do_kmugoki(_shell_var: &mut ShellVar, _request: &Request, _response:&mut 
 /// 初期局面表示。
 pub fn do_ky0(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     let s = kaku_ky(&shell_var.searcher.ini_position, &shell_var.searcher.game_record);
-    g_writeln( &s );
+    LOGGER.try_write().unwrap().writeln( &s );
 }
 
 pub fn sub_ky(shell_var: &mut ShellVar){
     let s = kaku_ky(&shell_var.searcher.cur_position, &shell_var.searcher.game_record);
-    g_writeln( &s );
+    LOGGER.try_write().unwrap().writeln( &s );
 }
 /// 現局面表示。
 pub fn do_ky(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
@@ -353,7 +353,7 @@ pub fn do_other(shell_var: &mut ShellVar, _request: &Request, _response:&mut Res
     }else{
         // 局面表示
         let s = kaku_ky(&shell_var.searcher.cur_position, &shell_var.searcher.game_record);
-        g_writeln( &s );
+        LOGGER.try_write().unwrap().writeln( &s );
     }
 }
 
@@ -433,19 +433,19 @@ pub fn do_quit(_shell_var: &mut ShellVar, _request: &Request, response:&mut Resp
 /// 乱数の試し確認。
 pub fn do_rand(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     let secret_number = rand::thread_rng().gen_range(1, 101);//1~100
-    g_writeln( &format!( "乱数={}", secret_number ) );
+    LOGGER.try_write().unwrap().writeln( &format!( "乱数={}", secret_number ) );
 }
 
 /// 駒種類をランダムで出す。
 pub fn do_rndkms(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     let kms = thinks::randommove::rnd_kms();
-    g_writeln( &format!("乱駒種類={}", &kms) );
+    LOGGER.try_write().unwrap().writeln( &format!("乱駒種類={}", &kms) );
 }
 
 /// マスをランダムで返す。
 pub fn do_rndms(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
     let ms = thinks::randommove::rnd_ms();
-    g_writeln( &format!( "乱升={}", ms) );
+    LOGGER.try_write().unwrap().writeln( &format!( "乱升={}", ms) );
 }
 
 pub fn sub_rndpos(shell_var: &mut ShellVar) {
@@ -462,7 +462,7 @@ pub fn sub_rndpos(shell_var: &mut ShellVar) {
         // その駒が２つ。
         let km_dst = pos.get_km_by_ms(ms_dst);
         let km_src = pos.get_km_by_ms(ms_src);
-        // g_writeln( &format!( "{}{}<---->{}{}", ms_src, km_src, ms_dst, km_dst) );
+        // LOGGER.try_write().unwrap().writeln( &format!( "{}{}<---->{}{}", ms_src, km_src, ms_dst, km_dst) );
 
         // 入れ替え。
         pos.set_km_by_ms(ms_dst, km_src);
@@ -479,7 +479,7 @@ pub fn sub_rndpos(shell_var: &mut ShellVar) {
 
 /// ランダムな初期局面を作る。
 pub fn do_rndpos(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    g_writeln( &"ランダムな初期局面を作る。" );
+    LOGGER.try_write().unwrap().writeln( &"ランダムな初期局面を作る。" );
     sub_rndpos(shell_var);
 }
 
@@ -489,7 +489,7 @@ pub fn do_rndpos(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
 
 /// 同一局面回数調べ。
 pub fn do_same(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    g_writeln( &format!("同一局面調べ count={}", shell_var.searcher.game_record.count_same_ky()));
+    LOGGER.try_write().unwrap().writeln( &format!("同一局面調べ count={}", shell_var.searcher.game_record.count_same_ky()));
 }
 
 
@@ -500,9 +500,9 @@ pub fn do_sasite(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
     
     insert_picked_movement(&shell_var.searcher.cur_position, &shell_var.searcher.game_record, &mut ss_potential_hashset,
         &mut shell_var.searcher.movepicker_hashset_work, &mut shell_var.searcher.movepicker_hashset_result, &mut shell_var.searcher.movepicker_hashset_drop);
-    g_writeln("----指し手生成 ここから----");
+    LOGGER.try_write().unwrap().writeln("----指し手生成 ここから----");
     hyoji_ss_hashset( &ss_potential_hashset );
-    g_writeln("----指し手生成 ここまで----");
+    LOGGER.try_write().unwrap().writeln("----指し手生成 ここまで----");
 }
 
 
@@ -558,7 +558,7 @@ pub fn do_teigi_conv(_shell_var: &mut ShellVar, _request: &Request, _response:&m
         for hash in 0..10 {
             let next = push_ms_to_hash(hash,ms);
             let (hash_orig,ms_orig) = pop_ms_from_hash(next);
-            g_writeln( &format!("push_ms_to_hash(0b{:4b},0b{:5b})=0b{:11b} pop_ms_from_hash(...)=(0b{:4b},0b{:5b})"
+            LOGGER.try_write().unwrap().writeln( &format!("push_ms_to_hash(0b{:4b},0b{:5b})=0b{:11b} pop_ms_from_hash(...)=(0b{:4b},0b{:5b})"
                 ,hash
                 ,ms
                 ,next
@@ -571,7 +571,7 @@ pub fn do_teigi_conv(_shell_var: &mut ShellVar, _request: &Request, _response:&m
 
 /// いろいろな動作テストをしたいときに汎用的に使う。
 pub fn do_test(shell_var: &mut ShellVar, request: &Request, response:&mut Response<ShellVar>) {
-    g_writeln( &format!("test caret={} len={}", request.caret, request.line_len));
+    LOGGER.try_write().unwrap().writeln( &format!("test caret={} len={}", request.caret, request.line_len));
     test(&shell_var.searcher, &request.line, &mut response.caret, request.line_len);
 }
 
@@ -586,7 +586,7 @@ pub fn do_undo(shell_var: &mut ShellVar, _request: &Request, _response:&mut Resp
 
     if !successful {
         let teme = shell_var.searcher.game_record.teme;
-        g_writeln( &format!("teme={} を、これより戻せません", teme));
+        LOGGER.try_write().unwrap().writeln( &format!("teme={} を、これより戻せません", teme));
 
     }
 }
@@ -601,10 +601,10 @@ pub fn do_usinewgame(shell_var: &mut ShellVar, _request: &Request, _response:&mu
 
 /// USIプロトコル参照。
 pub fn do_usi(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
-    g_writeln( &format!("id name {}", ENGINE_NAME) );
-    g_writeln( &format!("id author {}", ENGINE_AUTHOR) );
-    g_writeln("option name depth type spin default 1 min 1 max 999");
-    g_writeln("usiok");
+    LOGGER.try_write().unwrap().writeln( &format!("id name {}", ENGINE_NAME) );
+    LOGGER.try_write().unwrap().writeln( &format!("id author {}", ENGINE_AUTHOR) );
+    LOGGER.try_write().unwrap().writeln("option name depth type spin default 1 min 1 max 999");
+    LOGGER.try_write().unwrap().writeln("usiok");
 }
 
 
