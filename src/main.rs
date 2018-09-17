@@ -46,12 +46,11 @@ mod teigi;
 //mod teiri;
 mod tusin;
 
+use logger::LOGGER;
 use memory::uchu::*;
 use misc::option::*;
-use shell_impl::*;
-
-
 use rand::Rng;
+use shell_impl::*;
 
 
 // グローバル変数。
@@ -65,6 +64,9 @@ lazy_static! {
 
 fn main() {
     
+    // ロガー
+    LOGGER.try_write().unwrap().set_file_path(&"log-kw-2018-MM-DD.log".to_string());
+
     // 任意の構造体を作成する。
     let mut shell_var = ShellVar::new();
     // グローバル変数と内容を合わせなくても、初期状態は同じ。

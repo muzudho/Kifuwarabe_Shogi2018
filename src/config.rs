@@ -8,5 +8,5 @@ pub const ENGINE_NAME : &str = "Kifuwarabe 2018";
 pub const ENGINE_AUTHOR : &str = "TAKAHASHI, Satoshi";
 
 // ログ
-pub const LOG_FILE_PATH : &str = "log_kw2018.log";
+// pub const LOG_FILE_PATH : &str = "log_kw2018.log";
 pub const LOG_ENABLE : bool = true;//false;
