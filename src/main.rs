@@ -8,6 +8,7 @@
 /// 実行ファイルは target/debug/kifuwarabe_shogi2018.exe だぜ☆
 ///
 extern crate chrono;
+extern crate time;
 extern crate rand;
 #[macro_use]
 extern crate lazy_static;
@@ -69,6 +70,7 @@ fn main() {
     // ロガー
     {
         LOGGER.try_write().unwrap().set_file_path(&"log-kw", &".log");
+        LOGGER.try_write().unwrap().delete_old_file();
     }
 
     // 任意の構造体を作成する。
