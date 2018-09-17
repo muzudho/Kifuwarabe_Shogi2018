@@ -32,6 +32,7 @@ mod config;
 mod consoles;
 mod display_impl;
 mod kasetu;
+mod logger;
 mod meidai;
 mod mediators;
 mod memory;

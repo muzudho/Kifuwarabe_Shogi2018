@@ -4,7 +4,7 @@
  */
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-use memory::uchu::*;
+use logger::*;
 use std::collections::HashSet;
 use tusin::us_conv::*;
 

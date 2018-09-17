@@ -9,15 +9,14 @@ use consoles::visuals::dumps::*;
 use consoles::visuals::title::*;
 use display_impl::*;
 use kifuwarabe_usi::*;
-use memory::uchu::*;
 use kifuwarabe_movement_picker::*;
+use logger::*;
 use rand::Rng;
 use searcher_impl::*;
 use std::collections::HashSet;
 use thinks;
 use thinks::think::*;
 use teigi::constants::*;
-// use teigi::shogi_syugo::*;
 use tusin::us_conv::*;
 use UCHU_WRAP;
 
@@ -59,11 +58,7 @@ pub fn sub_cmate0(shell_var: &mut ShellVar) -> bool {
     // 思考する。
     let bestmove = think(shell_var, milliseconds, 1);
 
-    if bestmove.exists() {
-        false
-    } else {
-        true
-    }
+    !bestmove.exists()
 }
 
 /// すでに詰んでいるかを調べる。

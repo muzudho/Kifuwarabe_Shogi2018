@@ -6,7 +6,7 @@
 use consoles::visuals::dumps::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-use memory::uchu::*;
+use logger::*;
 use meidai::math_meidai::*;
 use kifuwarabe_movement_picker::*;
 use movement_thinks::*;

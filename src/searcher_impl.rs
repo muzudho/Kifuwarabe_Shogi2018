@@ -1,7 +1,7 @@
 use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
-use memory::uchu::*;
+use logger::*;
 use kifuwarabe_movement_picker::*;
 use movement_thinks::*;
 use std::collections::HashSet;

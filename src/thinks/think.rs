@@ -5,7 +5,7 @@ use kifuwarabe_alpha_beta_search::*;
 use kifuwarabe_movement::*;
 use kifuwarabe_position::*;
 use mediators::med_kikisu::*;
-use memory::uchu::*;
+use logger::*;
 use searcher_impl::*;
 use shell_impl::*;
 use std::time::{Instant};
@@ -16,13 +16,13 @@ use UCHU_WRAP;
 
 /// どの深さまで潜るか。
 pub fn get_max_depth(shell_var: &mut ShellVar) -> i16 {
-    // 指定がなければ 5。
-    let mut max_depth = 5;
     // 深さ 3 ぐらいなら 0.015秒ぐらい。
     if shell_var.engine_settings.contains(&"depth".to_string()) {
-        max_depth = shell_var.engine_settings.get(&"depth".to_string()).parse::<i16>().unwrap();
+        shell_var.engine_settings.get(&"depth".to_string()).parse::<i16>().unwrap()
+    } else {
+        // 指定がなければ 5。
+        5
     }
-    max_depth
 }
 
 /// 現局面での最善手を返すぜ☆（*＾～＾*）

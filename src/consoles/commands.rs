@@ -3,7 +3,7 @@
  */
 
 use kifuwarabe_position::*;
-use memory::uchu::*;
+use logger::*;
 
 use UCHU_WRAP;
 

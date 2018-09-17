@@ -1,4 +1,4 @@
-use memory::uchu::*;
+use logger::*;
 
 // 対話モードのタイトル画面
 pub fn hyoji_title(){
