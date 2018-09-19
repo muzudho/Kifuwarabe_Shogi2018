@@ -64,7 +64,7 @@ pub fn sub_cmate0(shell_var: &mut ShellVar) -> bool {
 /// すでに詰んでいるかを調べる。
 /// １手探索して投了すれば、すでに詰んでいると分かる。
 ///
-pub fn do_cmate0(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_cmate0(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     LOGGER.try_write().unwrap().writeln("すでに詰んでいるかを調べる。");
     if sub_cmate0(shell_var) {
         LOGGER.try_write().unwrap().writeln("詰んでるぜ☆（＾～＾）ｖ");
@@ -77,7 +77,7 @@ pub fn do_cmate0(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
 /// do_cmate0 を、ずっと続ける。
 /// FIXME 強制終了する方法が今のところない。
 ///
-pub fn do_cmate0auto(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_cmate0auto(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     // let old_info_off = shell_var.searcher.info_off;
     shell_var.searcher.info_off = true;
 
@@ -102,10 +102,10 @@ pub fn do_cmate0auto(shell_var: &mut ShellVar, _request: &Request, _response:&mu
  *****/
 
 /// 指し手を入れる。
-pub fn do_do(shell_var: &mut ShellVar, request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_do(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
 
     // コマンド読取。棋譜に追加され、手目も増える
-    let (successful, umov) = parse_movement(&request.line, &mut response.caret, request.line_len);
+    let (successful, umov) = parse_movement(&request.get_line(), &mut response.caret, request.get_line_len());
     let movement = usi_to_movement(successful, umov);// &umov
 
     shell_var.searcher.game_record.set_movement(movement);
@@ -124,7 +124,7 @@ pub fn do_do(shell_var: &mut ShellVar, request: &Request, response:&mut Response
 
 /// 何手詰めかを調べる。
 ///
-pub fn do_getmate(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_getmate(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     let mate = -1;
     LOGGER.try_write().unwrap().writeln(&format!("{}手詰め。", mate));
 }
@@ -133,7 +133,7 @@ pub fn do_getmate(_shell_var: &mut ShellVar, _request: &Request, _response:&mut 
 ///
 /// ### 例。
 /// go btime 60000 wtime 50000 byoyomi 10000
-pub fn do_go(shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_go(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     // 指定しなければ無制限。
     shell_var.player_milliseconds_array[Sengo::Sen as usize] = <i32>::max_value();
     shell_var.player_milliseconds_array[Sengo::Go as usize] = <i32>::max_value();
@@ -144,50 +144,50 @@ pub fn do_go(shell_var: &mut ShellVar, _request: &Request, response:&mut Respons
     response.next = "ND_go_btime";
 }
 
-pub fn do_go_btime(_shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_go_btime(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     response.next = "ND_go_btimevar";
 }
 
-pub fn do_go_btimevar(shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_go_btimevar(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     let word = &response.groups[0];
     let num: i32 = word.parse().unwrap();
     shell_var.player_milliseconds_array[0] = num;
     response.next = "ND_go_wtime";
 }
 
-pub fn do_go_wtime(_shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_go_wtime(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     response.next = "ND_go_wtimevar";
 }
 
-pub fn do_go_wtimevar(shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_go_wtimevar(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     let word = &response.groups[0];
     let num: i32 = word.parse().unwrap();
     shell_var.player_milliseconds_array[1] = num;
     response.next = "ND_go_binc";
 }
 
-pub fn do_go_binc(_shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_go_binc(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     response.next = "ND_go_bincvar";
 }
 
-pub fn do_go_bincvar(shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_go_bincvar(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     let word = &response.groups[0];
     let num: i32 = word.parse().unwrap();
     shell_var.player_milliseconds_array[0] += num;
     response.next = "ND_go_winc";
 }
 
-pub fn do_go_winc(_shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_go_winc(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     response.next = "ND_go_wincvar";
 }
 
-pub fn do_go_wincvar(shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_go_wincvar(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     let word = &response.groups[0];
     let num: i32 = word.parse().unwrap();
     shell_var.player_milliseconds_array[1] += num;
 }
 
-pub fn do_go_linebreak(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_go_linebreak(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     // 自分の手番
     let turn_num = shell_var.searcher.game_record.get_teban(Jiai::Ji) as usize;
 
@@ -207,13 +207,13 @@ pub fn do_go_linebreak(shell_var: &mut ShellVar, _request: &Request, _response:&
  *****/
 
 /// 局面ハッシュ表示。
-pub fn do_hash(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_hash(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     let s = kaku_ky_hash(&shell_var.searcher.game_record);
     LOGGER.try_write().unwrap().writeln( &s );
 }
 
 /// 平手初期局面にする。
-pub fn do_hirate(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_hirate(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     // 初期局面、現局面ともにクリアーします。手目も 0 に戻します。
     shell_var.searcher.ini_position.clear();
     shell_var.searcher.cur_position.clear();
@@ -272,7 +272,7 @@ pub fn do_hirate(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
  *****/
 
 /// USIプロトコル参照。
-pub fn do_isready(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_isready(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     LOGGER.try_write().unwrap().writeln("readyok");
 }
 
@@ -281,26 +281,26 @@ pub fn do_isready(_shell_var: &mut ShellVar, _request: &Request, _response:&mut 
  *****/
 
 /// 棋譜表示。
-pub fn do_kifu(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_kifu(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     let s = kaku_kifu(&shell_var.searcher.game_record);
     LOGGER.try_write().unwrap().writeln( &s );
 }
 
 /// 利き数表示。
-pub fn do_kikisu(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_kikisu(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     consoles::commands::cmd_kikisu();
 }
 
 
 
 /// TODO 升と駒を指定して、移動先の確認。
-pub fn do_kmmove(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_kmmove(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
 }
 
 
 
 /// 駒の動きの確認。
-pub fn do_kmugokidir(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_kmugokidir(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
@@ -312,7 +312,7 @@ pub fn do_kmugokidir(_shell_var: &mut ShellVar, _request: &Request, _response:&m
 }
 
 /// 駒の動き確認用。
-pub fn do_kmugoki(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_kmugoki(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
 
@@ -321,7 +321,7 @@ pub fn do_kmugoki(_shell_var: &mut ShellVar, _request: &Request, _response:&mut 
 }
 
 /// 初期局面表示。
-pub fn do_ky0(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_ky0(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     let s = kaku_ky(&shell_var.searcher.ini_position, &shell_var.searcher.game_record);
     LOGGER.try_write().unwrap().writeln( &s );
 }
@@ -331,7 +331,7 @@ pub fn sub_ky(shell_var: &mut ShellVar){
     LOGGER.try_write().unwrap().writeln( &s );
 }
 /// 現局面表示。
-pub fn do_ky(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_ky(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     sub_ky(shell_var);
 }
 
@@ -340,7 +340,7 @@ pub fn do_ky(shell_var: &mut ShellVar, _request: &Request, _response:&mut Respon
  * O *
  *****/
 
-pub fn do_other(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>){
+pub fn do_other(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>){
     // 書込許可モードで、ロック。
     let mut uchu_w = UCHU_WRAP.try_write().unwrap();
     if !&uchu_w.dialogue_mode {
@@ -364,7 +364,7 @@ pub fn do_other(shell_var: &mut ShellVar, _request: &Request, _response:&mut Res
  *****/
 
 /// USIプロトコル参照。
-pub fn do_position(shell_var: &mut ShellVar, request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_position(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     // 初期局面、現局面ともにクリアーします。手目も 0 に戻します。
     shell_var.searcher.ini_position.clear();
     shell_var.searcher.cur_position.clear();
@@ -373,7 +373,7 @@ pub fn do_position(shell_var: &mut ShellVar, request: &Request, response:&mut Re
     // positionコマンド読取。
     parse_position(
         &mut shell_var.searcher,
-        &request.line,
+        &request.get_line(),
         // 持ち駒数読取。
         |searcher, hand_count_arr : [i8; HAND_PIECE_ARRAY_LN]|{
             for (i, item) in HAND_PIECE_ARRAY.iter().enumerate() {
@@ -422,7 +422,7 @@ pub fn do_position(shell_var: &mut ShellVar, request: &Request, response:&mut Re
  *****/
 
 /// 終了。
-pub fn do_quit(_shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>){
+pub fn do_quit(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>){
     response.quits = true;
 }
 
@@ -431,19 +431,19 @@ pub fn do_quit(_shell_var: &mut ShellVar, _request: &Request, response:&mut Resp
  *****/
 
 /// 乱数の試し確認。
-pub fn do_rand(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_rand(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     let secret_number = rand::thread_rng().gen_range(1, 101);//1~100
     LOGGER.try_write().unwrap().writeln( &format!( "乱数={}", secret_number ) );
 }
 
 /// 駒種類をランダムで出す。
-pub fn do_rndkms(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_rndkms(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     let kms = thinks::randommove::rnd_kms();
     LOGGER.try_write().unwrap().writeln( &format!("乱駒種類={}", &kms) );
 }
 
 /// マスをランダムで返す。
-pub fn do_rndms(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_rndms(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     let ms = thinks::randommove::rnd_ms();
     LOGGER.try_write().unwrap().writeln( &format!( "乱升={}", ms) );
 }
@@ -478,7 +478,7 @@ pub fn sub_rndpos(shell_var: &mut ShellVar) {
 }
 
 /// ランダムな初期局面を作る。
-pub fn do_rndpos(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_rndpos(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     LOGGER.try_write().unwrap().writeln( &"ランダムな初期局面を作る。" );
     sub_rndpos(shell_var);
 }
@@ -488,13 +488,13 @@ pub fn do_rndpos(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
  *****/
 
 /// 同一局面回数調べ。
-pub fn do_same(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_same(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     LOGGER.try_write().unwrap().writeln( &format!("同一局面調べ count={}", shell_var.searcher.game_record.count_same_ky()));
 }
 
 
 /// 合法手を確認する。
-pub fn do_sasite(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_sasite(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     // FIXME 合法手とは限らない
     let mut ss_potential_hashset = HashSet::new();
     
@@ -509,17 +509,17 @@ pub fn do_sasite(shell_var: &mut ShellVar, _request: &Request, _response:&mut Re
 
 
 /// USI
-pub fn do_setoption(_shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_setoption(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     if VERBOSE { println!("Setoption begin."); }
     response.next = "ND_setoption_name";
     set_linebreak_controller(response, do_setoption_lineend);
     if VERBOSE { println!("Setoption end."); }
 }
-pub fn do_setoption_name(_shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_setoption_name(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     if VERBOSE { println!("Name."); }
     response.next = "ND_setoption_namevar";
 }
-pub fn do_setoption_namevar(shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_setoption_namevar(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     let name = &response.groups[0];
     if VERBOSE { println!("Namevar begin. [{}]", name); }
 
@@ -527,11 +527,11 @@ pub fn do_setoption_namevar(shell_var: &mut ShellVar, _request: &Request, respon
     response.next = "ND_setoption_value";
     if VERBOSE { println!("Namevar end."); }
 }
-pub fn do_setoption_value(_shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_setoption_value(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     if VERBOSE { println!("Value."); }
     response.next = "ND_setoption_valuevar";
 }
-pub fn do_setoption_valuevar(shell_var: &mut ShellVar, _request: &Request, response:&mut Response<ShellVar>) {
+pub fn do_setoption_valuevar(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
     let value = &response.groups[0];
     if VERBOSE { println!("Valuevar begin. [{}]", value); }
 
@@ -539,7 +539,7 @@ pub fn do_setoption_valuevar(shell_var: &mut ShellVar, _request: &Request, respo
     response.done_line = true;
     if VERBOSE { println!("Valuevar end."); }
 }
-pub fn do_setoption_lineend(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_setoption_lineend(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     if VERBOSE { println!("Lineend begin."); }
     shell_var.engine_settings.flush();
     if VERBOSE { println!("Lineend end."); }
@@ -553,7 +553,7 @@ pub fn do_setoption_lineend(shell_var: &mut ShellVar, _request: &Request, _respo
  *****/
 
 /// convのテスト。
-pub fn do_teigi_conv(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_teigi_conv(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     for ms in 11..19 {
         for hash in 0..10 {
             let next = push_ms_to_hash(hash,ms);
@@ -570,9 +570,9 @@ pub fn do_teigi_conv(_shell_var: &mut ShellVar, _request: &Request, _response:&m
 }
 
 /// いろいろな動作テストをしたいときに汎用的に使う。
-pub fn do_test(shell_var: &mut ShellVar, request: &Request, response:&mut Response<ShellVar>) {
-    LOGGER.try_write().unwrap().writeln( &format!("test caret={} len={}", request.caret, request.line_len));
-    test(&shell_var.searcher, &request.line, &mut response.caret, request.line_len);
+pub fn do_test(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Response<ShellVar>) {
+    LOGGER.try_write().unwrap().writeln( &format!("test caret={} len={}", request.get_caret(), request.get_line_len()));
+    test(&shell_var.searcher, &request.get_line(), &mut response.caret, request.get_line_len());
 }
 
 
@@ -581,7 +581,7 @@ pub fn do_test(shell_var: &mut ShellVar, request: &Request, response:&mut Respon
  *****/
 
 /// 指した手を１手戻す。
-pub fn do_undo(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_undo(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     let (successful, _cap_kms) = unmakemove(&mut shell_var.searcher);
 
     if !successful {
@@ -592,7 +592,7 @@ pub fn do_undo(shell_var: &mut ShellVar, _request: &Request, _response:&mut Resp
 }
 
 /// USIプロトコル参照。
-pub fn do_usinewgame(shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_usinewgame(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     // 初期局面、現局面ともにクリアーします。手目も 0 に戻します。
     shell_var.searcher.ini_position.clear();
     shell_var.searcher.cur_position.clear();
@@ -600,7 +600,7 @@ pub fn do_usinewgame(shell_var: &mut ShellVar, _request: &Request, _response:&mu
 }
 
 /// USIプロトコル参照。
-pub fn do_usi(_shell_var: &mut ShellVar, _request: &Request, _response:&mut Response<ShellVar>) {
+pub fn do_usi(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Response<ShellVar>) {
     LOGGER.try_write().unwrap().writeln( &format!("id name {}", ENGINE_NAME) );
     LOGGER.try_write().unwrap().writeln( &format!("id author {}", ENGINE_AUTHOR) );
     LOGGER.try_write().unwrap().writeln("option name depth type spin default 1 min 1 max 999");

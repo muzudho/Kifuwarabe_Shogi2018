@@ -100,20 +100,20 @@ impl Logger {
             // println!("metadata: {:?}", metadata);
 
             if let Ok(unix_time) = metadata.unwrap().modified() {
-                println!("metadata.modified: {:?}", unix_time);
+                println!("logger.rs: metadata.modified: {:?}", unix_time);
                 let local_time = self.system_time_to_date_time(unix_time);
-                println!("local_time: {:?}", local_time);
+                println!("logger.rs: local_time: {:?}", local_time);
 
                 let today = Local::now();
 
                 if local_time < today - Duration::days(10) {
-                    println!("I want remove file. {}", path_str.to_string());
+                    println!("logger.rs: I want remove file. {}", path_str.to_string());
                     // fs::remove_file("a.txt")?;
                 //} else {
                     //println!("path_str: {:?}", path_str);
                 }
             } else {
-                println!("Not supported on this platform");
+                println!("logger.rs: Not supported on this platform");
             }
             
         }
