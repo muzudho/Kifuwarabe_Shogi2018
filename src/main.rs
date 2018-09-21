@@ -103,9 +103,6 @@ fn main() {
     // グラフの作成。
     let mut graph = new_graph();
 
-    // シェルの作成。
-    let mut shell = new_shell();
-
     // 該当なしのときに実行されるコールバック関数を選択。
     set_complementary_controller(&mut graph, do_other);
 
@@ -177,6 +174,11 @@ fn main() {
     insert_node(&mut graph, "ND_usinewgame", "usinewgame", do_usinewgame);
     insert_node(&mut graph, "ND_undo", "undo", do_undo);
     insert_node(&mut graph, "ND_usi", "usi", do_usi);
+
+
+
+    // シェルの作成。
+    let mut shell = new_shell();
 
     // 開始ノードを選択する。
     set_next(&mut shell, "ND_cmate0, ND_cmate0auto,

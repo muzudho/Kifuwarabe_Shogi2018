@@ -102,10 +102,11 @@ pub fn do_cmate0auto(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, 
  *****/
 
 /// 指し手を入れる。
-pub fn do_do(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
+pub fn do_do(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, _response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
 
     // コマンド読取。棋譜に追加され、手目も増える
-    let (successful, umov) = parse_movement(&request.get_line(), &mut response.get_caret(), request.get_line_len());
+    // let (successful, umov) = parse_movement(&request.get_line(), &mut response.get_caret(), request.get_line_len());
+    let (successful, umov) = parse_movement(&request.get_line(), &mut request.get_caret(), request.get_line_len());
     let movement = usi_to_movement(successful, umov);// &umov
 
     shell_var.searcher.game_record.set_movement(movement);
@@ -148,41 +149,41 @@ pub fn do_go_btime(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, r
     response.set_next("ND_go_btimevar");
 }
 
-pub fn do_go_btimevar(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
-    response.set_next("ND_go_wtime"); // (1) response を変更してからなら、
-    let word = &response.get_groups()[0];
+pub fn do_go_btimevar(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
+    let word = &request.get_groups()[0];
     let num: i32 = word.parse().unwrap();
-    shell_var.player_milliseconds_array[0] = num; // (2) response の中の num を他へ渡すことができる。
+    shell_var.player_milliseconds_array[0] = num;
+    response.set_next("ND_go_wtime");
 }
 
 pub fn do_go_wtime(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
     response.set_next("ND_go_wtimevar");
 }
 
-pub fn do_go_wtimevar(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
-    response.set_next("ND_go_binc");
-    let word = &response.get_groups()[0];
+pub fn do_go_wtimevar(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
+    let word = &request.get_groups()[0];
     let num: i32 = word.parse().unwrap();
     shell_var.player_milliseconds_array[1] = num;
+    response.set_next("ND_go_binc");
 }
 
 pub fn do_go_binc(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
     response.set_next( "ND_go_bincvar");
 }
 
-pub fn do_go_bincvar(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
-    response.set_next("ND_go_winc");
-    let word = &response.get_groups()[0];
+pub fn do_go_bincvar(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
+    let word = &request.get_groups()[0];
     let num: i32 = word.parse().unwrap();
     shell_var.player_milliseconds_array[0] += num;
+    response.set_next("ND_go_winc");
 }
 
 pub fn do_go_winc(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
     response.set_next("ND_go_wincvar");
 }
 
-pub fn do_go_wincvar(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
-    let word = &response.get_groups()[0];
+pub fn do_go_wincvar(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, _response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
+    let word = &request.get_groups()[0];
     let num: i32 = word.parse().unwrap();
     shell_var.player_milliseconds_array[1] += num;
 }
@@ -519,25 +520,25 @@ pub fn do_setoption_name(_shell_var: &mut ShellVar, _request: &Box<RequestAccess
     if VERBOSE { println!("Name."); }
     response.set_next( "ND_setoption_namevar");
 }
-pub fn do_setoption_namevar(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
-    response.set_next( "ND_setoption_value");
-    let name = &response.get_groups()[0];
+pub fn do_setoption_namevar(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
+    let name = &request.get_groups()[0];
     if VERBOSE { println!("Namevar begin. [{}]", name); }
 
     shell_var.engine_settings.buffer_name = name.to_string();
     if VERBOSE { println!("Namevar end."); }
+    response.set_next( "ND_setoption_value");
 }
 pub fn do_setoption_value(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
     if VERBOSE { println!("Value."); }
     response.set_next( "ND_setoption_valuevar");
 }
-pub fn do_setoption_valuevar(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
-    response.set_done_line( true);
-    let value = &response.get_groups()[0];
+pub fn do_setoption_valuevar(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
+    let value = &request.get_groups()[0];
     if VERBOSE { println!("Valuevar begin. [{}]", value); }
 
     shell_var.engine_settings.buffer_value = value.to_string();
     if VERBOSE { println!("Valuevar end."); }
+    response.set_done_line( true);
 }
 pub fn do_setoption_lineend(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
     if VERBOSE { println!("Lineend begin."); }
@@ -570,9 +571,10 @@ pub fn do_teigi_conv(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>,
 }
 
 /// いろいろな動作テストをしたいときに汎用的に使う。
-pub fn do_test(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
+pub fn do_test(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, _response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
     LOGGER.try_write().unwrap().writeln( &format!("test caret={} len={}", request.get_caret(), request.get_line_len()));
-    test(&shell_var.searcher, &request.get_line(), &mut response.get_caret(), request.get_line_len());
+    // test(&shell_var.searcher, &request.get_line(), &mut response.get_caret(), request.get_line_len());
+    test(&shell_var.searcher, &request.get_line(), &mut request.get_caret(), request.get_line_len());
 }
 
 
