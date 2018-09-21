@@ -344,9 +344,9 @@ pub fn do_ky(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _respons
 pub fn do_other(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _response:&mut Box<dyn ResponseAccessor<ShellVar>>){
     // 書込許可モードで、ロック。
     let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-    if !&uchu_w.dialogue_mode {
-        // 空打ち１回目なら、対話モードへ☆（＾～＾）
-        uchu_w.dialogue_mode = true;
+    if uchu_w.title_dirty {
+        // 空打ちでタイトル画面を出すなら☆（＾～＾）
+        uchu_w.title_dirty = false;
         // タイトル表示
         // １画面は２５行だが、最後の２行は開けておかないと、
         // カーソルが２行分場所を取るんだぜ☆（＾～＾）
@@ -607,6 +607,10 @@ pub fn do_usi(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _respo
     LOGGER.try_write().unwrap().writeln( &format!("id author {}", ENGINE_AUTHOR) );
     LOGGER.try_write().unwrap().writeln("option name depth type spin default 1 min 1 max 999");
     LOGGER.try_write().unwrap().writeln("usiok");
+
+    // 空打ちしてもタイトル画面は出さない☆（＾～＾）
+    let mut uchu_w = UCHU_WRAP.try_write().unwrap();
+    uchu_w.title_dirty = false;
 }
 
 

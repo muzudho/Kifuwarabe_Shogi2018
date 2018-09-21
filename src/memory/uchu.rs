@@ -23,8 +23,8 @@ use thinks::visions::vision_tree::*;
  * ここに全部入れてあるぜ☆（＾～＾）
  */
 pub struct Uchu{
-    // 対話モード
-    pub dialogue_mode : bool,
+    // 空打ちでタイトル画面を出すなら真。
+    pub title_dirty : bool,
     // 利きの数（先後別）
     pub kiki_su_by_sn : [NumberBoard; Sengo::Num as usize],
     // 利きの数（先後付き駒別）
@@ -41,7 +41,7 @@ impl Uchu{
     }
     pub fn new()->Uchu{
         Uchu{
-            dialogue_mode : false,
+            title_dirty : true,
             // 利き数（先後別）
             kiki_su_by_sn : [
                 NumberBoard::new(), NumberBoard::new(),
