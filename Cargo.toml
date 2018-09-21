@@ -12,7 +12,7 @@ time = "0.1"
 
 [dependencies.kifuwarabe_shell]
 git = "https://github.com/muzudho/rust_kifuwarabe_shell.git"
-rev = "7eabec04e693cb862a56248a55c1a5da9ea6e669"
+rev = "49b3c82b9e4b6ad71d1d7873301fbb23c30eaf8f"
 
 [dependencies.kifuwarabe_usi]
 git = "https://github.com/muzudho/rust_kifuwarabe_usi.git"

@@ -120,7 +120,7 @@ fn main() {
     // [G]
     insert_node(&mut graph, "ND_getmate", "getmate", do_getmate, hashmap![]);
 
-    insert_node(&mut graph, "ND_go", "go", do_go, hashmap!["next" => "ND_go_btime"]);
+    insert_node(&mut graph, "ND_go", "go", do_go, hashmap!["next" => "ND_go_btime", "#linebreak" => "ND_go_linebreak"]); // #linebreak コールバック関数は行終了時に実行される。
     insert_node(&mut graph, "ND_go_btime", "btime", do_go_btime, hashmap!["next" => "ND_go_btimevar"]);
     insert_node_re(&mut graph, "ND_go_btimevar", r"(\d+)", do_go_btimevar, hashmap!["next" => "ND_go_wtime"]);
     insert_node(&mut graph, "ND_go_wtime", "wtime", do_go_wtime, hashmap!["next" => "ND_go_wtimevar"]);
@@ -129,6 +129,7 @@ fn main() {
     insert_node_re(&mut graph, "ND_go_bincvar", r"(\d+)", do_go_bincvar, hashmap!["next" => "ND_go_winc"]);
     insert_node(&mut graph, "ND_go_winc", "winc", do_go_winc, hashmap!["next" => "ND_go_wincvar"]);
     insert_node_re(&mut graph, "ND_go_wincvar", r"(\d+)", do_go_wincvar, hashmap![]);
+    insert_node_single(&mut graph, "ND_go_linebreak", do_go_linebreak);
 
     // [H]
     insert_node(&mut graph, "ND_hash", "hash", do_hash, hashmap![]);
@@ -162,11 +163,12 @@ fn main() {
     insert_node(&mut graph, "ND_same", "same", do_same, hashmap![]);
     insert_node(&mut graph, "ND_sasite", "sasite", do_sasite, hashmap![]);
 
-    insert_node(&mut graph, "ND_setoption", "setoption", do_setoption, hashmap!["next" => "ND_setoption_name"]);
+    insert_node(&mut graph, "ND_setoption", "setoption", do_setoption, hashmap!["next" => "ND_setoption_name", "#linebreak" => "ND_setoption_linebreak"]);
     insert_node(&mut graph, "ND_setoption_name", "name", do_setoption_name, hashmap!["next" => "ND_setoption_namevar"]);
     insert_node_re(&mut graph, "ND_setoption_namevar", r"(\w+)", do_setoption_namevar, hashmap!["next" => "ND_setoption_value"]);
     insert_node(&mut graph, "ND_setoption_value", "value", do_setoption_value, hashmap!["next" => "ND_setoption_valuevar"]);
     insert_node_re(&mut graph, "ND_setoption_valuevar", r"(\w+)", do_setoption_valuevar, hashmap![]);
+    insert_node_single(&mut graph, "ND_setoption_linebreak", do_setoption_linebreak);
 
     // [T]
     insert_node(&mut graph, "ND_teigi_conv", "teigi::conv", do_teigi_conv, hashmap![]);
