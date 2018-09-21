@@ -142,44 +142,44 @@ pub fn do_go(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response
     // 行終了時に実行されるコールバック関数を１つ設定できる。
     set_linebreak_controller(response, do_go_linebreak);
 
-    response.set_next("ND_go_btime");
+    response.forward("next");
 }
 
 pub fn do_go_btime(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
-    response.set_next("ND_go_btimevar");
+    response.forward("next");
 }
 
 pub fn do_go_btimevar(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
     let word = &request.get_groups()[0];
     let num: i32 = word.parse().unwrap();
     shell_var.player_milliseconds_array[0] = num;
-    response.set_next("ND_go_wtime");
+    response.forward("next");
 }
 
 pub fn do_go_wtime(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
-    response.set_next("ND_go_wtimevar");
+    response.forward("next");
 }
 
 pub fn do_go_wtimevar(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
     let word = &request.get_groups()[0];
     let num: i32 = word.parse().unwrap();
     shell_var.player_milliseconds_array[1] = num;
-    response.set_next("ND_go_binc");
+    response.forward("next");
 }
 
 pub fn do_go_binc(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
-    response.set_next( "ND_go_bincvar");
+    response.forward("next");
 }
 
 pub fn do_go_bincvar(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
     let word = &request.get_groups()[0];
     let num: i32 = word.parse().unwrap();
     shell_var.player_milliseconds_array[0] += num;
-    response.set_next("ND_go_winc");
+    response.forward("next");
 }
 
 pub fn do_go_winc(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
-    response.set_next("ND_go_wincvar");
+    response.forward("next");
 }
 
 pub fn do_go_wincvar(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, _response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
@@ -512,13 +512,13 @@ pub fn do_sasite(shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, _res
 /// USI
 pub fn do_setoption(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
     if VERBOSE { println!("Setoption begin."); }
-    response.set_next( "ND_setoption_name");
+    response.forward("next");
     set_linebreak_controller(response, do_setoption_lineend);
     if VERBOSE { println!("Setoption end."); }
 }
 pub fn do_setoption_name(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
     if VERBOSE { println!("Name."); }
-    response.set_next( "ND_setoption_namevar");
+    response.forward("next");
 }
 pub fn do_setoption_namevar(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
     let name = &request.get_groups()[0];
@@ -526,11 +526,11 @@ pub fn do_setoption_namevar(shell_var: &mut ShellVar, request: &Box<RequestAcces
 
     shell_var.engine_settings.buffer_name = name.to_string();
     if VERBOSE { println!("Namevar end."); }
-    response.set_next( "ND_setoption_value");
+    response.forward("next");
 }
 pub fn do_setoption_value(_shell_var: &mut ShellVar, _request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
     if VERBOSE { println!("Value."); }
-    response.set_next( "ND_setoption_valuevar");
+    response.forward("next");
 }
 pub fn do_setoption_valuevar(shell_var: &mut ShellVar, request: &Box<RequestAccessor>, response:&mut Box<dyn ResponseAccessor<ShellVar>>) {
     let value = &request.get_groups()[0];

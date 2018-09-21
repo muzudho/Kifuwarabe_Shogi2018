@@ -12,6 +12,8 @@ extern crate time;
 extern crate rand;
 #[macro_use]
 extern crate lazy_static;
+
+#[macro_use(hashmap)]
 extern crate kifuwarabe_shell;
 use kifuwarabe_shell::graph::*;
 use kifuwarabe_shell::node::*;
@@ -106,74 +108,74 @@ fn main() {
     // 該当なしのときに実行されるコールバック関数を選択。
     set_complementary_controller(&mut graph, do_other);
 
-    // コマンド トークン構成。
+    // グラフ ノード構成。
 
     // [C]
-    insert_node(&mut graph, "ND_cmate0", "cmate0", do_cmate0);
-    insert_node(&mut graph, "ND_cmate0auto", "cmate0auto", do_cmate0auto);
+    insert_node(&mut graph, "ND_cmate0", "cmate0", do_cmate0, hashmap![]);
+    insert_node(&mut graph, "ND_cmate0auto", "cmate0auto", do_cmate0auto, hashmap![]);
 
     // [D]
-    insert_node(&mut graph, "ND_do", "do ", do_do);
+    insert_node(&mut graph, "ND_do", "do ", do_do, hashmap![]);
 
     // [G]
-    insert_node(&mut graph, "ND_getmate", "getmate", do_getmate);
+    insert_node(&mut graph, "ND_getmate", "getmate", do_getmate, hashmap![]);
 
-    insert_node(&mut graph, "ND_go", "go", do_go);
-    insert_node(&mut graph, "ND_go_btime", "btime", do_go_btime);
-    insert_node_re(&mut graph, "ND_go_btimevar", r"(\d+)", do_go_btimevar);
-    insert_node(&mut graph, "ND_go_wtime", "wtime", do_go_wtime);
-    insert_node_re(&mut graph, "ND_go_wtimevar", r"(\d+)", do_go_wtimevar);
-    insert_node(&mut graph, "ND_go_binc", "binc", do_go_binc);
-    insert_node_re(&mut graph, "ND_go_bincvar", r"(\d+)", do_go_bincvar);
-    insert_node(&mut graph, "ND_go_winc", "winc", do_go_winc);
-    insert_node_re(&mut graph, "ND_go_wincvar", r"(\d+)", do_go_wincvar);
+    insert_node(&mut graph, "ND_go", "go", do_go, hashmap!["next" => "ND_go_btime"]);
+    insert_node(&mut graph, "ND_go_btime", "btime", do_go_btime, hashmap!["next" => "ND_go_btimevar"]);
+    insert_node_re(&mut graph, "ND_go_btimevar", r"(\d+)", do_go_btimevar, hashmap!["next" => "ND_go_wtime"]);
+    insert_node(&mut graph, "ND_go_wtime", "wtime", do_go_wtime, hashmap!["next" => "ND_go_wtimevar"]);
+    insert_node_re(&mut graph, "ND_go_wtimevar", r"(\d+)", do_go_wtimevar, hashmap!["next" => "ND_go_binc"]);
+    insert_node(&mut graph, "ND_go_binc", "binc", do_go_binc, hashmap!["next" => "ND_go_bincvar"]);
+    insert_node_re(&mut graph, "ND_go_bincvar", r"(\d+)", do_go_bincvar, hashmap!["next" => "ND_go_winc"]);
+    insert_node(&mut graph, "ND_go_winc", "winc", do_go_winc, hashmap!["next" => "ND_go_wincvar"]);
+    insert_node_re(&mut graph, "ND_go_wincvar", r"(\d+)", do_go_wincvar, hashmap![]);
 
     // [H]
-    insert_node(&mut graph, "ND_hash", "hash", do_hash);
-    insert_node(&mut graph, "ND_hirate", "hirate", do_hirate);
+    insert_node(&mut graph, "ND_hash", "hash", do_hash, hashmap![]);
+    insert_node(&mut graph, "ND_hirate", "hirate", do_hirate, hashmap![]);
 
     // [I]
-    insert_node(&mut graph, "ND_isready", "isready", do_isready);
+    insert_node(&mut graph, "ND_isready", "isready", do_isready, hashmap![]);
 
     // [K]
-    insert_node(&mut graph, "ND_kifu", "kifu", do_kifu);
-    insert_node(&mut graph, "ND_kikisu", "kikisu", do_kikisu);
-    insert_node(&mut graph, "ND_kmmove", "kmmove", do_kmmove);
-    insert_node(&mut graph, "ND_kmugokidir", "kmugokidir", do_kmugokidir);
-    insert_node(&mut graph, "ND_kmugoki", "kmugoki", do_kmugoki);
-    insert_node(&mut graph, "ND_ky0", "ky0", do_ky0);
-    insert_node(&mut graph, "ND_ky", "ky", do_ky);
+    insert_node(&mut graph, "ND_kifu", "kifu", do_kifu, hashmap![]);
+    insert_node(&mut graph, "ND_kikisu", "kikisu", do_kikisu, hashmap![]);
+    insert_node(&mut graph, "ND_kmmove", "kmmove", do_kmmove, hashmap![]);
+    insert_node(&mut graph, "ND_kmugokidir", "kmugokidir", do_kmugokidir, hashmap![]);
+    insert_node(&mut graph, "ND_kmugoki", "kmugoki", do_kmugoki, hashmap![]);
+    insert_node(&mut graph, "ND_ky0", "ky0", do_ky0, hashmap![]);
+    insert_node(&mut graph, "ND_ky", "ky", do_ky, hashmap![]);
 
     // [P]
-    insert_node(&mut graph, "ND_position", "position", do_position);
+    insert_node(&mut graph, "ND_position", "position", do_position, hashmap![]);
 
     // [Q]
-    insert_node(&mut graph, "ND_quit", "quit", do_quit);
+    insert_node(&mut graph, "ND_quit", "quit", do_quit, hashmap![]);
 
     // [R]
-    insert_node(&mut graph, "ND_rand", "rand", do_rand);
-    insert_node(&mut graph, "ND_rndkms", "rndkms", do_rndkms);
-    insert_node(&mut graph, "ND_rndms", "rndms", do_rndms);
-    insert_node(&mut graph, "ND_rndpos", "rndpos", do_rndpos);
+    insert_node(&mut graph, "ND_rand", "rand", do_rand, hashmap![]);
+    insert_node(&mut graph, "ND_rndkms", "rndkms", do_rndkms, hashmap![]);
+    insert_node(&mut graph, "ND_rndms", "rndms", do_rndms, hashmap![]);
+    insert_node(&mut graph, "ND_rndpos", "rndpos", do_rndpos, hashmap![]);
 
     // [S]
-    insert_node(&mut graph, "ND_same", "same", do_same);
-    insert_node(&mut graph, "ND_sasite", "sasite", do_sasite);
+    insert_node(&mut graph, "ND_same", "same", do_same, hashmap![]);
+    insert_node(&mut graph, "ND_sasite", "sasite", do_sasite, hashmap![]);
 
-    insert_node(&mut graph, "ND_setoption", "setoption", do_setoption);
-    insert_node(&mut graph, "ND_setoption_name", "name", do_setoption_name);
-    insert_node_re(&mut graph, "ND_setoption_namevar", r"(\w+)", do_setoption_namevar);
-    insert_node(&mut graph, "ND_setoption_value", "value", do_setoption_value);
-    insert_node_re(&mut graph, "ND_setoption_valuevar", r"(\w+)", do_setoption_valuevar);
+    insert_node(&mut graph, "ND_setoption", "setoption", do_setoption, hashmap!["next" => "ND_setoption_name"]);
+    insert_node(&mut graph, "ND_setoption_name", "name", do_setoption_name, hashmap!["next" => "ND_setoption_namevar"]);
+    insert_node_re(&mut graph, "ND_setoption_namevar", r"(\w+)", do_setoption_namevar, hashmap!["next" => "ND_setoption_value"]);
+    insert_node(&mut graph, "ND_setoption_value", "value", do_setoption_value, hashmap!["next" => "ND_setoption_valuevar"]);
+    insert_node_re(&mut graph, "ND_setoption_valuevar", r"(\w+)", do_setoption_valuevar, hashmap![]);
 
     // [T]
-    insert_node(&mut graph, "ND_teigi_conv", "teigi::conv", do_teigi_conv);
-    insert_node(&mut graph, "ND_test", "test", do_test);
+    insert_node(&mut graph, "ND_teigi_conv", "teigi::conv", do_teigi_conv, hashmap![]);
+    insert_node(&mut graph, "ND_test", "test", do_test, hashmap![]);
 
     // [U]
-    insert_node(&mut graph, "ND_usinewgame", "usinewgame", do_usinewgame);
-    insert_node(&mut graph, "ND_undo", "undo", do_undo);
-    insert_node(&mut graph, "ND_usi", "usi", do_usi);
+    insert_node(&mut graph, "ND_usinewgame", "usinewgame", do_usinewgame, hashmap![]);
+    insert_node(&mut graph, "ND_undo", "undo", do_undo, hashmap![]);
+    insert_node(&mut graph, "ND_usi", "usi", do_usi, hashmap![]);
 
 
 
