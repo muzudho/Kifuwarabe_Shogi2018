@@ -108,38 +108,40 @@ pub fn get_dir8_to_slider_from_target(
                     Dir8::Owari
             }
         },
-        PZ => {
-            // 筋か、段か、
-            // 左上がり筋か、左下がり筋かの　いずれかが同じ
-            if match_argangle0_p_p( &p_slider, &p_target ) {
-                if match_a_south_of_b( &p_slider, &p_target ){
-                    Dir8::S
-                } else {
-                    Dir8::N
-                }
-            } else if match_argangle45_p_p( &p_slider, &p_target ) {
-                if match_a_west_of_b( &p_slider, &p_target ){
-                    Dir8::NW
-                } else {
-                    Dir8::SE
-                }
-            } else if match_argangle90_p_p( &p_slider, &p_target ) {
-                if match_a_west_of_b( &p_slider, &p_target ){
-                    Dir8::W
-                } else {
-                    Dir8::E
-                }
-            } else if match_argangle135_p_p( &p_slider, &p_target ) {
-                if match_a_west_of_b( &p_slider, &p_target ){
-                    Dir8::NW
-                } else {
-                    Dir8::SE
-                }
-            } else {
-                    Dir8::Owari
-            }
-        },
+        PZ => get_dir8_pz( &p_slider, &p_target ),
         _ => Dir8::Owari
     }
 }
 
+/// cyclomatic complexity を避けるために分けただけ。
+fn get_dir8_pz (p_slider: &Point, p_target: &Point) -> Dir8 {
+    // 筋か、段か、
+    // 左上がり筋か、左下がり筋かの　いずれかが同じ
+    if match_argangle0_p_p( &p_slider, &p_target ) {
+        if match_a_south_of_b( &p_slider, &p_target ){
+            Dir8::S
+        } else {
+            Dir8::N
+        }
+    } else if match_argangle45_p_p( &p_slider, &p_target ) {
+        if match_a_west_of_b( &p_slider, &p_target ){
+            Dir8::NW
+        } else {
+            Dir8::SE
+        }
+    } else if match_argangle90_p_p( &p_slider, &p_target ) {
+        if match_a_west_of_b( &p_slider, &p_target ){
+            Dir8::W
+        } else {
+            Dir8::E
+        }
+    } else if match_argangle135_p_p( &p_slider, &p_target ) {
+        if match_a_west_of_b( &p_slider, &p_target ){
+            Dir8::NW
+        } else {
+            Dir8::SE
+        }
+    } else {
+            Dir8::Owari
+    }
+}
