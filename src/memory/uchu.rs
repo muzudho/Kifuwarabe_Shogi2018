@@ -25,6 +25,8 @@ use thinks::visions::vision_tree::*;
 pub struct Uchu{
     // 空打ちでタイトル画面を出すなら真。
     pub title_dirty : bool,
+    // コンソール画面用の局面を出力するなら真。
+    pub console_game_mode: bool,
     // 利きの数（先後別）
     pub kiki_su_by_sn : [NumberBoard; Sengo::Num as usize],
     // 利きの数（先後付き駒別）
@@ -41,7 +43,8 @@ impl Uchu{
     }
     pub fn new()->Uchu{
         Uchu{
-            title_dirty : true,
+            title_dirty: true,
+            console_game_mode: true,
             // 利き数（先後別）
             kiki_su_by_sn : [
                 NumberBoard::new(), NumberBoard::new(),

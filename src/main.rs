@@ -1,5 +1,5 @@
-#![cfg_attr(feature="clippy", feature(plugin))]
-#![cfg_attr(feature="clippy", plugin(clippy))]
+#![cfg_attr(feature = "clippy", feature(plugin))]
+#![cfg_attr(feature = "clippy", plugin(clippy))]
 
 ///
 /// きふわらべ将棋2018
@@ -7,25 +7,29 @@
 /// 外部クレートを利用しているので、cargo build でコンパイルすること。rustc main.rs ではコンパイルが成功しない。
 /// 実行ファイルは target/debug/kifuwarabe_shogi2018.exe だぜ☆
 ///
+// #[macro_use]
+// extern crate log;
+extern crate env_logger;
+// use log::Level;
+
 extern crate chrono;
-extern crate time;
 extern crate rand;
+extern crate time;
 #[macro_use]
 extern crate lazy_static;
 
 #[macro_use(hashmap)]
 extern crate kifuwarabe_shell;
 use kifuwarabe_shell::graph::*;
-use kifuwarabe_shell::node::*;
 use kifuwarabe_shell::shell::*;
 
-extern crate kifuwarabe_usi;
 extern crate kifuwarabe_position;
+extern crate kifuwarabe_usi;
 use kifuwarabe_position::*;
 
+extern crate kifuwarabe_alpha_beta_search;
 extern crate kifuwarabe_movement;
 extern crate kifuwarabe_movement_picker;
-extern crate kifuwarabe_alpha_beta_search;
 
 ///
 /// Rust言語の mod や ソース置き場の説明
@@ -33,22 +37,21 @@ extern crate kifuwarabe_alpha_beta_search;
 ///      https://qiita.com/skitaoka/items/753a519d720a1ccebb0d
 ///
 /// use したい モジュールは、最初に読み取られる　この main.rs ファイルに並べる
-
 mod config;
 mod consoles;
 mod display_impl;
 mod kasetu;
 mod logger;
-mod meidai;
 mod mediators;
+mod meidai;
 mod memory;
 mod misc;
 mod movement_thinks;
 mod searcher_impl;
 mod shell_impl;
+mod teigi;
 mod thinks;
 mod time_manager;
-mod teigi;
 //mod teiri;
 mod tusin;
 
@@ -59,22 +62,31 @@ use misc::option::*;
 use rand::Rng;
 use shell_impl::*;
 
-
 // グローバル変数。
 use std::sync::RwLock;
 lazy_static! {
     static ref UCHU_WRAP: RwLock<Uchu> = RwLock::new(Uchu::new());
 }
 
-
-
-
 fn main() {
-    
-    // ロガー
+    // TODO ロガー
     {
-        LOGGER.try_write().unwrap().set_file_path(&"log-kw", &".log");
-        LOGGER.try_write().unwrap().delete_old_file();
+        // https://docs.rs/env_logger/0.5.13/env_logger/
+        env_logger::init();
+        /*
+        debug!("this is a debug {}", "message");
+        error!("this is printed by default");
+
+        if log_enabled!(Level::Info) {
+            let x = 3 * 4; // expensive computation
+            info!("the answer was: {}", x);
+        }
+        */
+        LOGGER
+            .try_write()
+            .unwrap()
+            .set_file_path(&"log-kw", &".log");
+        // TODO LOGGER.try_write().unwrap().delete_old_file();
     }
 
     // 任意の構造体を作成する。
@@ -87,105 +99,168 @@ fn main() {
         for i_ms in MASU_0..BAN_SIZE {
             for i_km in 0..Koma::Num as usize {
                 // FIXME 18446744073709551615 が含まれないだろ、どうなってるんだぜ☆（＾～＾）！？
-                shell_var.searcher.game_record.ky_hash_seed.km[i_ms][i_km] = rand::thread_rng().gen_range(0,18_446_744_073_709_551_615);
+                shell_var.searcher.game_record.ky_hash_seed.km[i_ms][i_km] =
+                    rand::thread_rng().gen_range(0, 18_446_744_073_709_551_615);
             }
         }
         // 持ち駒
         for i_km in 0..Koma::Num as usize {
             for i_mg in 0..MG_MAX {
-                shell_var.searcher.game_record.ky_hash_seed.mg[i_km][i_mg] = rand::thread_rng().gen_range(0,18_446_744_073_709_551_615);
+                shell_var.searcher.game_record.ky_hash_seed.mg[i_km][i_mg] =
+                    rand::thread_rng().gen_range(0, 18_446_744_073_709_551_615);
             }
         }
         // 先後
         for i_sn in 0..Sengo::Num as usize {
-            shell_var.searcher.game_record.ky_hash_seed.sn[i_sn] = rand::thread_rng().gen_range(0,18_446_744_073_709_551_615);
+            shell_var.searcher.game_record.ky_hash_seed.sn[i_sn] =
+                rand::thread_rng().gen_range(0, 18_446_744_073_709_551_615);
         }
     }
 
     // グラフの作成。
-    let mut graph = new_graph();
+    let mut graph = Graph::new();
 
-    // 該当なしのときに実行されるコールバック関数を選択。
-    set_complementary_controller(&mut graph, do_other);
+    // 該当なしのときに実行されるコールバック関数を選択
+    graph.insert_node_single("#ND_complementary", do_other);
 
     // グラフ ノード構成。
 
     // [C]
-    insert_node(&mut graph, "ND_cmate0", "cmate0", do_cmate0, hashmap![]);
-    insert_node(&mut graph, "ND_cmate0auto", "cmate0auto", do_cmate0auto, hashmap![]);
+    graph.insert_node("ND_cmate0", "cmate0", do_cmate0, hashmap![]);
+    graph.insert_node("ND_cmate0auto", "cmate0auto", do_cmate0auto, hashmap![]);
 
     // [D]
-    insert_node(&mut graph, "ND_do", "do ", do_do, hashmap![]);
+    graph.insert_node("ND_do", "do ", do_do, hashmap![]);
 
     // [G]
-    insert_node(&mut graph, "ND_getmate", "getmate", do_getmate, hashmap![]);
+    graph.insert_node("ND_getmate", "getmate", do_getmate, hashmap![]);
 
-    insert_node(&mut graph, "ND_go", "go", do_go, hashmap!["next" => "ND_go_btime", "#linebreak" => "ND_go_linebreak"]); // #linebreak コールバック関数は行終了時に実行される。
-    insert_node(&mut graph, "ND_go_btime", "btime", do_go_btime, hashmap!["next" => "ND_go_btimevar"]);
-    insert_node_re(&mut graph, "ND_go_btimevar", r"(\d+)", do_go_btimevar, hashmap!["next" => "ND_go_wtime"]);
-    insert_node(&mut graph, "ND_go_wtime", "wtime", do_go_wtime, hashmap!["next" => "ND_go_wtimevar"]);
-    insert_node_re(&mut graph, "ND_go_wtimevar", r"(\d+)", do_go_wtimevar, hashmap!["next" => "ND_go_binc"]);
-    insert_node(&mut graph, "ND_go_binc", "binc", do_go_binc, hashmap!["next" => "ND_go_bincvar"]);
-    insert_node_re(&mut graph, "ND_go_bincvar", r"(\d+)", do_go_bincvar, hashmap!["next" => "ND_go_winc"]);
-    insert_node(&mut graph, "ND_go_winc", "winc", do_go_winc, hashmap!["next" => "ND_go_wincvar"]);
-    insert_node_re(&mut graph, "ND_go_wincvar", r"(\d+)", do_go_wincvar, hashmap![]);
-    insert_node_single(&mut graph, "ND_go_linebreak", do_go_linebreak);
+    graph.insert_node(
+        "ND_go",
+        "go",
+        do_go,
+        hashmap!["next" => "ND_go_btime", "#linebreak" => "ND_go_linebreak"],
+    ); // #linebreak コールバック関数は行終了時に実行される。
+    graph.insert_node(
+        "ND_go_btime",
+        "btime",
+        do_go_btime,
+        hashmap!["next" => "ND_go_btimevar"],
+    );
+    graph.insert_node_reg(
+        "ND_go_btimevar",
+        r"(\d+)",
+        do_go_btimevar,
+        hashmap!["next" => "ND_go_wtime"],
+    );
+    graph.insert_node(
+        "ND_go_wtime",
+        "wtime",
+        do_go_wtime,
+        hashmap!["next" => "ND_go_wtimevar"],
+    );
+    graph.insert_node_reg(
+        "ND_go_wtimevar",
+        r"(\d+)",
+        do_go_wtimevar,
+        hashmap!["next" => "ND_go_binc"],
+    );
+    graph.insert_node(
+        "ND_go_binc",
+        "binc",
+        do_go_binc,
+        hashmap!["next" => "ND_go_bincvar"],
+    );
+    graph.insert_node_reg(
+        "ND_go_bincvar",
+        r"(\d+)",
+        do_go_bincvar,
+        hashmap!["next" => "ND_go_winc"],
+    );
+    graph.insert_node(
+        "ND_go_winc",
+        "winc",
+        do_go_winc,
+        hashmap!["next" => "ND_go_wincvar"],
+    );
+    graph.insert_node_reg("ND_go_wincvar", r"(\d+)", do_go_wincvar, hashmap![]);
+    graph.insert_node_single("ND_go_linebreak", do_go_linebreak);
 
     // [H]
-    insert_node(&mut graph, "ND_hash", "hash", do_hash, hashmap![]);
-    insert_node(&mut graph, "ND_hirate", "hirate", do_hirate, hashmap![]);
+    graph.insert_node("ND_hash", "hash", do_hash, hashmap![]);
+    graph.insert_node("ND_hirate", "hirate", do_hirate, hashmap![]);
 
     // [I]
-    insert_node(&mut graph, "ND_isready", "isready", do_isready, hashmap![]);
+    graph.insert_node("ND_isready", "isready", do_isready, hashmap![]);
 
     // [K]
-    insert_node(&mut graph, "ND_kifu", "kifu", do_kifu, hashmap![]);
-    insert_node(&mut graph, "ND_kikisu", "kikisu", do_kikisu, hashmap![]);
-    insert_node(&mut graph, "ND_kmmove", "kmmove", do_kmmove, hashmap![]);
-    insert_node(&mut graph, "ND_kmugokidir", "kmugokidir", do_kmugokidir, hashmap![]);
-    insert_node(&mut graph, "ND_kmugoki", "kmugoki", do_kmugoki, hashmap![]);
-    insert_node(&mut graph, "ND_ky0", "ky0", do_ky0, hashmap![]);
-    insert_node(&mut graph, "ND_ky", "ky", do_ky, hashmap![]);
+    graph.insert_node("ND_kifu", "kifu", do_kifu, hashmap![]);
+    graph.insert_node("ND_kikisu", "kikisu", do_kikisu, hashmap![]);
+    graph.insert_node("ND_kmmove", "kmmove", do_kmmove, hashmap![]);
+    graph.insert_node("ND_kmugokidir", "kmugokidir", do_kmugokidir, hashmap![]);
+    graph.insert_node("ND_kmugoki", "kmugoki", do_kmugoki, hashmap![]);
+    graph.insert_node("ND_ky0", "ky0", do_ky0, hashmap![]);
+    graph.insert_node("ND_ky", "ky", do_ky, hashmap![]);
 
     // [P]
-    insert_node(&mut graph, "ND_position", "position", do_position, hashmap![]);
+    graph.insert_node("ND_position", "position", do_position, hashmap![]);
 
     // [Q]
-    insert_node(&mut graph, "ND_quit", "quit", do_quit, hashmap![]);
+    graph.insert_node("ND_quit", "quit", do_quit, hashmap![]);
 
     // [R]
-    insert_node(&mut graph, "ND_rand", "rand", do_rand, hashmap![]);
-    insert_node(&mut graph, "ND_rndkms", "rndkms", do_rndkms, hashmap![]);
-    insert_node(&mut graph, "ND_rndms", "rndms", do_rndms, hashmap![]);
-    insert_node(&mut graph, "ND_rndpos", "rndpos", do_rndpos, hashmap![]);
+    graph.insert_node("ND_rand", "rand", do_rand, hashmap![]);
+    graph.insert_node("ND_rndkms", "rndkms", do_rndkms, hashmap![]);
+    graph.insert_node("ND_rndms", "rndms", do_rndms, hashmap![]);
+    graph.insert_node("ND_rndpos", "rndpos", do_rndpos, hashmap![]);
 
     // [S]
-    insert_node(&mut graph, "ND_same", "same", do_same, hashmap![]);
-    insert_node(&mut graph, "ND_sasite", "sasite", do_sasite, hashmap![]);
+    graph.insert_node("ND_same", "same", do_same, hashmap![]);
+    graph.insert_node("ND_sasite", "sasite", do_sasite, hashmap![]);
 
-    insert_node(&mut graph, "ND_setoption", "setoption", do_setoption, hashmap!["next" => "ND_setoption_name", "#linebreak" => "ND_setoption_linebreak"]);
-    insert_node(&mut graph, "ND_setoption_name", "name", do_setoption_name, hashmap!["next" => "ND_setoption_namevar"]);
-    insert_node_re(&mut graph, "ND_setoption_namevar", r"(\w+)", do_setoption_namevar, hashmap!["next" => "ND_setoption_value"]);
-    insert_node(&mut graph, "ND_setoption_value", "value", do_setoption_value, hashmap!["next" => "ND_setoption_valuevar"]);
-    insert_node_re(&mut graph, "ND_setoption_valuevar", r"(\w+)", do_setoption_valuevar, hashmap![]);
-    insert_node_single(&mut graph, "ND_setoption_linebreak", do_setoption_linebreak);
+    graph.insert_node(
+        "ND_setoption",
+        "setoption",
+        do_setoption,
+        hashmap!["next" => "ND_setoption_name", "#linebreak" => "ND_setoption_linebreak"],
+    );
+    graph.insert_node(
+        "ND_setoption_name",
+        "name",
+        do_setoption_name,
+        hashmap!["next" => "ND_setoption_namevar"],
+    );
+    graph.insert_node_reg(
+        "ND_setoption_namevar",
+        r"(\w+)",
+        do_setoption_namevar,
+        hashmap!["next" => "ND_setoption_value"],
+    );
+    graph.insert_node(
+        "ND_setoption_value",
+        "value",
+        do_setoption_value,
+        hashmap!["next" => "ND_setoption_valuevar"],
+    );
+    graph.insert_node_reg(
+        "ND_setoption_valuevar",
+        r"([\d\w]+)",
+        do_setoption_valuevar,
+        hashmap![],
+    );
+    graph.insert_node_single("ND_setoption_linebreak", do_setoption_linebreak);
 
     // [T]
-    insert_node(&mut graph, "ND_teigi_conv", "teigi::conv", do_teigi_conv, hashmap![]);
-    insert_node(&mut graph, "ND_test", "test", do_test, hashmap![]);
+    graph.insert_node("ND_teigi_conv", "teigi::conv", do_teigi_conv, hashmap![]);
+    graph.insert_node("ND_test", "test", do_test, hashmap![]);
 
     // [U]
-    insert_node(&mut graph, "ND_usinewgame", "usinewgame", do_usinewgame, hashmap![]);
-    insert_node(&mut graph, "ND_undo", "undo", do_undo, hashmap![]);
-    insert_node(&mut graph, "ND_usi", "usi", do_usi, hashmap![]);
-
-
-
-    // シェルの作成。
-    let mut shell = new_shell();
+    graph.insert_node("ND_usinewgame", "usinewgame", do_usinewgame, hashmap![]);
+    graph.insert_node("ND_undo", "undo", do_undo, hashmap![]);
+    graph.insert_node("ND_usi", "usi", do_usi, hashmap![]);
 
     // 開始ノードを選択する。
-    set_next(&mut shell, "ND_cmate0, ND_cmate0auto,
+    graph.set_entrance("ND_cmate0, ND_cmate0auto,
     ND_do,
     ND_getmate,
     ND_go,
@@ -199,6 +274,9 @@ fn main() {
     ND_same,ND_sasite,ND_teigi_conv,
     ND_test,ND_usinewgame,ND_undo,ND_usi");
 
+    // シェルの作成。
+    let mut shell = Shell::new();
+
     // [Ctrl]+[C] で強制終了
-    run(&mut graph, &mut shell, &mut shell_var);
+    shell.run(&graph, &mut shell_var);
 }

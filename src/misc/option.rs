@@ -17,12 +17,9 @@ impl EngineSettings {
         self.map.contains_key(key)
     }
     pub fn get(&self, key: &str) -> &String {
-        &self.map[key]
+        &self.map[&key.to_string()]
     }
     pub fn flush(&mut self) {
-        self.map.insert(
-            self.buffer_name.to_string(),
-            self.buffer_value.to_string()
-        );
+        self.map.insert(self.buffer_name.to_string(), self.buffer_value.to_string());
     }
 }

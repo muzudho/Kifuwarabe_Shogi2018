@@ -9,10 +9,12 @@ lazy_static = "1.1.0"
 clippy = { version = "*", optional = true }
 chrono = "0.4"
 time = "0.1"
+log = "*"
+env_logger = "*"
 
 [dependencies.kifuwarabe_shell]
 git = "https://github.com/muzudho/rust_kifuwarabe_shell.git"
-rev = "49b3c82b9e4b6ad71d1d7873301fbb23c30eaf8f"
+rev = "23d6553603f43095a9c2e5aabb546093625cba4a"
 
 [dependencies.kifuwarabe_usi]
 git = "https://github.com/muzudho/rust_kifuwarabe_usi.git"
