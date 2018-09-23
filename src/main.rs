@@ -18,7 +18,7 @@ extern crate time;
 #[macro_use]
 extern crate lazy_static;
 
-#[macro_use(hashmap)]
+// #[macro_use(hashmap)]
 extern crate kifuwarabe_shell;
 use kifuwarabe_shell::graph::*;
 use kifuwarabe_shell::shell::*;
@@ -68,6 +68,7 @@ lazy_static! {
     static ref UCHU_WRAP: RwLock<Uchu> = RwLock::new(Uchu::new());
 }
 
+const graph_json_file : &'static str = "graph.json";
 fn main() {
     // TODO ロガー
     {
@@ -117,6 +118,7 @@ fn main() {
         }
     }
 
+
     // グラフの作成。
     let mut graph = Graph::new();
     // コントローラーを登録。
@@ -158,6 +160,7 @@ fn main() {
     graph.insert_controller("do_quit", do_quit);
     // [R]
     graph.insert_controller("do_rand", do_rand);
+    graph.insert_controller("do_reload", do_reload);
     graph.insert_controller("do_rndkms", do_rndkms);
     graph.insert_controller("do_rndms", do_rndms);
     graph.insert_controller("do_rndpos", do_rndpos);
@@ -179,7 +182,7 @@ fn main() {
     graph.insert_controller("do_usi", do_usi);
 
     // ファイルからグラフのノード構成を読取。
-    graph.read_graph_file("graph.json".to_string());
+    graph.read_graph_file(graph_json_file.to_string());
     // - 正規表現は、うまく作れていない。全体を丸括弧で囲む。1個だけ。
     // - #linebreak コールバック関数は行終了時に実行される。
 

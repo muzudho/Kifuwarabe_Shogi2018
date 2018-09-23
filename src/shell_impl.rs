@@ -577,6 +577,14 @@ pub fn do_rand(
         .writeln(&format!("乱数={}", secret_number));
 }
 
+pub fn do_reload(
+    _shell_var: &mut ShellVar,
+    _request: &RequestAccessor,
+    response: &mut dyn ResponseAccessor,
+) {
+    response.set_reloads(graph_json_file);
+}
+
 /// 駒種類をランダムで出す。
 pub fn do_rndkms(
     _shell_var: &mut ShellVar,

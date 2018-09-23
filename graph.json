@@ -22,6 +22,7 @@
 		"ND_position",
 		"ND_quit",
 		"ND_rand",
+		"ND_reload",
 		"ND_rndkms",
 		"ND_rndms",
 		"ND_rndpos",
@@ -214,6 +215,11 @@
 			"name": "ND_rand",
 			"token": "rand",
 			"controller": "do_rand"
+		},
+		{
+			"name": "ND_reload",
+			"token": "reload",
+			"controller": "do_reload"
 		},
 		{
 			"name": "ND_rndkms",
