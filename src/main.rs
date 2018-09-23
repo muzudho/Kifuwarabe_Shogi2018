@@ -119,160 +119,69 @@ fn main() {
 
     // グラフの作成。
     let mut graph = Graph::new();
-
-    // 該当なしのときに実行されるコールバック関数を選択
-    graph.insert_node_single("#ND_complementary", do_other);
-
-    // グラフ ノード構成。
-
+    // コントローラーを登録。
     // [C]
-    graph.insert_node("ND_cmate0", "cmate0", do_cmate0, hashmap![]);
-    graph.insert_node("ND_cmate0auto", "cmate0auto", do_cmate0auto, hashmap![]);
-
+    graph.insert_controller("do_cmate0", do_cmate0);
+    graph.insert_controller("do_cmate0auto", do_cmate0auto);
     // [D]
-    graph.insert_node("ND_do", "do ", do_do, hashmap![]);
-
+    graph.insert_controller("do_do", do_do);
     // [G]
-    graph.insert_node("ND_getmate", "getmate", do_getmate, hashmap![]);
-
-    graph.insert_node(
-        "ND_go",
-        "go",
-        do_go,
-        hashmap!["next" => "ND_go_btime", "#linebreak" => "ND_go_linebreak"],
-    ); // #linebreak コールバック関数は行終了時に実行される。
-    graph.insert_node(
-        "ND_go_btime",
-        "btime",
-        do_go_btime,
-        hashmap!["next" => "ND_go_btimevar"],
-    );
-    graph.insert_node_reg(
-        "ND_go_btimevar",
-        r"(\d+)",
-        do_go_btimevar,
-        hashmap!["next" => "ND_go_wtime"],
-    );
-    graph.insert_node(
-        "ND_go_wtime",
-        "wtime",
-        do_go_wtime,
-        hashmap!["next" => "ND_go_wtimevar"],
-    );
-    graph.insert_node_reg(
-        "ND_go_wtimevar",
-        r"(\d+)",
-        do_go_wtimevar,
-        hashmap!["next" => "ND_go_binc"],
-    );
-    graph.insert_node(
-        "ND_go_binc",
-        "binc",
-        do_go_binc,
-        hashmap!["next" => "ND_go_bincvar"],
-    );
-    graph.insert_node_reg(
-        "ND_go_bincvar",
-        r"(\d+)",
-        do_go_bincvar,
-        hashmap!["next" => "ND_go_winc"],
-    );
-    graph.insert_node(
-        "ND_go_winc",
-        "winc",
-        do_go_winc,
-        hashmap!["next" => "ND_go_wincvar"],
-    );
-    graph.insert_node_reg("ND_go_wincvar", r"(\d+)", do_go_wincvar, hashmap![]);
-    graph.insert_node_single("ND_go_linebreak", do_go_linebreak);
-
+    graph.insert_controller("do_getmate", do_getmate);
+    graph.insert_controller("do_go", do_go);
+    graph.insert_controller("do_go_btime", do_go_btime);
+    graph.insert_controller("do_go_btimevar", do_go_btimevar);
+    graph.insert_controller("do_go_wtime", do_go_wtime);
+    graph.insert_controller("do_go_wtimevar", do_go_wtimevar);
+    graph.insert_controller("do_go_binc", do_go_binc);
+    graph.insert_controller("do_go_bincvar", do_go_bincvar);
+    graph.insert_controller("do_go_winc", do_go_winc);
+    graph.insert_controller("do_go_wincvar", do_go_wincvar);
+    graph.insert_controller("do_go_linebreak", do_go_linebreak);
     // [H]
-    graph.insert_node("ND_hash", "hash", do_hash, hashmap![]);
-    graph.insert_node("ND_hirate", "hirate", do_hirate, hashmap![]);
-
+    graph.insert_controller("do_hash", do_hash);
+    graph.insert_controller("do_hirate", do_hirate);
     // [I]
-    graph.insert_node("ND_isready", "isready", do_isready, hashmap![]);
-
+    graph.insert_controller("do_isready", do_isready);
     // [K]
-    graph.insert_node("ND_kifu", "kifu", do_kifu, hashmap![]);
-    graph.insert_node("ND_kikisu", "kikisu", do_kikisu, hashmap![]);
-    graph.insert_node("ND_kmmove", "kmmove", do_kmmove, hashmap![]);
-    graph.insert_node("ND_kmugokidir", "kmugokidir", do_kmugokidir, hashmap![]);
-    graph.insert_node("ND_kmugoki", "kmugoki", do_kmugoki, hashmap![]);
-    graph.insert_node("ND_ky0", "ky0", do_ky0, hashmap![]);
-    graph.insert_node("ND_ky", "ky", do_ky, hashmap![]);
-
+    graph.insert_controller("do_kifu", do_kifu);
+    graph.insert_controller("do_kikisu", do_kikisu);
+    graph.insert_controller("do_kmmove", do_kmmove);
+    graph.insert_controller("do_kmugokidir", do_kmugokidir);
+    graph.insert_controller("do_kmugoki", do_kmugoki);
+    graph.insert_controller("do_ky0", do_ky0);
+    graph.insert_controller("do_ky", do_ky);
+    // [O]
+    graph.insert_controller("do_other", do_other);
     // [P]
-    graph.insert_node("ND_position", "position", do_position, hashmap![]);
-
+    graph.insert_controller("do_position", do_position);
     // [Q]
-    graph.insert_node("ND_quit", "quit", do_quit, hashmap![]);
-
+    graph.insert_controller("do_quit", do_quit);
     // [R]
-    graph.insert_node("ND_rand", "rand", do_rand, hashmap![]);
-    graph.insert_node("ND_rndkms", "rndkms", do_rndkms, hashmap![]);
-    graph.insert_node("ND_rndms", "rndms", do_rndms, hashmap![]);
-    graph.insert_node("ND_rndpos", "rndpos", do_rndpos, hashmap![]);
-
+    graph.insert_controller("do_rand", do_rand);
+    graph.insert_controller("do_rndkms", do_rndkms);
+    graph.insert_controller("do_rndms", do_rndms);
+    graph.insert_controller("do_rndpos", do_rndpos);
     // [S]
-    graph.insert_node("ND_same", "same", do_same, hashmap![]);
-    graph.insert_node("ND_sasite", "sasite", do_sasite, hashmap![]);
-
-    graph.insert_node(
-        "ND_setoption",
-        "setoption",
-        do_setoption,
-        hashmap!["next" => "ND_setoption_name", "#linebreak" => "ND_setoption_linebreak"],
-    );
-    graph.insert_node(
-        "ND_setoption_name",
-        "name",
-        do_setoption_name,
-        hashmap!["next" => "ND_setoption_namevar"],
-    );
-    graph.insert_node_reg(
-        "ND_setoption_namevar",
-        r"(\w+)",
-        do_setoption_namevar,
-        hashmap!["next" => "ND_setoption_value"],
-    );
-    graph.insert_node(
-        "ND_setoption_value",
-        "value",
-        do_setoption_value,
-        hashmap!["next" => "ND_setoption_valuevar"],
-    );
-    graph.insert_node_reg(
-        "ND_setoption_valuevar",
-        r"([\d\w]+)",
-        do_setoption_valuevar,
-        hashmap![],
-    );
-    graph.insert_node_single("ND_setoption_linebreak", do_setoption_linebreak);
-
+    graph.insert_controller("do_same", do_same);
+    graph.insert_controller("do_sasite", do_sasite);
+    graph.insert_controller("do_setoption", do_setoption);
+    graph.insert_controller("do_setoption_name", do_setoption_name);
+    graph.insert_controller("do_setoption_namevar", do_setoption_namevar);
+    graph.insert_controller("do_setoption_value", do_setoption_value);
+    graph.insert_controller("do_setoption_valuevar", do_setoption_valuevar);
+    graph.insert_controller("do_setoption_linebreak", do_setoption_linebreak);
     // [T]
-    graph.insert_node("ND_teigi_conv", "teigi::conv", do_teigi_conv, hashmap![]);
-    graph.insert_node("ND_test", "test", do_test, hashmap![]);
-
+    graph.insert_controller("do_teigi_conv", do_teigi_conv);
+    graph.insert_controller("do_test", do_test);
     // [U]
-    graph.insert_node("ND_usinewgame", "usinewgame", do_usinewgame, hashmap![]);
-    graph.insert_node("ND_undo", "undo", do_undo, hashmap![]);
-    graph.insert_node("ND_usi", "usi", do_usi, hashmap![]);
+    graph.insert_controller("do_usinewgame", do_usinewgame);
+    graph.insert_controller("do_undo", do_undo);
+    graph.insert_controller("do_usi", do_usi);
 
-    // 開始ノードを選択する。
-    graph.set_entrance("ND_cmate0, ND_cmate0auto,
-    ND_do,
-    ND_getmate,
-    ND_go,
-    ND_hash,ND_hirate,ND_isready,
-    ND_kifu,ND_kikisu,ND_kmugokidir,ND_kmugoki,ND_ky0,ND_ky,
-
-    ND_setoption, ND_setoption_name, ND_setoption_namevar, ND_setoption_value, ND_setoption_valuevar,
-
-    ND_position,ND_quit,
-    ND_rand,ND_rndkms,ND_rndms,ND_rndpos,
-    ND_same,ND_sasite,ND_teigi_conv,
-    ND_test,ND_usinewgame,ND_undo,ND_usi");
+    // ファイルからグラフのノード構成を読取。
+    graph.read_graph_file("graph.json".to_string());
+    // - 正規表現は、うまく作れていない。全体を丸括弧で囲む。1個だけ。
+    // - #linebreak コールバック関数は行終了時に実行される。
 
     // シェルの作成。
     let mut shell = Shell::new();

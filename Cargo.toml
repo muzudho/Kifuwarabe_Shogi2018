@@ -14,7 +14,7 @@ env_logger = "*"
 
 [dependencies.kifuwarabe_shell]
 git = "https://github.com/muzudho/rust_kifuwarabe_shell.git"
-rev = "b8c315edf2353415eae8d66ee2c9049400a4e809"
+rev = "4534c72b312d0e1da3496ef83967e5046ff737d2"
 
 [dependencies.kifuwarabe_usi]
 git = "https://github.com/muzudho/rust_kifuwarabe_usi.git"
