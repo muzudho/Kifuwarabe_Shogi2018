@@ -68,8 +68,9 @@ lazy_static! {
     static ref UCHU_WRAP: RwLock<Uchu> = RwLock::new(Uchu::new());
 }
 
-const GRAPH_JSON_FILE : &'static str = "graph.json";
+const GRAPH_JSON_FILE : &str = "graph.json";
 fn main() {
+    //println!("main: begin.");
     // TODO ロガー
     {
         // https://docs.rs/env_logger/0.5.13/env_logger/
@@ -120,6 +121,7 @@ fn main() {
 
 
     // グラフの作成。
+    //println!("main: Graph::new().");
     let mut graph = Graph::new();
     // コントローラーを登録。
     // [C]
@@ -141,7 +143,6 @@ fn main() {
     graph.insert_controller("do_go_linebreak", do_go_linebreak);
     // [H]
     graph.insert_controller("do_hash", do_hash);
-    graph.insert_controller("do_hirate", do_hirate);
     // [I]
     graph.insert_controller("do_isready", do_isready);
     // [K]
@@ -156,7 +157,9 @@ fn main() {
     graph.insert_controller("do_other", do_other);
     // [P]
     graph.insert_controller("do_position", do_position);
-    graph.insert_controller("do_position_sfen", do_position_sfen);
+    graph.insert_controller("do_position_sfen_board", do_position_sfen_board);
+    graph.insert_controller("do_position_sfen_hands", do_position_sfen_hands);
+    graph.insert_controller("do_position_sfen_movevar", do_position_sfen_movevar);
     graph.insert_controller("do_position_startpos", do_position_startpos);
     // [Q]
     graph.insert_controller("do_quit", do_quit);
@@ -184,13 +187,16 @@ fn main() {
     graph.insert_controller("do_usi", do_usi);
 
     // ファイルからグラフのノード構成を読取。
+    //println!("main: read_graph_file.");
     graph.read_graph_file(GRAPH_JSON_FILE.to_string());
     // - 正規表現は、うまく作れていない。全体を丸括弧で囲む。1個だけ。
     // - #linebreak コールバック関数は行終了時に実行される。
 
     // シェルの作成。
+    //println!("main: Shell:new().");
     let mut shell = Shell::new();
 
     // [Ctrl]+[C] で強制終了
+    //println!("main: shell.run:");
     shell.run(&graph, &mut shell_var);
 }

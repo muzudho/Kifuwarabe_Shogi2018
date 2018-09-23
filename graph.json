@@ -159,11 +159,6 @@
 			"controller": "do_hash"
 		},
 		{
-			"name": "ND_hirate",
-			"token": "hirate",
-			"controller": "do_hirate"
-		},
-		{
 			"name": "ND_isready",
 			"token": "isready",
 			"controller": "do_isready"
@@ -217,12 +212,78 @@
 		{
 			"name": "ND_position_sfen",
 			"token": "sfen",
-			"controller": "do_position_sfen"
+			"exit": {
+				"next": [
+					"ND_position_sfen_board"
+				]
+			}
+		},
+		{
+			"name": "ND_position_sfen_board",
+			"regex": "([\\d\\w/]+)",
+			"controller": "do_position_sfen_board",
+			"exit": {
+				"next": [
+					"ND_position_sfen_turn"
+				]
+			}
+		},
+		{
+			"name": "ND_position_sfen_turn",
+			"regex": "([bw])",
+			"exit": {
+				"next": [
+					"ND_position_sfen_hands"
+				]
+			}
+		},
+		{
+			"name": "ND_position_sfen_hands",
+			"regex": "([\\d\\w+]*)",
+			"controller": "do_position_sfen_hands",
+			"exit": {
+				"next": [
+					"ND_position_sfen_ply"
+				]
+			}
+		},
+		{
+			"name": "ND_position_sfen_ply",
+			"token": "1",
+			"exit": {
+				"next": [
+					"ND_position_sfen_moves"
+				]
+			}
+		},
+		{
+			"name": "ND_position_sfen_moves",
+			"token": "moves",
+			"exit": {
+				"next": [
+					"ND_position_sfen_movevar"
+				]
+			}
+		},
+		{
+			"name": "ND_position_sfen_movevar",
+			"regex": "([\\d\\w+*]+)",
+			"controller": "do_position_sfen_movevar",
+			"exit": {
+				"next": [
+					"ND_position_sfen_movevar"
+				]
+			}
 		},
 		{
 			"name": "ND_position_startpos",
 			"token": "startpos",
-			"controller": "do_position_startpos"
+			"controller": "do_position_startpos",
+			"exit": {
+				"next": [
+					"ND_position_sfen_moves"
+				]
+			}
 		},
 		{
 			"name": "ND_quit",

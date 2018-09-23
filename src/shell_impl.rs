@@ -12,7 +12,7 @@ use kifuwarabe_usi::*;
 use rand::Rng;
 use searcher_impl::*;
 use std::collections::HashSet;
-use teigi::constants::*;
+// use teigi::constants::*;
 use thinks;
 use thinks::think::*;
 use tusin::us_conv::*;
@@ -27,13 +27,27 @@ pub struct ShellVar {
     pub searcher: Searcher,
     /// エンジン設定。
     pub engine_settings: EngineSettings,
+    /// position コマンド読み取り中に使う。盤。
+    pub ban: [Piece; 100],
 }
 impl ShellVar {
     pub fn new() -> ShellVar {
+        use kifuwarabe_usi::Piece::Space;
         ShellVar {
             player_milliseconds_array: [0, 0],
             searcher: Searcher::new(),
             engine_settings: EngineSettings::new(),
+            ban: [
+                Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space,
+                Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space,
+                Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space,
+                Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space,
+                Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space,
+                Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space,
+                Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space,
+                Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space, Space,
+                Space, Space, Space, Space,
+            ],
         }
     }
 }
@@ -291,65 +305,6 @@ pub fn do_hash(
     LOGGER.try_write().unwrap().writeln(&s);
 }
 
-/// 平手初期局面にする。
-pub fn do_hirate(
-    shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
-) {
-    // 初期局面、現局面ともにクリアーします。手目も 0 に戻します。
-    shell_var.searcher.ini_position.clear();
-    shell_var.searcher.cur_position.clear();
-    shell_var.searcher.game_record.set_teme(0);
-
-    parse_position(
-        &mut shell_var.searcher,
-        &KY1.to_string(),
-        #[allow(unused_mut)]
-        |mut searcher, hand_count_arr: [i8; HAND_PIECE_ARRAY_LN]| {
-            // 持ち駒数コピー。
-            for (i, item) in HAND_PIECE_ARRAY.iter().enumerate() {
-                //let mut i=0;
-                //for item in &HAND_PIECE_ARRAY { // for item in HAND_PIECE_ARRAY.iter() {
-                let km = pc_to_km(*item);
-
-                searcher.ini_position.set_mg(km, hand_count_arr[i]);
-                // i += 1;
-            }
-        },
-        |searcher, ban: [Piece; 100]| {
-            // 盤面コピー
-            for file in SUJI_1..SUJI_10 {
-                for rank in DAN_1..DAN_10 {
-                    searcher.ini_position.set_km_by_ms(
-                        suji_dan_to_ms(file, rank),
-                        pc_to_km(ban[file_rank_to_cell(file, rank)]),
-                    );
-                }
-            }
-
-            // 初期局面ハッシュを作り直す
-            let ky_hash = searcher.game_record.create_ky0_hash(&searcher.ini_position);
-
-            searcher.game_record.set_ky0_hash(ky_hash);
-
-            // 初期局面を、現局面に写す。
-            searcher.cur_position.set_all(&searcher.ini_position);
-        },
-        |mut searcher, successful, usi_movement| {
-            let movement = usi_to_movement(successful, usi_movement); //&usi_movement
-
-            searcher.game_record.set_movement(movement);
-
-            if successful {
-                // 入っている指し手の通り指すぜ☆（＾～＾）
-                let mut dummy_alpha = 0;
-                userdefined_makemove(&mut searcher, movement.to_hash(), &mut dummy_alpha);
-            }
-        },
-    );
-}
-
 /*****
  * I *
  *****/
@@ -493,124 +448,120 @@ pub fn do_position(
     _request: &RequestAccessor,
     response: &mut dyn ResponseAccessor,
 ) {
+    //println!("Position: begin.");
     // 初期局面、現局面ともにクリアーします。手目も 0 に戻します。
     shell_var.searcher.ini_position.clear();
     shell_var.searcher.cur_position.clear();
     shell_var.searcher.game_record.set_teme(0);
+    response.forward("next");
+}
+
+fn sub_load_board(
+    shell_var: &mut ShellVar,
+) {
+    //println!("Load board: begin.");
+    // 盤面読取。
+    for file in SUJI_1..SUJI_10 {
+        for rank in DAN_1..DAN_10 {
+            shell_var.searcher.ini_position.set_km_by_ms(
+                suji_dan_to_ms(file, rank),
+                pc_to_km(shell_var.ban[file_rank_to_cell(file, rank)]),
+            );
+        }
+    }
+    // 初期局面ハッシュを作り直す
+    let hash_pos = shell_var.searcher.game_record.create_ky0_hash(&shell_var.searcher.ini_position);
+    shell_var.searcher.game_record.set_ky0_hash(hash_pos);
+    // 初期局面を、現局面に写す。
+    shell_var.searcher.cur_position.set_all(&shell_var.searcher.ini_position);
+}
+
+/// USIプロトコル参照。
+pub fn do_position_sfen_board(
+    shell_var: &mut ShellVar,
+    request: &RequestAccessor,
+    response: &mut dyn ResponseAccessor,
+) {
+    //println!("Sfen board: begin.");
+    let mut starts = 0;
+    let line = &request.get_groups()[0];
+    let len = line.chars().count();
+
+    // position コマンド 盤上部分のみ 読取
+    shell_var.ban = parse_board(&line, &mut starts, len);
+    sub_load_board(shell_var);
 
     response.forward("next");
 }
 
 /// USIプロトコル参照。
-pub fn do_position_sfen(
+pub fn do_position_sfen_hands(
     shell_var: &mut ShellVar,
     request: &RequestAccessor,
     response: &mut dyn ResponseAccessor,
 ) {
+    //println!("Sfen hands: begin.");
+    let mut starts = 0;
+    let line = &request.get_groups()[0];
+    let len = line.chars().count();
 
-    // positionコマンド読取。
-    parse_position(
-        &mut shell_var.searcher,
-        &request.get_line(),
-        // 持ち駒数読取。
-        |searcher, hand_count_arr: [i8; HAND_PIECE_ARRAY_LN]| {
-            for (i, item) in HAND_PIECE_ARRAY.iter().enumerate() {
-                let km = pc_to_km(*item);
+    // 持ち駒数。増減させたいので、u8 ではなく i8。
+    let hand_count_arr: [i8; HAND_PIECE_ARRAY_LN] = parse_hand_piece(&line, &mut starts, len);
+    // 持ち駒数読取。
+    for (i, item) in HAND_PIECE_ARRAY.iter().enumerate() {
+        let km = pc_to_km(*item);
 
-                searcher.ini_position.set_mg(km, hand_count_arr[i]);
-            }
-        },
-        // 盤面読取。
-        |searcher, ban: [Piece; 100]| {
-            // 局面のクローンを作成。
-            for file in SUJI_1..SUJI_10 {
-                for rank in DAN_1..DAN_10 {
-                    searcher.ini_position.set_km_by_ms(
-                        suji_dan_to_ms(file, rank),
-                        pc_to_km(ban[file_rank_to_cell(file, rank)]),
-                    );
-                }
-            }
+        shell_var
+            .searcher
+            .ini_position
+            .set_mg(km, hand_count_arr[i]);
+    }
+    response.forward("next");
+}
 
-            // 初期局面ハッシュを作り直す
-            let hash_pos = searcher.game_record.create_ky0_hash(&searcher.ini_position);
-            searcher.game_record.set_ky0_hash(hash_pos);
+/// USIプロトコル参照。
+/// 指し手１つ分のパース。
+pub fn do_position_sfen_movevar(
+    shell_var: &mut ShellVar,
+    request: &RequestAccessor,
+    response: &mut dyn ResponseAccessor,
+) {
+    //println!("Sfen movevar: begin.");
+    let mut starts = 0;
+    let line = &request.get_groups()[0];
+    let len = line.chars().count();
 
-            // 初期局面を、現局面に写す。
-            searcher.cur_position.set_all(&searcher.ini_position);
-        },
-        // 指し手読取。
-        |mut searcher, successful, usi_movement| {
-            let movement = usi_to_movement(successful, usi_movement); // &usi_movement
+    // 指し手を1つずつ返すぜ☆（＾～＾）
+    let (successful, usi_movement) = parse_movement(&line, &mut starts, len);
+    let movement = usi_to_movement(successful, usi_movement);
+    // 棋譜に書き込み。
+    shell_var.searcher.game_record.set_movement(movement);
+    if successful {
+        // 指し手が付いていれば、指し手を指すぜ☆（＾～＾）
+        let mut dummy_alpha = 0;
+        userdefined_makemove(&mut shell_var.searcher, movement.to_hash(), &mut dummy_alpha);
+    }
 
-            // 棋譜に書き込み。
-            searcher.game_record.set_movement(movement);
-
-            if successful {
-                // 指し手が付いていれば、指し手を指すぜ☆（＾～＾）
-                let mut dummy_alpha = 0;
-                userdefined_makemove(&mut searcher, movement.to_hash(), &mut dummy_alpha);
-            }
-        },
-    );
-
-    response.set_done_line(true);
+    response.forward("next");
+    //println!("Sfen movevar: end.");
 }
 
 /// USIプロトコル参照。
 pub fn do_position_startpos(
     shell_var: &mut ShellVar,
-    request: &RequestAccessor,
+    _request: &RequestAccessor,
     response: &mut dyn ResponseAccessor,
 ) {
+    //println!("Position startpos: begin.");
+    // 別途用意した平手初期局面文字列を読取
+    let mut local_starts = 0;
 
-    // positionコマンド読取。
-    parse_position(
-        &mut shell_var.searcher,
-        &request.get_line(),
-        // 持ち駒数読取。
-        |searcher, hand_count_arr: [i8; HAND_PIECE_ARRAY_LN]| {
-            for (i, item) in HAND_PIECE_ARRAY.iter().enumerate() {
-                let km = pc_to_km(*item);
+    // position コマンド 盤上部分のみ 読取
+    shell_var.ban = parse_board(&STARTPOS.to_string(), &mut local_starts, STARTPOS_LN);
+    sub_load_board(shell_var);
 
-                searcher.ini_position.set_mg(km, hand_count_arr[i]);
-            }
-        },
-        // 盤面読取。
-        |searcher, ban: [Piece; 100]| {
-            // 局面のクローンを作成。
-            for file in SUJI_1..SUJI_10 {
-                for rank in DAN_1..DAN_10 {
-                    searcher.ini_position.set_km_by_ms(
-                        suji_dan_to_ms(file, rank),
-                        pc_to_km(ban[file_rank_to_cell(file, rank)]),
-                    );
-                }
-            }
-
-            // 初期局面ハッシュを作り直す
-            let hash_pos = searcher.game_record.create_ky0_hash(&searcher.ini_position);
-            searcher.game_record.set_ky0_hash(hash_pos);
-
-            // 初期局面を、現局面に写す。
-            searcher.cur_position.set_all(&searcher.ini_position);
-        },
-        // 指し手読取。
-        |mut searcher, successful, usi_movement| {
-            let movement = usi_to_movement(successful, usi_movement); // &usi_movement
-
-            // 棋譜に書き込み。
-            searcher.game_record.set_movement(movement);
-
-            if successful {
-                // 指し手が付いていれば、指し手を指すぜ☆（＾～＾）
-                let mut dummy_alpha = 0;
-                userdefined_makemove(&mut searcher, movement.to_hash(), &mut dummy_alpha);
-            }
-        },
-    );
-
-    response.set_done_line(true);
+    response.forward("next");
+    //println!("Position startpos: end.");
 }
 
 /*****
