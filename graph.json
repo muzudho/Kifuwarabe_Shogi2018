@@ -20,6 +20,8 @@
 		"ND_setoption_value",
 		"ND_setoption_valuevar",
 		"ND_position",
+		"ND_position_sfen",
+		"ND_position_startpos",
 		"ND_quit",
 		"ND_rand",
 		"ND_reload",
@@ -51,7 +53,7 @@
 		},
 		{
 			"name": "ND_do",
-			"token": "do ",
+			"token": "do",
 			"controller": "do_do"
 		},
 		{
@@ -204,7 +206,23 @@
 		{
 			"name": "ND_position",
 			"token": "position",
-			"controller": "do_position"
+			"controller": "do_position",
+			"exit": {
+				"next": [
+					"ND_position_sfen",
+					"ND_position_startpos"
+				]
+			}
+		},
+		{
+			"name": "ND_position_sfen",
+			"token": "sfen",
+			"controller": "do_position_sfen"
+		},
+		{
+			"name": "ND_position_startpos",
+			"token": "startpos",
+			"controller": "do_position_startpos"
 		},
 		{
 			"name": "ND_quit",

@@ -68,7 +68,7 @@ lazy_static! {
     static ref UCHU_WRAP: RwLock<Uchu> = RwLock::new(Uchu::new());
 }
 
-const graph_json_file : &'static str = "graph.json";
+const GRAPH_JSON_FILE : &'static str = "graph.json";
 fn main() {
     // TODO ロガー
     {
@@ -156,6 +156,8 @@ fn main() {
     graph.insert_controller("do_other", do_other);
     // [P]
     graph.insert_controller("do_position", do_position);
+    graph.insert_controller("do_position_sfen", do_position_sfen);
+    graph.insert_controller("do_position_startpos", do_position_startpos);
     // [Q]
     graph.insert_controller("do_quit", do_quit);
     // [R]
@@ -182,7 +184,7 @@ fn main() {
     graph.insert_controller("do_usi", do_usi);
 
     // ファイルからグラフのノード構成を読取。
-    graph.read_graph_file(graph_json_file.to_string());
+    graph.read_graph_file(GRAPH_JSON_FILE.to_string());
     // - 正規表現は、うまく作れていない。全体を丸括弧で囲む。1個だけ。
     // - #linebreak コールバック関数は行終了時に実行される。
 

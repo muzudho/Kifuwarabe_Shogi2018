@@ -490,13 +490,79 @@ pub fn do_other(
 /// USIプロトコル参照。
 pub fn do_position(
     shell_var: &mut ShellVar,
-    request: &RequestAccessor,
+    _request: &RequestAccessor,
     response: &mut dyn ResponseAccessor,
 ) {
     // 初期局面、現局面ともにクリアーします。手目も 0 に戻します。
     shell_var.searcher.ini_position.clear();
     shell_var.searcher.cur_position.clear();
     shell_var.searcher.game_record.set_teme(0);
+
+    response.forward("next");
+}
+
+/// USIプロトコル参照。
+pub fn do_position_sfen(
+    shell_var: &mut ShellVar,
+    request: &RequestAccessor,
+    response: &mut dyn ResponseAccessor,
+) {
+
+    // positionコマンド読取。
+    parse_position(
+        &mut shell_var.searcher,
+        &request.get_line(),
+        // 持ち駒数読取。
+        |searcher, hand_count_arr: [i8; HAND_PIECE_ARRAY_LN]| {
+            for (i, item) in HAND_PIECE_ARRAY.iter().enumerate() {
+                let km = pc_to_km(*item);
+
+                searcher.ini_position.set_mg(km, hand_count_arr[i]);
+            }
+        },
+        // 盤面読取。
+        |searcher, ban: [Piece; 100]| {
+            // 局面のクローンを作成。
+            for file in SUJI_1..SUJI_10 {
+                for rank in DAN_1..DAN_10 {
+                    searcher.ini_position.set_km_by_ms(
+                        suji_dan_to_ms(file, rank),
+                        pc_to_km(ban[file_rank_to_cell(file, rank)]),
+                    );
+                }
+            }
+
+            // 初期局面ハッシュを作り直す
+            let hash_pos = searcher.game_record.create_ky0_hash(&searcher.ini_position);
+            searcher.game_record.set_ky0_hash(hash_pos);
+
+            // 初期局面を、現局面に写す。
+            searcher.cur_position.set_all(&searcher.ini_position);
+        },
+        // 指し手読取。
+        |mut searcher, successful, usi_movement| {
+            let movement = usi_to_movement(successful, usi_movement); // &usi_movement
+
+            // 棋譜に書き込み。
+            searcher.game_record.set_movement(movement);
+
+            if successful {
+                // 指し手が付いていれば、指し手を指すぜ☆（＾～＾）
+                let mut dummy_alpha = 0;
+                userdefined_makemove(&mut searcher, movement.to_hash(), &mut dummy_alpha);
+            }
+        },
+    );
+
+    response.set_done_line(true);
+}
+
+/// USIプロトコル参照。
+pub fn do_position_startpos(
+    shell_var: &mut ShellVar,
+    request: &RequestAccessor,
+    response: &mut dyn ResponseAccessor,
+) {
 
     // positionコマンド読取。
     parse_position(
@@ -582,7 +648,7 @@ pub fn do_reload(
     _request: &RequestAccessor,
     response: &mut dyn ResponseAccessor,
 ) {
-    response.set_reloads(graph_json_file);
+    response.set_reloads(GRAPH_JSON_FILE);
 }
 
 /// 駒種類をランダムで出す。
