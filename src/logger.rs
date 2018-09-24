@@ -7,6 +7,7 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 // use std::sync::Mutex;
+use std::ffi::OsStr;
 use std::sync::RwLock;
 use std::time::{SystemTime, UNIX_EPOCH}; //Duration
 use time::Duration;
@@ -88,48 +89,33 @@ impl Logger {
         Local.timestamp(sec, nsec) // Utc
     }
 
-    /// TODO 古いログファイルを消す。
-    pub fn delete_old_file(&self) {
-        // TODO ファイルを一覧する。
-        // let mut files: Vec<String> = Vec::new();
+    /// 古いログファイルを消す。
+    pub fn delete_old_file(&self, days: i64) {
+        let today = Local::now();
         for path in fs::read_dir(&self.directory).unwrap() {
             use std::fs;
 
             let path_str = path.unwrap().path().display().to_string();
-            //files.push(path_str);
             let metadata = fs::metadata(path_str.to_string());
-            // println!("metadata: {:?}", metadata);
 
-            if let Ok(unix_time) = metadata.unwrap().modified() {
-                // TODO println!("logger.rs: metadata.modified: {:?}", unix_time);
-                let local_time = self.system_time_to_date_time(unix_time);
-                // TODO println!("logger.rs: local_time: {:?}", local_time);
-
-                let today = Local::now();
-
-                if local_time < today - Duration::days(10) {
-                    // TODO println!("logger.rs: I want remove file. {}", path_str.to_string());
-                    // fs::remove_file("a.txt")?;
-                //} else {
-                    //println!("path_str: {:?}", path_str);
+            match metadata.unwrap().modified() {
+                Ok(unix_time) => {
+                    let local_time = self.system_time_to_date_time(unix_time);
+                    // 何日か前のファイルなら消す。
+                    if local_time < today - Duration::days(days) {
+                        let file_path = Path::new(&path_str);
+                        // 拡張子を見て、ログファイルであることを確かめる。
+                        if file_path.extension() == Some(OsStr::new("log")) {
+                            fs::remove_file(path_str.to_string());
+                            println!("Removed: {}", path_str.to_string());
+                        }
+                    }
+                },
+                Err(err) => {
+                    panic!("logger.rs: Metadata not supported on this platform. {}", err);
                 }
-            } else {
-                // TODO println!("logger.rs: Not supported on this platform");
-            }
-            
+            }            
         }
-
-        /*
-        files.sort();
-        let strings = files.iter()
-            .fold(String::new(), |joined, s| {
-                if joined == String::new() { s.to_string() } else { joined + "  " + s }
-            });
-
-        println!("{}", strings)        
-        */
-        // TODO 日付を確認する。
-        // TODO 10日前のファイルなら消す。
     }
 
     pub fn set_file_path(&mut self, base_file_name2: &str, extension2: &str) {

@@ -70,7 +70,7 @@ lazy_static! {
     static ref UCHU_WRAP: RwLock<Uchu> = RwLock::new(Uchu::new());
 }
 
-const GRAPH_JSON_FILE : &str = "graph.json";
+const GRAPH_JSON_FILE: &str = "graph.json";
 fn main() {
     //println!("main: begin.");
     // TODO ロガー
@@ -86,11 +86,11 @@ fn main() {
             info!("the answer was: {}", x);
         }
         */
-        LOGGER
-            .try_write()
-            .unwrap()
-            .set_file_path(&"log-kw", &".log");
-        // TODO LOGGER.try_write().unwrap().delete_old_file();
+        {
+            let mut logger = LOGGER.try_write().unwrap();
+            logger.set_file_path(&"log-kw", &".log");
+            logger.delete_old_file(3);
+        }
     }
 
     // 任意の構造体を作成する。
@@ -120,7 +120,6 @@ fn main() {
                 rand::thread_rng().gen_range(0, 18_446_744_073_709_551_615);
         }
     }
-
 
     // グラフの作成。
     //println!("main: Graph::new().");
