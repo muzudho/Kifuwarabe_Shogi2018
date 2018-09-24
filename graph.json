@@ -1,406 +1,405 @@
 {
 	"entrance": [
-		"ND_cmate0",
-		"ND_cmate0auto",
-		"ND_do",
-		"ND_getmate",
-		"ND_go",
-		"ND_hash",
-		"ND_hirate",
-		"ND_isready",
-		"ND_kifu",
-		"ND_kikisu",
-		"ND_kmugokidir",
-		"ND_kmugoki",
-		"ND_ky0",
-		"ND_ky",
-		"ND_setoption",
-		"ND_setoption_name",
-		"ND_setoption_namevar",
-		"ND_setoption_value",
-		"ND_setoption_valuevar",
-		"ND_position",
-		"ND_position_sfen",
-		"ND_position_startpos",
-		"ND_quit",
-		"ND_rand",
-		"ND_reload",
-		"ND_rndkms",
-		"ND_rndms",
-		"ND_rndpos",
-		"ND_same",
-		"ND_sasite",
-		"ND_teigi_conv",
-		"ND_test",
-		"ND_usinewgame",
-		"ND_undo",
-		"ND_usi"
+		"ND.cmate0",
+		"ND.cmate0auto",
+		"ND.do",
+		"ND.getmate",
+		"ND.hash",
+		"ND.hirate",
+		"ND.kifu",
+		"ND.kikisu",
+		"ND.kmugokidir",
+		"ND.kmugoki",
+		"ND.ky0",
+		"ND.ky",
+		"ND.quit",
+		"ND.rand",
+		"ND.reload",
+		"ND.rndkms",
+		"ND.rndms",
+		"ND.rndpos",
+		"ND.same",
+		"ND.sasite",
+		"ND.teigi_conv",
+		"ND.test",
+		"ND.undo",
+
+		"ND.usi.go",
+		"ND.usi.isready",
+		"ND.usi.setoption",
+		"ND.usi.position",
+		"ND.usi.usinewgame",
+		"ND.usi.usi"
 	],
 	"nodes" : [
 		{
-			"name": "#ND_complementary",
-			"controller": "do_other"
+			"label": "#else",
+			"fn": "do_other"
 		},
 		{
-			"name": "ND_cmate0",
+			"label": "ND.cmate0",
 			"token": "cmate0",
-			"controller": "do_cmate0"
+			"fn": "do_cmate0"
 		},
 		{
-			"name": "ND_cmate0auto",
+			"label": "ND.cmate0auto",
 			"token": "cmate0auto",
-			"controller": "do_cmate0auto"
+			"fn": "do_cmate0auto"
 		},
 		{
-			"name": "ND_do",
+			"label": "ND.do",
 			"token": "do",
-			"controller": "do_do"
+			"fn": "do_do"
 		},
 		{
-			"name": "ND_getmate",
+			"label": "ND.getmate",
 			"token": "getmate",
-			"controller": "do_getmate"
+			"fn": "do_getmate"
 		},
 		{
-			"name": "ND_go",
-			"token": "go",
-			"controller": "do_go",
-			"exit": {
-				"next": [
-					"ND_go_btime"
-				],
-				"#linebreak": [
-					"ND_go_linebreak"
-				]
-			}
-		},
-		{
-			"name": "ND_go_btime",
-			"token": "btime",
-			"controller": "do_go_btime",
-			"exit": {
-				"next": [
-					"ND_go_btimevar"
-				]
-			}
-		},
-		{
-			"name": "ND_go_btimevar",
-			"regex": "(\\d+)",
-			"controller": "do_go_btimevar",
-			"exit": {
-				"next": [
-					"ND_go_wtime"
-				]
-			}
-		},
-		{
-			"name": "ND_go_wtime",
-			"token": "wtime",
-			"controller": "do_go_wtime",
-			"exit": {
-				"next": [
-					"ND_go_wtimevar"
-				]
-			}
-		},
-		{
-			"name": "ND_go_wtimevar",
-			"regex": "(\\d+)",
-			"controller": "do_go_wtimevar",
-			"exit": {
-				"next": [
-					"ND_go_binc"
-				]
-			}
-		},
-		{
-			"name": "ND_go_binc",
-			"token": "binc",
-			"controller": "do_go_binc",
-			"exit": {
-				"next": [
-					"ND_go_bincvar"
-				]
-			}
-		},
-		{
-			"name": "ND_go_bincvar",
-			"regex": "(\\d+)",
-			"controller": "do_go_bincvar",
-			"exit": {
-				"next": [
-					"ND_go_winc"
-				]
-			}
-		},
-		{
-			"name": "ND_go_winc",
-			"token": "winc",
-			"controller": "do_go_winc",
-			"exit": {
-				"next": [
-					"ND_go_wincvar"
-				]
-			}
-		},
-		{
-			"name": "ND_go_wincvar",
-			"regex": "(\\d+)",
-			"controller": "do_go_wincvar"
-		},
-		{
-			"name": "ND_go_linebreak",
-			"controller": "do_go_linebreak"
-		},
-		{
-			"name": "ND_hash",
+			"label": "ND.hash",
 			"token": "hash",
-			"controller": "do_hash"
+			"fn": "do_hash"
 		},
 		{
-			"name": "ND_isready",
-			"token": "isready",
-			"controller": "do_isready"
-		},
-		{
-			"name": "ND_kifu",
+			"label": "ND.kifu",
 			"token": "kifu",
-			"controller": "do_kifu"
+			"fn": "do_kifu"
 		},
 		{
-			"name": "ND_kikisu",
+			"label": "ND.kikisu",
 			"token": "kikisu",
-			"controller": "do_kikisu"
+			"fn": "do_kikisu"
 		},
 		{
-			"name": "ND_kmmove",
+			"label": "ND.kmmove",
 			"token": "kmmove",
-			"controller": "do_kmmove"
+			"fn": "do_kmmove"
 		},
 		{
-			"name": "ND_kmugokidir",
+			"label": "ND.kmugokidir",
 			"token": "kmugokidir",
-			"controller": "do_kmugokidir"
+			"fn": "do_kmugokidir"
 		},
 		{
-			"name": "ND_kmugoki",
+			"label": "ND.kmugoki",
 			"token": "kmugoki",
-			"controller": "do_kmugoki"
+			"fn": "do_kmugoki"
 		},
 		{
-			"name": "ND_ky0",
+			"label": "ND.ky0",
 			"token": "ky0",
-			"controller": "do_ky0"
+			"fn": "do_ky0"
 		},
 		{
-			"name": "ND_ky",
+			"label": "ND.ky",
 			"token": "ky",
-			"controller": "do_ky"
+			"fn": "do_ky"
 		},
 		{
-			"name": "ND_position",
-			"token": "position",
-			"controller": "do_position",
+			"label": "ND.quit",
+			"token": "quit",
+			"fn": "do_quit"
+		},
+		{
+			"label": "ND.rand",
+			"token": "rand",
+			"fn": "do_rand"
+		},
+		{
+			"label": "ND.reload",
+			"token": "reload",
+			"fn": "do_reload"
+		},
+		{
+			"label": "ND.rndkms",
+			"token": "rndkms",
+			"fn": "do_rndkms"
+		},
+		{
+			"label": "ND.rndms",
+			"token": "rndms",
+			"fn": "do_rndms"
+		},
+		{
+			"label": "ND.rndpos",
+			"token": "rndpos",
+			"fn": "do_rndpos"
+		},
+		{
+			"label": "ND.same",
+			"token": "same",
+			"fn": "do_same"
+		},
+		{
+			"label": "ND.sasite",
+			"token": "sasite",
+			"fn": "do_sasite"
+		},
+		{
+			"label": "ND.teigi_conv",
+			"token": "teigi::conv",
+			"fn": "do_teigi_conv"
+		},
+		{
+			"label": "ND.test",
+			"token": "test",
+			"fn": "do_test"
+		},
+		{
+			"label": "ND.undo",
+			"token": "undo",
+			"fn": "do_undo"
+		},
+
+
+
+
+		{
+			"label": "ND.usi.go",
+			"token": "go",
+			"fn": "do_go",
 			"exit": {
 				"next": [
-					"ND_position_sfen",
-					"ND_position_startpos"
+					"ND.usi.go_btime"
+				],
+				"#newline": [
+					"ND.usi.go_linebreak"
 				]
 			}
 		},
 		{
-			"name": "ND_position_sfen",
+			"label": "ND.usi.go_btime",
+			"token": "btime",
+			"fn": "do_go_btime",
+			"exit": {
+				"next": [
+					"ND.usi.go_btimevar"
+				]
+			}
+		},
+		{
+			"label": "ND.usi.go_btimevar",
+			"regex": "(\\d+)",
+			"fn": "do_go_btimevar",
+			"exit": {
+				"next": [
+					"ND.usi.go_wtime"
+				]
+			}
+		},
+		{
+			"label": "ND.usi.go_wtime",
+			"token": "wtime",
+			"fn": "do_go_wtime",
+			"exit": {
+				"next": [
+					"ND.usi.go_wtimevar"
+				]
+			}
+		},
+		{
+			"label": "ND.usi.go_wtimevar",
+			"regex": "(\\d+)",
+			"fn": "do_go_wtimevar",
+			"exit": {
+				"next": [
+					"ND.usi.go_binc"
+				]
+			}
+		},
+		{
+			"label": "ND.usi.go_binc",
+			"token": "binc",
+			"fn": "do_go_binc",
+			"exit": {
+				"next": [
+					"ND.usi.go_bincvar"
+				]
+			}
+		},
+		{
+			"label": "ND.usi.go_bincvar",
+			"regex": "(\\d+)",
+			"fn": "do_go_bincvar",
+			"exit": {
+				"next": [
+					"ND.usi.go_winc"
+				]
+			}
+		},
+		{
+			"label": "ND.usi.go_winc",
+			"token": "winc",
+			"fn": "do_go_winc",
+			"exit": {
+				"next": [
+					"ND.usi.go_wincvar"
+				]
+			}
+		},
+		{
+			"label": "ND.usi.go_wincvar",
+			"regex": "(\\d+)",
+			"fn": "do_go_wincvar"
+		},
+		{
+			"label": "ND.usi.go_linebreak",
+			"fn": "do_go_linebreak"
+		},
+		{
+			"label": "ND.usi.isready",
+			"token": "isready",
+			"fn": "do_isready"
+		},
+		{
+			"label": "ND.usi.setoption",
+			"token": "setoption",
+			"fn": "do_setoption",
+			"exit": {
+				"next": [
+					"ND.usi.setoption_name"
+				],
+				"#newline": [
+					"ND.usi.setoption_linebreak"
+				]
+			}
+		},
+		{
+			"label": "ND.usi.setoption_name",
+			"token": "name",
+			"fn": "do_setoption_name",
+			"exit": {
+				"next": [
+					"ND.usi.setoption_namevar"
+				]
+			}
+		},
+		{
+			"label": "ND.usi.setoption_namevar",
+			"regex": "(\\w+)",
+			"fn": "do_setoption_namevar",
+			"exit": {
+				"next": [
+					"ND.usi.setoption_value"
+				]
+			}
+		},
+		{
+			"label": "ND.usi.setoption_value",
+			"token": "value",
+			"fn": "do_setoption_value",
+			"exit": {
+				"next": [
+					"ND.usi.setoption_valuevar"
+				]
+			}
+		},
+		{
+			"label": "ND.usi.setoption_valuevar",
+			"regex": "([\\d\\w]+)",
+			"fn": "do/usi.setoption_valuevar"
+		},
+		{
+			"label": "ND.usi.setoption_linebreak",
+			"fn": "do_setoption_linebreak"
+		},
+		{
+			"label": "ND.usi.position",
+			"token": "position",
+			"fn": "do_position",
+			"exit": {
+				"next": [
+					"ND.usi.position_sfen",
+					"ND.usi.position_startpos"
+				]
+			}
+		},
+		{
+			"label": "ND.usi.position_sfen",
 			"token": "sfen",
 			"exit": {
 				"next": [
-					"ND_position_sfen_board"
+					"ND.usi.position_sfen_board"
 				]
 			}
 		},
 		{
-			"name": "ND_position_sfen_board",
+			"label": "ND.usi.position_sfen_board",
 			"regex": "([\\d\\w/]+)",
-			"controller": "do_position_sfen_board",
+			"fn": "do_position_sfen_board",
 			"exit": {
 				"next": [
-					"ND_position_sfen_turn"
+					"ND.usi.position_sfen_turn"
 				]
 			}
 		},
 		{
-			"name": "ND_position_sfen_turn",
+			"label": "ND.usi.position_sfen_turn",
 			"regex": "([bw])",
 			"exit": {
 				"next": [
-					"ND_position_sfen_hands"
+					"ND.usi.position_sfen_hands"
 				]
 			}
 		},
 		{
-			"name": "ND_position_sfen_hands",
+			"label": "ND.usi.position_sfen_hands",
 			"regex": "([\\d\\w+]*)",
-			"controller": "do_position_sfen_hands",
+			"fn": "do_position_sfen_hands",
 			"exit": {
 				"next": [
-					"ND_position_sfen_ply"
+					"ND.usi.position_sfen_ply"
 				]
 			}
 		},
 		{
-			"name": "ND_position_sfen_ply",
+			"label": "ND.usi.position_sfen_ply",
 			"token": "1",
 			"exit": {
 				"next": [
-					"ND_position_sfen_moves"
+					"ND.usi.position_sfen_moves"
 				]
 			}
 		},
 		{
-			"name": "ND_position_sfen_moves",
+			"label": "ND.usi.position_sfen_moves",
 			"token": "moves",
 			"exit": {
 				"next": [
-					"ND_position_sfen_movevar"
+					"ND.usi.position_sfen_movevar"
 				]
 			}
 		},
 		{
-			"name": "ND_position_sfen_movevar",
+			"label": "ND.usi.position_sfen_movevar",
 			"regex": "([\\d\\w+*]+)",
-			"controller": "do_position_sfen_movevar",
+			"fn": "do_position_sfen_movevar",
 			"exit": {
 				"next": [
-					"ND_position_sfen_movevar"
+					"ND.usi.position_sfen_movevar"
 				]
 			}
 		},
 		{
-			"name": "ND_position_startpos",
+			"label": "ND.usi.position_startpos",
 			"token": "startpos",
-			"controller": "do_position_startpos",
+			"fn": "do_position_startpos",
 			"exit": {
 				"next": [
-					"ND_position_sfen_moves"
+					"ND.usi.position_sfen_moves"
 				]
 			}
 		},
 		{
-			"name": "ND_quit",
-			"token": "quit",
-			"controller": "do_quit"
-		},
-		{
-			"name": "ND_rand",
-			"token": "rand",
-			"controller": "do_rand"
-		},
-		{
-			"name": "ND_reload",
-			"token": "reload",
-			"controller": "do_reload"
-		},
-		{
-			"name": "ND_rndkms",
-			"token": "rndkms",
-			"controller": "do_rndkms"
-		},
-		{
-			"name": "ND_rndms",
-			"token": "rndms",
-			"controller": "do_rndms"
-		},
-		{
-			"name": "ND_rndpos",
-			"token": "rndpos",
-			"controller": "do_rndpos"
-		},
-		{
-			"name": "ND_same",
-			"token": "same",
-			"controller": "do_same"
-		},
-		{
-			"name": "ND_sasite",
-			"token": "sasite",
-			"controller": "do_sasite"
-		},
-		{
-			"name": "ND_setoption",
-			"token": "setoption",
-			"controller": "do_setoption",
-			"exit": {
-				"next": [
-					"ND_setoption_name"
-				],
-				"#linebreak": [
-					"ND_setoption_linebreak"
-				]
-			}
-		},
-		{
-			"name": "ND_setoption_name",
-			"token": "name",
-			"controller": "do_setoption_name",
-			"exit": {
-				"next": [
-					"ND_setoption_namevar"
-				]
-			}
-		},
-		{
-			"name": "ND_setoption_namevar",
-			"regex": "(\\w+)",
-			"controller": "do_setoption_namevar",
-			"exit": {
-				"next": [
-					"ND_setoption_value"
-				]
-			}
-		},
-		{
-			"name": "ND_setoption_value",
-			"token": "value",
-			"controller": "do_setoption_value",
-			"exit": {
-				"next": [
-					"ND_setoption_valuevar"
-				]
-			}
-		},
-		{
-			"name": "ND_setoption_valuevar",
-			"regex": "([\\d\\w]+)",
-			"controller": "do_setoption_valuevar"
-		},
-		{
-			"name": "ND_setoption_linebreak",
-			"controller": "do_setoption_linebreak"
-		},
-		{
-			"name": "ND_teigi_conv",
-			"token": "teigi::conv",
-			"controller": "do_teigi_conv"
-		},
-		{
-			"name": "ND_test",
-			"token": "test",
-			"controller": "do_test"
-		},
-		{
-			"name": "ND_usinewgame",
+			"label": "ND.usi.usinewgame",
 			"token": "usinewgame",
-			"controller": "do_usinewgame"
+			"fn": "do_usinewgame"
 		},
 		{
-			"name": "ND_undo",
-			"token": "undo",
-			"controller": "do_undo"
-		},
-		{
-			"name": "ND_usi",
+			"label": "ND.usi.usi",
 			"token": "usi",
-			"controller": "do_usi"
+			"fn": "do_usi"
 		}
 	]
 }

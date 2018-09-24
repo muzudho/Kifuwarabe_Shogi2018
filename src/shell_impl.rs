@@ -1,7 +1,7 @@
 // デバッグ出力。
 const VERBOSE: bool = false;
 
-use config::*;
+//use config::*;
 use consoles;
 use consoles::unit_test::*;
 use consoles::visuals::dumps::*;
@@ -79,8 +79,8 @@ pub fn sub_cmate0(shell_var: &mut ShellVar) -> bool {
 ///
 pub fn do_cmate0(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &dyn Request,
+    _res: &mut dyn Response,
 ) {
     LOGGER
         .try_write()
@@ -104,8 +104,8 @@ pub fn do_cmate0(
 ///
 pub fn do_cmate0auto(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     // let old_info_off = shell_var.searcher.info_off;
     shell_var.searcher.info_off = true;
@@ -136,8 +136,8 @@ pub fn do_cmate0auto(
 /// 指し手を入れる。
 pub fn do_do(
     shell_var: &mut ShellVar,
-    request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    request: &Request,
+    _res: &mut dyn Response,
 ) {
     // コマンド読取。棋譜に追加され、手目も増える
     // let (successful, umov) = parse_movement(&request.get_line(), &mut response.get_caret(), request.get_line_len());
@@ -169,8 +169,8 @@ pub fn do_do(
 ///
 pub fn do_getmate(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     let mate = -1;
     LOGGER
@@ -185,8 +185,8 @@ pub fn do_getmate(
 /// go btime 60000 wtime 50000 byoyomi 10000
 pub fn do_go(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    response: &mut dyn Response,
 ) {
     // 指定しなければ無制限。
     shell_var.player_milliseconds_array[Sengo::Sen as usize] = <i32>::max_value();
@@ -196,16 +196,16 @@ pub fn do_go(
 
 pub fn do_go_btime(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    response: &mut dyn Response,
 ) {
     response.forward("next");
 }
 
 pub fn do_go_btimevar(
     shell_var: &mut ShellVar,
-    request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    request: &Request,
+    response: &mut dyn Response,
 ) {
     let word = &request.get_groups()[0];
     let num: i32 = word.parse().unwrap();
@@ -215,16 +215,16 @@ pub fn do_go_btimevar(
 
 pub fn do_go_wtime(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    response: &mut dyn Response,
 ) {
     response.forward("next");
 }
 
 pub fn do_go_wtimevar(
     shell_var: &mut ShellVar,
-    request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    request: &Request,
+    response: &mut dyn Response,
 ) {
     let word = &request.get_groups()[0];
     let num: i32 = word.parse().unwrap();
@@ -234,16 +234,16 @@ pub fn do_go_wtimevar(
 
 pub fn do_go_binc(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    response: &mut dyn Response,
 ) {
     response.forward("next");
 }
 
 pub fn do_go_bincvar(
     shell_var: &mut ShellVar,
-    request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    request: &Request,
+    response: &mut dyn Response,
 ) {
     let word = &request.get_groups()[0];
     let num: i32 = word.parse().unwrap();
@@ -253,16 +253,16 @@ pub fn do_go_bincvar(
 
 pub fn do_go_winc(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    response: &mut dyn Response,
 ) {
     response.forward("next");
 }
 
 pub fn do_go_wincvar(
     shell_var: &mut ShellVar,
-    request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    request: &Request,
+    _res: &mut dyn Response,
 ) {
     let word = &request.get_groups()[0];
     let num: i32 = word.parse().unwrap();
@@ -271,8 +271,8 @@ pub fn do_go_wincvar(
 
 pub fn do_go_linebreak(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     // 自分の手番
     let turn_num = shell_var.searcher.game_record.get_teban(Jiai::Ji) as usize;
@@ -298,8 +298,8 @@ pub fn do_go_linebreak(
 /// 局面ハッシュ表示。
 pub fn do_hash(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     let s = kaku_ky_hash(&shell_var.searcher.game_record);
     LOGGER.try_write().unwrap().writeln(&s);
@@ -312,8 +312,8 @@ pub fn do_hash(
 /// USIプロトコル参照。
 pub fn do_isready(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     LOGGER.try_write().unwrap().writeln("readyok");
 }
@@ -325,8 +325,8 @@ pub fn do_isready(
 /// 棋譜表示。
 pub fn do_kifu(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     let s = kaku_kifu(&shell_var.searcher.game_record);
     LOGGER.try_write().unwrap().writeln(&s);
@@ -335,8 +335,8 @@ pub fn do_kifu(
 /// 利き数表示。
 pub fn do_kikisu(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     consoles::commands::cmd_kikisu();
 }
@@ -344,16 +344,16 @@ pub fn do_kikisu(
 /// TODO 升と駒を指定して、移動先の確認。
 pub fn do_kmmove(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
 }
 
 /// 駒の動きの確認。
 pub fn do_kmugokidir(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
@@ -371,8 +371,8 @@ pub fn do_kmugokidir(
 /// 駒の動き確認用。
 pub fn do_kmugoki(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     // 読取許可モードで、ロック。
     let uchu_r = UCHU_WRAP.try_read().unwrap();
@@ -384,8 +384,8 @@ pub fn do_kmugoki(
 /// 初期局面表示。
 pub fn do_ky0(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     let s = kaku_ky(
         &shell_var.searcher.ini_position,
@@ -404,8 +404,8 @@ pub fn sub_ky(shell_var: &mut ShellVar) {
 /// 現局面表示。
 pub fn do_ky(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     sub_ky(shell_var);
 }
@@ -416,8 +416,8 @@ pub fn do_ky(
 
 pub fn do_other(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     // 書込許可モードで、ロック。
     let mut uchu_w = UCHU_WRAP.try_write().unwrap();
@@ -445,8 +445,8 @@ pub fn do_other(
 /// USIプロトコル参照。
 pub fn do_position(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    response: &mut dyn Response,
 ) {
     //println!("Position: begin.");
     // 初期局面、現局面ともにクリアーします。手目も 0 に戻します。
@@ -479,8 +479,8 @@ fn sub_load_board(
 /// USIプロトコル参照。
 pub fn do_position_sfen_board(
     shell_var: &mut ShellVar,
-    request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    request: &Request,
+    response: &mut dyn Response,
 ) {
     //println!("Sfen board: begin.");
     let mut starts = 0;
@@ -497,8 +497,8 @@ pub fn do_position_sfen_board(
 /// USIプロトコル参照。
 pub fn do_position_sfen_hands(
     shell_var: &mut ShellVar,
-    request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    request: &Request,
+    response: &mut dyn Response,
 ) {
     //println!("Sfen hands: begin.");
     let mut starts = 0;
@@ -523,8 +523,8 @@ pub fn do_position_sfen_hands(
 /// 指し手１つ分のパース。
 pub fn do_position_sfen_movevar(
     shell_var: &mut ShellVar,
-    request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    request: &Request,
+    response: &mut dyn Response,
 ) {
     //println!("Sfen movevar: begin.");
     let mut starts = 0;
@@ -549,8 +549,8 @@ pub fn do_position_sfen_movevar(
 /// USIプロトコル参照。
 pub fn do_position_startpos(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    response: &mut dyn Response,
 ) {
     //println!("Position startpos: begin.");
     // 別途用意した平手初期局面文字列を読取
@@ -571,8 +571,8 @@ pub fn do_position_startpos(
 /// 終了。
 pub fn do_quit(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    response: &mut dyn Response,
 ) {
     response.set_quits(true);
 }
@@ -584,8 +584,8 @@ pub fn do_quit(
 /// 乱数の試し確認。
 pub fn do_rand(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     let secret_number = rand::thread_rng().gen_range(1, 101); //1~100
     LOGGER
@@ -596,8 +596,8 @@ pub fn do_rand(
 
 pub fn do_reload(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    response: &mut dyn Response,
 ) {
     response.set_reloads(GRAPH_JSON_FILE);
 }
@@ -605,8 +605,8 @@ pub fn do_reload(
 /// 駒種類をランダムで出す。
 pub fn do_rndkms(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     let kms = thinks::randommove::rnd_kms();
     LOGGER
@@ -618,8 +618,8 @@ pub fn do_rndkms(
 /// マスをランダムで返す。
 pub fn do_rndms(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     let ms = thinks::randommove::rnd_ms();
     LOGGER
@@ -660,8 +660,8 @@ pub fn sub_rndpos(shell_var: &mut ShellVar) {
 /// ランダムな初期局面を作る。
 pub fn do_rndpos(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     LOGGER
         .try_write()
@@ -677,8 +677,8 @@ pub fn do_rndpos(
 /// 同一局面回数調べ。
 pub fn do_same(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     LOGGER.try_write().unwrap().writeln(&format!(
         "同一局面調べ count={}",
@@ -689,8 +689,8 @@ pub fn do_same(
 /// 合法手を確認する。
 pub fn do_sasite(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     // FIXME 合法手とは限らない
     let mut ss_potential_hashset = HashSet::new();
@@ -717,8 +717,8 @@ pub fn do_sasite(
 /// USI
 pub fn do_setoption(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    response: &mut dyn Response,
 ) {
     if VERBOSE {
         println!("#Setoption: begin.");
@@ -730,8 +730,8 @@ pub fn do_setoption(
 }
 pub fn do_setoption_name(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    response: &mut dyn Response,
 ) {
     if VERBOSE {
         println!("#Setoption name: begin.");
@@ -743,8 +743,8 @@ pub fn do_setoption_name(
 }
 pub fn do_setoption_namevar(
     shell_var: &mut ShellVar,
-    request: &dyn RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    request: &dyn Request,
+    response: &mut dyn Response,
 ) {
     let name = &request.get_groups()[0];
     if VERBOSE {
@@ -758,8 +758,8 @@ pub fn do_setoption_namevar(
 }
 pub fn do_setoption_value(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    response: &mut dyn Response,
 ) {
     if VERBOSE {
         println!("#Setoption value: begin.");
@@ -771,8 +771,8 @@ pub fn do_setoption_value(
 }
 pub fn do_setoption_valuevar(
     shell_var: &mut ShellVar,
-    request: &dyn RequestAccessor,
-    response: &mut dyn ResponseAccessor,
+    request: &dyn Request,
+    response: &mut dyn Response,
 ) {
     let value = &request.get_groups()[0];
     if VERBOSE {
@@ -786,8 +786,8 @@ pub fn do_setoption_valuevar(
 }
 pub fn do_setoption_linebreak(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     if VERBOSE {
         println!("#Setoption linebreak: begin.");
@@ -805,8 +805,8 @@ pub fn do_setoption_linebreak(
 /// convのテスト。
 pub fn do_teigi_conv(
     _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     for ms in 11..19 {
         for hash in 0..10 {
@@ -823,8 +823,8 @@ pub fn do_teigi_conv(
 /// いろいろな動作テストをしたいときに汎用的に使う。
 pub fn do_test(
     shell_var: &mut ShellVar,
-    request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    request: &Request,
+    _res: &mut dyn Response,
 ) {
     LOGGER.try_write().unwrap().writeln(&format!(
         "test caret={} len={}",
@@ -847,8 +847,8 @@ pub fn do_test(
 /// 指した手を１手戻す。
 pub fn do_undo(
     shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
+    _req: &Request,
+    _res: &mut dyn Response,
 ) {
     let (successful, _cap_kms) = unmakemove(&mut shell_var.searcher);
 
@@ -859,42 +859,4 @@ pub fn do_undo(
             .unwrap()
             .writeln(&format!("teme={} を、これより戻せません", teme));
     }
-}
-
-/// USIプロトコル参照。
-pub fn do_usinewgame(
-    shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
-) {
-    // 初期局面、現局面ともにクリアーします。手目も 0 に戻します。
-    shell_var.searcher.ini_position.clear();
-    shell_var.searcher.cur_position.clear();
-    shell_var.searcher.game_record.set_teme(0);
-}
-
-/// USIプロトコル参照。
-pub fn do_usi(
-    _shell_var: &mut ShellVar,
-    _request: &RequestAccessor,
-    _response: &mut dyn ResponseAccessor,
-) {
-    LOGGER
-        .try_write()
-        .unwrap()
-        .writeln(&format!("id name {}", ENGINE_NAME));
-    LOGGER
-        .try_write()
-        .unwrap()
-        .writeln(&format!("id author {}", ENGINE_AUTHOR));
-    LOGGER
-        .try_write()
-        .unwrap()
-        .writeln("option name depth type spin default 1 min 1 max 999");
-    LOGGER.try_write().unwrap().writeln("usiok");
-
-    // 空打ちしてもタイトル画面は出さない☆（＾～＾）
-    let mut uchu_w = UCHU_WRAP.try_write().unwrap();
-    uchu_w.title_dirty = false;
-    uchu_w.console_game_mode = false;
 }

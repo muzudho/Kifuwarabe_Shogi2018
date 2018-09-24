@@ -49,6 +49,7 @@ mod misc;
 mod movement_thinks;
 mod searcher_impl;
 mod shell_impl;
+mod shell_usi_impl;
 mod teigi;
 mod thinks;
 mod time_manager;
@@ -61,6 +62,7 @@ use memory::uchu::*;
 use misc::option::*;
 use rand::Rng;
 use shell_impl::*;
+use shell_usi_impl::*;
 
 // グローバル変数。
 use std::sync::RwLock;
@@ -125,66 +127,71 @@ fn main() {
     let mut graph = Graph::new();
     // コントローラーを登録。
     // [C]
-    graph.insert_controller("do_cmate0", do_cmate0);
-    graph.insert_controller("do_cmate0auto", do_cmate0auto);
+    graph.insert_fn("do_cmate0", do_cmate0);
+    graph.insert_fn("do_cmate0auto", do_cmate0auto);
     // [D]
-    graph.insert_controller("do_do", do_do);
+    graph.insert_fn("do_do", do_do);
     // [G]
-    graph.insert_controller("do_getmate", do_getmate);
-    graph.insert_controller("do_go", do_go);
-    graph.insert_controller("do_go_btime", do_go_btime);
-    graph.insert_controller("do_go_btimevar", do_go_btimevar);
-    graph.insert_controller("do_go_wtime", do_go_wtime);
-    graph.insert_controller("do_go_wtimevar", do_go_wtimevar);
-    graph.insert_controller("do_go_binc", do_go_binc);
-    graph.insert_controller("do_go_bincvar", do_go_bincvar);
-    graph.insert_controller("do_go_winc", do_go_winc);
-    graph.insert_controller("do_go_wincvar", do_go_wincvar);
-    graph.insert_controller("do_go_linebreak", do_go_linebreak);
+    graph.insert_fn("do_getmate", do_getmate);
     // [H]
-    graph.insert_controller("do_hash", do_hash);
-    // [I]
-    graph.insert_controller("do_isready", do_isready);
+    graph.insert_fn("do_hash", do_hash);
     // [K]
-    graph.insert_controller("do_kifu", do_kifu);
-    graph.insert_controller("do_kikisu", do_kikisu);
-    graph.insert_controller("do_kmmove", do_kmmove);
-    graph.insert_controller("do_kmugokidir", do_kmugokidir);
-    graph.insert_controller("do_kmugoki", do_kmugoki);
-    graph.insert_controller("do_ky0", do_ky0);
-    graph.insert_controller("do_ky", do_ky);
+    graph.insert_fn("do_kifu", do_kifu);
+    graph.insert_fn("do_kikisu", do_kikisu);
+    graph.insert_fn("do_kmmove", do_kmmove);
+    graph.insert_fn("do_kmugokidir", do_kmugokidir);
+    graph.insert_fn("do_kmugoki", do_kmugoki);
+    graph.insert_fn("do_ky0", do_ky0);
+    graph.insert_fn("do_ky", do_ky);
     // [O]
-    graph.insert_controller("do_other", do_other);
-    // [P]
-    graph.insert_controller("do_position", do_position);
-    graph.insert_controller("do_position_sfen_board", do_position_sfen_board);
-    graph.insert_controller("do_position_sfen_hands", do_position_sfen_hands);
-    graph.insert_controller("do_position_sfen_movevar", do_position_sfen_movevar);
-    graph.insert_controller("do_position_startpos", do_position_startpos);
+    graph.insert_fn("do_other", do_other);
     // [Q]
-    graph.insert_controller("do_quit", do_quit);
+    graph.insert_fn("do_quit", do_quit);
     // [R]
-    graph.insert_controller("do_rand", do_rand);
-    graph.insert_controller("do_reload", do_reload);
-    graph.insert_controller("do_rndkms", do_rndkms);
-    graph.insert_controller("do_rndms", do_rndms);
-    graph.insert_controller("do_rndpos", do_rndpos);
+    graph.insert_fn("do_rand", do_rand);
+    graph.insert_fn("do_reload", do_reload);
+    graph.insert_fn("do_rndkms", do_rndkms);
+    graph.insert_fn("do_rndms", do_rndms);
+    graph.insert_fn("do_rndpos", do_rndpos);
     // [S]
-    graph.insert_controller("do_same", do_same);
-    graph.insert_controller("do_sasite", do_sasite);
-    graph.insert_controller("do_setoption", do_setoption);
-    graph.insert_controller("do_setoption_name", do_setoption_name);
-    graph.insert_controller("do_setoption_namevar", do_setoption_namevar);
-    graph.insert_controller("do_setoption_value", do_setoption_value);
-    graph.insert_controller("do_setoption_valuevar", do_setoption_valuevar);
-    graph.insert_controller("do_setoption_linebreak", do_setoption_linebreak);
+    graph.insert_fn("do_same", do_same);
+    graph.insert_fn("do_sasite", do_sasite);
     // [T]
-    graph.insert_controller("do_teigi_conv", do_teigi_conv);
-    graph.insert_controller("do_test", do_test);
+    graph.insert_fn("do_teigi_conv", do_teigi_conv);
+    graph.insert_fn("do_test", do_test);
     // [U]
-    graph.insert_controller("do_usinewgame", do_usinewgame);
-    graph.insert_controller("do_undo", do_undo);
-    graph.insert_controller("do_usi", do_usi);
+    graph.insert_fn("do_undo", do_undo);
+
+    // #### USI ####
+    // [G]
+    graph.insert_fn("do_go", do_go);
+    graph.insert_fn("do_go_btime", do_go_btime);
+    graph.insert_fn("do_go_btimevar", do_go_btimevar);
+    graph.insert_fn("do_go_wtime", do_go_wtime);
+    graph.insert_fn("do_go_wtimevar", do_go_wtimevar);
+    graph.insert_fn("do_go_binc", do_go_binc);
+    graph.insert_fn("do_go_bincvar", do_go_bincvar);
+    graph.insert_fn("do_go_winc", do_go_winc);
+    graph.insert_fn("do_go_wincvar", do_go_wincvar);
+    graph.insert_fn("do_go_linebreak", do_go_linebreak);
+    // [I]
+    graph.insert_fn("do_isready", do_isready);
+    // [P]
+    graph.insert_fn("do_position", do_position);
+    graph.insert_fn("do_position_sfen_board", do_position_sfen_board);
+    graph.insert_fn("do_position_sfen_hands", do_position_sfen_hands);
+    graph.insert_fn("do_position_sfen_movevar", do_position_sfen_movevar);
+    graph.insert_fn("do_position_startpos", do_position_startpos);
+    // [S]
+    graph.insert_fn("do_setoption", do_setoption);
+    graph.insert_fn("do_setoption_name", do_setoption_name);
+    graph.insert_fn("do_setoption_namevar", do_setoption_namevar);
+    graph.insert_fn("do_setoption_value", do_setoption_value);
+    graph.insert_fn("do_setoption_valuevar", do_setoption_valuevar);
+    graph.insert_fn("do_setoption_linebreak", do_setoption_linebreak);
+    // [U]
+    graph.insert_fn("do_usinewgame", do_usinewgame);
+    graph.insert_fn("do_usi", do_usi);
 
     // ファイルからグラフのノード構成を読取。
     //println!("main: read_graph_file.");
