@@ -10,6 +10,7 @@ use std::path::Path;
 use std::sync::RwLock;
 use std::time::{SystemTime, UNIX_EPOCH}; //Duration
 use time::Duration;
+use std::fs::OpenOptions;
 
 /**
  * グローバル定数
@@ -57,7 +58,6 @@ pub struct Logger {
     pub enable: bool,
 }
 impl Logger {
-    // FIXME 初回に要らないファイルを作ってしまう。
     pub fn new()->Logger {
         Logger {
             directory: "./logs/".to_string(),
@@ -65,6 +65,7 @@ impl Logger {
             extension: ".log".to_string(),
             file_path: "log-default-YYYY-MM-DD.log".to_string(),
             chrono: Local::now(),
+            // FIXME 初回に要らないファイルを作ってしまう。
             log_file: File::create(Path::new(&"log-default-YYYY-MM-DD.log".to_string())).unwrap(),
             enable: true,
         }
@@ -137,7 +138,11 @@ impl Logger {
         self.chrono = Local::now();
         // File::createの返り値は`io::Result<File>` なので .unwrap() で中身を取り出す
         self.file_path = format!("{}{}-{:04}-{:02}-{:02}{}", self.directory, self.base_file_name, self.chrono.year(), self.chrono.month(), self.chrono.day(), self.extension).to_string();
-        self.log_file = File::create(Path::new(&self.file_path)).unwrap();
+        // 追加書き込み。
+        self.log_file = match OpenOptions::new().create(true).append(true).open(&self.file_path) {
+            Ok(file) => file,
+            Err(err) => panic!("Log file open error. {}", err),
+        };
     }    
 
     pub fn refresh_filepath(&mut self) {
@@ -147,7 +152,11 @@ impl Logger {
             self.chrono = local;
             self.file_path = format!("{}{}-{:04}-{:02}-{:02}{}", self.directory, self.base_file_name, self.chrono.year(), self.chrono.month(), self.chrono.day(), self.extension).to_string();
         }
-        self.log_file = File::create(Path::new(&self.file_path)).unwrap();
+        // 追加書き込み。
+        self.log_file = match OpenOptions::new().create(true).append(true).open(&self.file_path) {
+            Ok(file) => file,
+            Err(err) => panic!("Log file open error. {}", err),
+        };
     }
 
     #[allow(dead_code)]
