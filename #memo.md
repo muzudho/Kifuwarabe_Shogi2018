@@ -1,3 +1,6 @@
+# ロガー作りかけ。
+logs フォルダーが必要。
+
 # 投了テスト
 position startpos moves 3g3f 3c3d 3i3h 2b7g+ 7i6h 7g6h 5i4h 6h6i 4h3g 6i8g 9g9f 8g8h 8i7g 8h7g 9i9h 7g6g 4i4h B*6d 4g4f N*2e 3g4g G*5e 2h1h 5e4f
 
@@ -14,3 +17,19 @@ position startpos moves 2g2f 6a7b 2f2e 3c3d 2e2d 1c1d 2d2c+ 2b4d P*2b 2a1c 2b2a+
 go btime 494000 wtime 289000 binc 10000 winc 10000
 
 - 玉を取られた時点で探索を打ち切りたい。
+
+#
+
+>1:usi
+<1:id name Kifuwarabe 2018
+<1:id author TAKAHASHI, Satoshi
+<1:option name depth type spin default 1 min 1 max 999
+<1:usiok
+>1:setoption name USI_Ponder value true
+>1:setoption name USI_Hash value 256
+>1:setoption name depth value 11
+>1:isready
+<1:readyok
+>1:usinewgame
+>1:position startpos
+>1:go btime 600000 wtime 600000 byoyomi 10000
