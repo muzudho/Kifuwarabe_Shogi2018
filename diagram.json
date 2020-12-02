@@ -1,37 +1,42 @@
 {
-	"entrance": [
-		"ND.cmate0",
-		"ND.cmate0auto",
-		"ND.do",
-		"ND.getmate",
-		"ND.hash",
-		"ND.hirate",
-		"ND.kifu",
-		"ND.kikisu",
-		"ND.kmugokidir",
-		"ND.kmugoki",
-		"ND.ky0",
-		"ND.ky",
-		"ND.quit",
-		"ND.rand",
-		"ND.reload",
-		"ND.rndkms",
-		"ND.rndms",
-		"ND.rndpos",
-		"ND.same",
-		"ND.sasite",
-		"ND.teigi_conv",
-		"ND.test",
-		"ND.undo",
-
-		"ND.usi.go",
-		"ND.usi.isready",
-		"ND.usi.setoption",
-		"ND.usi.position",
-		"ND.usi.usinewgame",
-		"ND.usi.usi"
-	],
+	"entry_point": "HEAD.entry_point",
 	"nodes" : [
+		{
+			"label": "HEAD.entry_point",
+			"exit": {
+				"#next": [
+					"ND.cmate0",
+					"ND.cmate0auto",
+					"ND.do",
+					"ND.getmate",
+					"ND.hash",
+					"ND.kifu",
+					"ND.kikisu",
+					"ND.kmugokidir",
+					"ND.kmugoki",
+					"ND.ky0",
+					"ND.ky",
+					"ND.quit",
+					"ND.rand",
+					"ND.reload",
+					"ND.rndkms",
+					"ND.rndms",
+					"ND.rndpos",
+					"ND.same",
+					"ND.sasite",
+					"ND.teigi_conv",
+					"ND.test",
+					"ND.undo",
+
+					"ND.usi.go",
+					"ND.usi.isready",
+					"ND.usi.setoption",
+					"ND.usi.position",
+					"ND.usi.usinewgame",
+					"ND.usi.usi"
+				]
+			}
+		},
 		{
 			"label": "#else",
 			"fn": "do_other"
@@ -160,7 +165,7 @@
 			"token": "go",
 			"fn": "do_go",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.go_btime"
 				],
 				"#newline": [
@@ -173,7 +178,7 @@
 			"token": "btime",
 			"fn": "do_go_btime",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.go_btimevar"
 				]
 			}
@@ -183,7 +188,7 @@
 			"regex": "(\\d+)",
 			"fn": "do_go_btimevar",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.go_wtime"
 				]
 			}
@@ -193,7 +198,7 @@
 			"token": "wtime",
 			"fn": "do_go_wtime",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.go_wtimevar"
 				]
 			}
@@ -203,7 +208,7 @@
 			"regex": "(\\d+)",
 			"fn": "do_go_wtimevar",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.go_binc"
 				]
 			}
@@ -213,7 +218,7 @@
 			"token": "binc",
 			"fn": "do_go_binc",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.go_bincvar"
 				]
 			}
@@ -223,7 +228,7 @@
 			"regex": "(\\d+)",
 			"fn": "do_go_bincvar",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.go_winc"
 				]
 			}
@@ -233,7 +238,7 @@
 			"token": "winc",
 			"fn": "do_go_winc",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.go_wincvar"
 				]
 			}
@@ -245,7 +250,12 @@
 		},
 		{
 			"label": "ND.usi.go_linebreak",
-			"fn": "do_go_linebreak"
+			"fn": "do_go_linebreak",
+			"exit": {
+				"#next": [
+					"HEAD.entry_point"
+				]
+			}			
 		},
 		{
 			"label": "ND.usi.isready",
@@ -257,7 +267,7 @@
 			"token": "setoption",
 			"fn": "do_setoption",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.setoption_name"
 				],
 				"#newline": [
@@ -270,7 +280,7 @@
 			"token": "name",
 			"fn": "do_setoption_name",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.setoption_namevar"
 				]
 			}
@@ -280,7 +290,7 @@
 			"regex": "(\\w+)",
 			"fn": "do_setoption_namevar",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.setoption_value"
 				]
 			}
@@ -290,7 +300,7 @@
 			"token": "value",
 			"fn": "do_setoption_value",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.setoption_valuevar"
 				]
 			}
@@ -298,18 +308,23 @@
 		{
 			"label": "ND.usi.setoption_valuevar",
 			"regex": "([\\d\\w]+)",
-			"fn": "do/usi.setoption_valuevar"
+			"fn": "do_setoption_valuevar"
 		},
 		{
 			"label": "ND.usi.setoption_linebreak",
-			"fn": "do_setoption_linebreak"
+			"fn": "do_setoption_linebreak",
+			"exit": {
+				"#next": [
+					"HEAD.entry_point"
+				]
+			}			
 		},
 		{
 			"label": "ND.usi.position",
 			"token": "position",
 			"fn": "do_position",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.position_sfen",
 					"ND.usi.position_startpos"
 				]
@@ -319,7 +334,7 @@
 			"label": "ND.usi.position_sfen",
 			"token": "sfen",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.position_sfen_board"
 				]
 			}
@@ -329,7 +344,7 @@
 			"regex": "([\\d\\w/]+)",
 			"fn": "do_position_sfen_board",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.position_sfen_turn"
 				]
 			}
@@ -338,7 +353,7 @@
 			"label": "ND.usi.position_sfen_turn",
 			"regex": "([bw])",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.position_sfen_hands"
 				]
 			}
@@ -348,7 +363,7 @@
 			"regex": "([\\d\\w+]*)",
 			"fn": "do_position_sfen_hands",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.position_sfen_ply"
 				]
 			}
@@ -357,7 +372,7 @@
 			"label": "ND.usi.position_sfen_ply",
 			"token": "1",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.position_sfen_moves"
 				]
 			}
@@ -366,7 +381,7 @@
 			"label": "ND.usi.position_sfen_moves",
 			"token": "moves",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.position_sfen_movevar"
 				]
 			}
@@ -376,7 +391,7 @@
 			"regex": "([\\d\\w+*]+)",
 			"fn": "do_position_sfen_movevar",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.position_sfen_movevar"
 				]
 			}
@@ -386,7 +401,7 @@
 			"token": "startpos",
 			"fn": "do_position_startpos",
 			"exit": {
-				"next": [
+				"#next": [
 					"ND.usi.position_sfen_moves"
 				]
 			}

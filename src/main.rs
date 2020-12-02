@@ -7,6 +7,17 @@
 /// 外部クレートを利用しているので、cargo build でコンパイルすること。rustc main.rs ではコンパイルが成功しない。
 /// 実行ファイルは target/debug/kifuwarabe_shogi2018.exe だぜ☆
 ///
+/// ```
+/// ### コンパイル
+/// cls
+/// cd C:\MuzudhoDrive\projects_rust\kifuwarabe_shogi2018
+/// cargo clippy
+/// 
+/// ### 実行
+/// cargo run --release
+/// ```
+
+
 // #[macro_use]
 // extern crate log;
 extern crate env_logger;
@@ -20,7 +31,7 @@ extern crate lazy_static;
 
 // #[macro_use(hashmap)]
 extern crate kifuwarabe_shell;
-use kifuwarabe_shell::graph::*;
+use kifuwarabe_shell::diagram::*;
 use kifuwarabe_shell::shell::*;
 
 extern crate kifuwarabe_position;
@@ -70,7 +81,7 @@ lazy_static! {
     static ref UCHU_WRAP: RwLock<Uchu> = RwLock::new(Uchu::new());
 }
 
-const GRAPH_JSON_FILE: &str = "graph.json";
+const GRAPH_JSON_FILE: &str = "diagram.json";
 fn main() {
     //println!("main: begin.");
     // TODO ロガー
@@ -122,79 +133,77 @@ fn main() {
     }
 
     // グラフの作成。
-    //println!("main: Graph::new().");
-    let mut graph = Graph::new();
+    let mut diagram = Diagram::new();
     // コントローラーを登録。
     // [C]
-    graph.insert_fn("do_cmate0", do_cmate0);
-    graph.insert_fn("do_cmate0auto", do_cmate0auto);
+    diagram.insert_fn("do_cmate0", do_cmate0);
+    diagram.insert_fn("do_cmate0auto", do_cmate0auto);
     // [D]
-    graph.insert_fn("do_do", do_do);
+    diagram.insert_fn("do_do", do_do);
     // [G]
-    graph.insert_fn("do_getmate", do_getmate);
+    diagram.insert_fn("do_getmate", do_getmate);
     // [H]
-    graph.insert_fn("do_hash", do_hash);
+    diagram.insert_fn("do_hash", do_hash);
     // [K]
-    graph.insert_fn("do_kifu", do_kifu);
-    graph.insert_fn("do_kikisu", do_kikisu);
-    graph.insert_fn("do_kmmove", do_kmmove);
-    graph.insert_fn("do_kmugokidir", do_kmugokidir);
-    graph.insert_fn("do_kmugoki", do_kmugoki);
-    graph.insert_fn("do_ky0", do_ky0);
-    graph.insert_fn("do_ky", do_ky);
+    diagram.insert_fn("do_kifu", do_kifu);
+    diagram.insert_fn("do_kikisu", do_kikisu);
+    diagram.insert_fn("do_kmmove", do_kmmove);
+    diagram.insert_fn("do_kmugokidir", do_kmugokidir);
+    diagram.insert_fn("do_kmugoki", do_kmugoki);
+    diagram.insert_fn("do_ky0", do_ky0);
+    diagram.insert_fn("do_ky", do_ky);
     // [O]
-    graph.insert_fn("do_other", do_other);
+    diagram.insert_fn("do_other", do_other);
     // [Q]
-    graph.insert_fn("do_quit", do_quit);
+    diagram.insert_fn("do_quit", do_quit);
     // [R]
-    graph.insert_fn("do_rand", do_rand);
-    graph.insert_fn("do_reload", do_reload);
-    graph.insert_fn("do_rndkms", do_rndkms);
-    graph.insert_fn("do_rndms", do_rndms);
-    graph.insert_fn("do_rndpos", do_rndpos);
+    diagram.insert_fn("do_rand", do_rand);
+    diagram.insert_fn("do_reload", do_reload);
+    diagram.insert_fn("do_rndkms", do_rndkms);
+    diagram.insert_fn("do_rndms", do_rndms);
+    diagram.insert_fn("do_rndpos", do_rndpos);
     // [S]
-    graph.insert_fn("do_same", do_same);
-    graph.insert_fn("do_sasite", do_sasite);
+    diagram.insert_fn("do_same", do_same);
+    diagram.insert_fn("do_sasite", do_sasite);
     // [T]
-    graph.insert_fn("do_teigi_conv", do_teigi_conv);
-    graph.insert_fn("do_test", do_test);
+    diagram.insert_fn("do_teigi_conv", do_teigi_conv);
+    diagram.insert_fn("do_test", do_test);
     // [U]
-    graph.insert_fn("do_undo", do_undo);
+    diagram.insert_fn("do_undo", do_undo);
 
     // #### USI ####
     // [G]
-    graph.insert_fn("do_go", do_go);
-    graph.insert_fn("do_go_btime", do_go_btime);
-    graph.insert_fn("do_go_btimevar", do_go_btimevar);
-    graph.insert_fn("do_go_wtime", do_go_wtime);
-    graph.insert_fn("do_go_wtimevar", do_go_wtimevar);
-    graph.insert_fn("do_go_binc", do_go_binc);
-    graph.insert_fn("do_go_bincvar", do_go_bincvar);
-    graph.insert_fn("do_go_winc", do_go_winc);
-    graph.insert_fn("do_go_wincvar", do_go_wincvar);
-    graph.insert_fn("do_go_linebreak", do_go_linebreak);
+    diagram.insert_fn("do_go", do_go);
+    diagram.insert_fn("do_go_btime", do_go_btime);
+    diagram.insert_fn("do_go_btimevar", do_go_btimevar);
+    diagram.insert_fn("do_go_wtime", do_go_wtime);
+    diagram.insert_fn("do_go_wtimevar", do_go_wtimevar);
+    diagram.insert_fn("do_go_binc", do_go_binc);
+    diagram.insert_fn("do_go_bincvar", do_go_bincvar);
+    diagram.insert_fn("do_go_winc", do_go_winc);
+    diagram.insert_fn("do_go_wincvar", do_go_wincvar);
+    diagram.insert_fn("do_go_linebreak", do_go_linebreak);
     // [I]
-    graph.insert_fn("do_isready", do_isready);
+    diagram.insert_fn("do_isready", do_isready);
     // [P]
-    graph.insert_fn("do_position", do_position);
-    graph.insert_fn("do_position_sfen_board", do_position_sfen_board);
-    graph.insert_fn("do_position_sfen_hands", do_position_sfen_hands);
-    graph.insert_fn("do_position_sfen_movevar", do_position_sfen_movevar);
-    graph.insert_fn("do_position_startpos", do_position_startpos);
+    diagram.insert_fn("do_position", do_position);
+    diagram.insert_fn("do_position_sfen_board", do_position_sfen_board);
+    diagram.insert_fn("do_position_sfen_hands", do_position_sfen_hands);
+    diagram.insert_fn("do_position_sfen_movevar", do_position_sfen_movevar);
+    diagram.insert_fn("do_position_startpos", do_position_startpos);
     // [S]
-    graph.insert_fn("do_setoption", do_setoption);
-    graph.insert_fn("do_setoption_name", do_setoption_name);
-    graph.insert_fn("do_setoption_namevar", do_setoption_namevar);
-    graph.insert_fn("do_setoption_value", do_setoption_value);
-    graph.insert_fn("do_setoption_valuevar", do_setoption_valuevar);
-    graph.insert_fn("do_setoption_linebreak", do_setoption_linebreak);
+    diagram.insert_fn("do_setoption", do_setoption);
+    diagram.insert_fn("do_setoption_name", do_setoption_name);
+    diagram.insert_fn("do_setoption_namevar", do_setoption_namevar);
+    diagram.insert_fn("do_setoption_value", do_setoption_value);
+    diagram.insert_fn("do_setoption_valuevar", do_setoption_valuevar);
+    diagram.insert_fn("do_setoption_linebreak", do_setoption_linebreak);
     // [U]
-    graph.insert_fn("do_usinewgame", do_usinewgame);
-    graph.insert_fn("do_usi", do_usi);
+    diagram.insert_fn("do_usinewgame", do_usinewgame);
+    diagram.insert_fn("do_usi", do_usi);
 
     // ファイルからグラフのノード構成を読取。
-    //println!("main: read_graph_file.");
-    graph.read_graph_file(GRAPH_JSON_FILE.to_string());
+    diagram.read_file(&GRAPH_JSON_FILE);
     // - 正規表現は、うまく作れていない。全体を丸括弧で囲む。1個だけ。
     // - #linebreak コールバック関数は行終了時に実行される。
 
@@ -204,5 +213,5 @@ fn main() {
 
     // [Ctrl]+[C] で強制終了
     //println!("main: shell.run:");
-    shell.run(&graph, &mut shell_var);
+    shell.run(&mut diagram, &mut shell_var);
 }

@@ -1,7 +1,6 @@
 // デバッグ出力。
 const VERBOSE: bool = false;
 
-//use config::*;
 use consoles;
 use consoles::unit_test::*;
 use consoles::visuals::dumps::*;
@@ -10,9 +9,9 @@ use display_impl::*;
 use kifuwarabe_movement_picker::*;
 use kifuwarabe_usi::*;
 use rand::Rng;
+use kifuwarabe_shell::diagram::ResponseOption;
 use searcher_impl::*;
 use std::collections::HashSet;
-// use teigi::constants::*;
 use thinks;
 use thinks::think::*;
 use tusin::us_conv::*;
@@ -22,7 +21,7 @@ use *;
 
 // 任意のオブジェクト。
 pub struct ShellVar {
-    player_milliseconds_array: [i32; 2],
+    phase_milliseconds_array: [i32; 2],
     /// 探索部で使う。
     pub searcher: Searcher,
     /// エンジン設定。
@@ -34,7 +33,7 @@ impl ShellVar {
     pub fn new() -> ShellVar {
         use kifuwarabe_usi::Piece::Space;
         ShellVar {
-            player_milliseconds_array: [0, 0],
+            phase_milliseconds_array: [0, 0],
             searcher: Searcher::new(),
             engine_settings: EngineSettings::new(),
             ban: [
@@ -59,14 +58,14 @@ impl ShellVar {
 /// 詰んでいたら真。
 pub fn sub_cmate0(shell_var: &mut ShellVar) -> bool {
     // 探索時間は無制限(最大時間)。
-    shell_var.player_milliseconds_array[Sengo::Sen as usize] = <i32>::max_value();
-    shell_var.player_milliseconds_array[Sengo::Go as usize] = <i32>::max_value();
+    shell_var.phase_milliseconds_array[Sengo::Sen as usize] = <i32>::max_value();
+    shell_var.phase_milliseconds_array[Sengo::Go as usize] = <i32>::max_value();
 
     // 自分の手番
     let turn_num = shell_var.searcher.game_record.get_teban(Jiai::Ji) as usize;
 
     // 自分の持ち時間。
-    let milliseconds = shell_var.player_milliseconds_array[turn_num];
+    let milliseconds = shell_var.phase_milliseconds_array[turn_num];
 
     // 思考する。
     let bestmove = think(shell_var, milliseconds, 1);
@@ -136,15 +135,15 @@ pub fn do_cmate0auto(
 /// 指し手を入れる。
 pub fn do_do(
     shell_var: &mut ShellVar,
-    request: &Request,
+    req: &Request,
     _res: &mut dyn Response,
 ) {
     // コマンド読取。棋譜に追加され、手目も増える
-    // let (successful, umov) = parse_movement(&request.get_line(), &mut response.get_caret(), request.get_line_len());
+    // let (successful, umov) = parse_movement(&req.get_line(), &mut res.get_caret(), req.get_line_len());
     let (successful, umov) = parse_movement(
-        &request.get_line(),
-        &mut request.get_caret(),
-        request.get_line_len(),
+        &req.get_line(),
+        &mut req.get_caret(),
+        req.get_line_len(),
     );
     let movement = usi_to_movement(successful, umov); // &umov
 
@@ -186,87 +185,79 @@ pub fn do_getmate(
 pub fn do_go(
     shell_var: &mut ShellVar,
     _req: &Request,
-    response: &mut dyn Response,
+    _res: &mut dyn Response,
 ) {
     // 指定しなければ無制限。
-    shell_var.player_milliseconds_array[Sengo::Sen as usize] = <i32>::max_value();
-    shell_var.player_milliseconds_array[Sengo::Go as usize] = <i32>::max_value();
-    response.forward("next");
+    shell_var.phase_milliseconds_array[Sengo::Sen as usize] = <i32>::max_value();
+    shell_var.phase_milliseconds_array[Sengo::Go as usize] = <i32>::max_value();
 }
 
 pub fn do_go_btime(
     _shell_var: &mut ShellVar,
     _req: &Request,
-    response: &mut dyn Response,
+    _res: &mut dyn Response,
 ) {
-    response.forward("next");
 }
 
 pub fn do_go_btimevar(
     shell_var: &mut ShellVar,
-    request: &Request,
-    response: &mut dyn Response,
+    req: &Request,
+    _res: &mut dyn Response,
 ) {
-    let word = &request.get_groups()[0];
+    let word = &req.get_groups()[0];
     let num: i32 = word.parse().unwrap();
-    shell_var.player_milliseconds_array[0] = num;
-    response.forward("next");
+    shell_var.phase_milliseconds_array[0] = num;
 }
 
 pub fn do_go_wtime(
     _shell_var: &mut ShellVar,
     _req: &Request,
-    response: &mut dyn Response,
+    _res: &mut dyn Response,
 ) {
-    response.forward("next");
 }
 
 pub fn do_go_wtimevar(
     shell_var: &mut ShellVar,
-    request: &Request,
-    response: &mut dyn Response,
+    req: &Request,
+    _res: &mut dyn Response,
 ) {
-    let word = &request.get_groups()[0];
+    let word = &req.get_groups()[0];
     let num: i32 = word.parse().unwrap();
-    shell_var.player_milliseconds_array[1] = num;
-    response.forward("next");
+    shell_var.phase_milliseconds_array[1] = num;
 }
 
 pub fn do_go_binc(
     _shell_var: &mut ShellVar,
     _req: &Request,
-    response: &mut dyn Response,
+    _res: &mut dyn Response,
 ) {
-    response.forward("next");
 }
 
 pub fn do_go_bincvar(
     shell_var: &mut ShellVar,
-    request: &Request,
-    response: &mut dyn Response,
+    req: &Request,
+    _res: &mut dyn Response,
 ) {
-    let word = &request.get_groups()[0];
+    let word = &req.get_groups()[0];
     let num: i32 = word.parse().unwrap();
-    shell_var.player_milliseconds_array[0] += num;
-    response.forward("next");
+    shell_var.phase_milliseconds_array[0] += num;
 }
 
 pub fn do_go_winc(
     _shell_var: &mut ShellVar,
     _req: &Request,
-    response: &mut dyn Response,
+    _res: &mut dyn Response,
 ) {
-    response.forward("next");
 }
 
 pub fn do_go_wincvar(
     shell_var: &mut ShellVar,
-    request: &Request,
+    req: &Request,
     _res: &mut dyn Response,
 ) {
-    let word = &request.get_groups()[0];
+    let word = &req.get_groups()[0];
     let num: i32 = word.parse().unwrap();
-    shell_var.player_milliseconds_array[1] += num;
+    shell_var.phase_milliseconds_array[1] += num;
 }
 
 pub fn do_go_linebreak(
@@ -278,7 +269,7 @@ pub fn do_go_linebreak(
     let turn_num = shell_var.searcher.game_record.get_teban(Jiai::Ji) as usize;
 
     // 自分の持ち時間。
-    let milliseconds = shell_var.player_milliseconds_array[turn_num];
+    let milliseconds = shell_var.phase_milliseconds_array[turn_num];
 
     // 思考する。
     let max_depth = get_max_depth(shell_var);
@@ -446,14 +437,13 @@ pub fn do_other(
 pub fn do_position(
     shell_var: &mut ShellVar,
     _req: &Request,
-    response: &mut dyn Response,
+    _res: &mut dyn Response,
 ) {
     //println!("Position: begin.");
     // 初期局面、現局面ともにクリアーします。手目も 0 に戻します。
     shell_var.searcher.ini_position.clear();
     shell_var.searcher.cur_position.clear();
     shell_var.searcher.game_record.set_teme(0);
-    response.forward("next");
 }
 
 fn sub_load_board(
@@ -479,30 +469,28 @@ fn sub_load_board(
 /// USIプロトコル参照。
 pub fn do_position_sfen_board(
     shell_var: &mut ShellVar,
-    request: &Request,
-    response: &mut dyn Response,
+    req: &Request,
+    _res: &mut dyn Response,
 ) {
     //println!("Sfen board: begin.");
     let mut starts = 0;
-    let line = &request.get_groups()[0];
+    let line = &req.get_groups()[0];
     let len = line.chars().count();
 
     // position コマンド 盤上部分のみ 読取
     shell_var.ban = parse_board(&line, &mut starts, len);
     sub_load_board(shell_var);
-
-    response.forward("next");
 }
 
 /// USIプロトコル参照。
 pub fn do_position_sfen_hands(
     shell_var: &mut ShellVar,
-    request: &Request,
-    response: &mut dyn Response,
+    req: &Request,
+    _res: &mut dyn Response,
 ) {
     //println!("Sfen hands: begin.");
     let mut starts = 0;
-    let line = &request.get_groups()[0];
+    let line = &req.get_groups()[0];
     let len = line.chars().count();
 
     // 持ち駒数。増減させたいので、u8 ではなく i8。
@@ -516,19 +504,18 @@ pub fn do_position_sfen_hands(
             .ini_position
             .set_mg(km, hand_count_arr[i]);
     }
-    response.forward("next");
 }
 
 /// USIプロトコル参照。
 /// 指し手１つ分のパース。
 pub fn do_position_sfen_movevar(
     shell_var: &mut ShellVar,
-    request: &Request,
-    response: &mut dyn Response,
+    req: &Request,
+    _res: &mut dyn Response,
 ) {
     //println!("Sfen movevar: begin.");
     let mut starts = 0;
-    let line = &request.get_groups()[0];
+    let line = &req.get_groups()[0];
     let len = line.chars().count();
 
     // 指し手を1つずつ返すぜ☆（＾～＾）
@@ -541,8 +528,6 @@ pub fn do_position_sfen_movevar(
         let mut dummy_alpha = 0;
         userdefined_makemove(&mut shell_var.searcher, movement.to_hash(), &mut dummy_alpha);
     }
-
-    response.forward("next");
     //println!("Sfen movevar: end.");
 }
 
@@ -550,7 +535,7 @@ pub fn do_position_sfen_movevar(
 pub fn do_position_startpos(
     shell_var: &mut ShellVar,
     _req: &Request,
-    response: &mut dyn Response,
+    _res: &mut dyn Response,
 ) {
     //println!("Position startpos: begin.");
     // 別途用意した平手初期局面文字列を読取
@@ -559,8 +544,6 @@ pub fn do_position_startpos(
     // position コマンド 盤上部分のみ 読取
     shell_var.ban = parse_board(&STARTPOS.to_string(), &mut local_starts, STARTPOS_LN);
     sub_load_board(shell_var);
-
-    response.forward("next");
     //println!("Position startpos: end.");
 }
 
@@ -572,9 +555,9 @@ pub fn do_position_startpos(
 pub fn do_quit(
     _shell_var: &mut ShellVar,
     _req: &Request,
-    response: &mut dyn Response,
+    res: &mut dyn Response,
 ) {
-    response.set_quits(true);
+    res.set_option(ResponseOption::Quits);
 }
 
 /*****
@@ -597,9 +580,9 @@ pub fn do_rand(
 pub fn do_reload(
     _shell_var: &mut ShellVar,
     _req: &Request,
-    response: &mut dyn Response,
+    res: &mut dyn Response,
 ) {
-    response.set_reloads(GRAPH_JSON_FILE);
+    res.set_option(ResponseOption::Reloads(GRAPH_JSON_FILE.to_string()));
 }
 
 /// 駒種類をランダムで出す。
@@ -718,12 +701,11 @@ pub fn do_sasite(
 pub fn do_setoption(
     _shell_var: &mut ShellVar,
     _req: &Request,
-    response: &mut dyn Response,
+    _res: &mut dyn Response,
 ) {
     if VERBOSE {
         println!("#Setoption: begin.");
     }
-    response.forward("next");
     if VERBOSE {
         println!("#Setoption: end.");
     }
@@ -731,27 +713,25 @@ pub fn do_setoption(
 pub fn do_setoption_name(
     _shell_var: &mut ShellVar,
     _req: &Request,
-    response: &mut dyn Response,
+    _res: &mut dyn Response,
 ) {
     if VERBOSE {
         println!("#Setoption name: begin.");
     }
-    response.forward("next");
     if VERBOSE {
         println!("#Setoption name: end.");
     }
 }
 pub fn do_setoption_namevar(
     shell_var: &mut ShellVar,
-    request: &dyn Request,
-    response: &mut dyn Response,
+    req: &dyn Request,
+    _res: &mut dyn Response,
 ) {
-    let name = &request.get_groups()[0];
+    let name = &req.get_groups()[0];
     if VERBOSE {
         println!("#Setoption namevar: begin. [{}]", name);
     }
     shell_var.engine_settings.buffer_name = name.to_string();
-    response.forward("next");
     if VERBOSE {
         println!("#Setoption namevar: end.");
     }
@@ -759,27 +739,25 @@ pub fn do_setoption_namevar(
 pub fn do_setoption_value(
     _shell_var: &mut ShellVar,
     _req: &Request,
-    response: &mut dyn Response,
+    _res: &mut dyn Response,
 ) {
     if VERBOSE {
         println!("#Setoption value: begin.");
     }
-    response.forward("next");
     if VERBOSE {
         println!("#Setoption value: end.");
     }
 }
 pub fn do_setoption_valuevar(
     shell_var: &mut ShellVar,
-    request: &dyn Request,
-    response: &mut dyn Response,
+    req: &dyn Request,
+    _res: &mut dyn Response,
 ) {
-    let value = &request.get_groups()[0];
+    let value = &req.get_groups()[0];
     if VERBOSE {
         println!("#Setoption valuevar: begin. [{}]", value);
     }
     shell_var.engine_settings.buffer_value = value.to_string();
-    response.set_done_line(true);
     if VERBOSE {
         println!("#Setoption valuevar: end.");
     }
@@ -823,20 +801,20 @@ pub fn do_teigi_conv(
 /// いろいろな動作テストをしたいときに汎用的に使う。
 pub fn do_test(
     shell_var: &mut ShellVar,
-    request: &Request,
+    req: &Request,
     _res: &mut dyn Response,
 ) {
     LOGGER.try_write().unwrap().writeln(&format!(
         "test caret={} len={}",
-        request.get_caret(),
-        request.get_line_len()
+        req.get_caret(),
+        req.get_line_len()
     ));
-    // test(&shell_var.searcher, &request.get_line(), &mut response.get_caret(), request.get_line_len());
+    // test(&shell_var.searcher, &req.get_line(), &mut res.get_caret(), req.get_line_len());
     test(
         &shell_var.searcher,
-        &request.get_line(),
-        &mut request.get_caret(),
-        request.get_line_len(),
+        &req.get_line(),
+        &mut req.get_caret(),
+        req.get_line_len(),
     );
 }
 

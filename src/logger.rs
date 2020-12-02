@@ -106,8 +106,12 @@ impl Logger {
                         let file_path = Path::new(&path_str);
                         // 拡張子を見て、ログファイルであることを確かめる。
                         if file_path.extension() == Some(OsStr::new("log")) {
-                            fs::remove_file(path_str.to_string());
-                            println!("Removed: {}", path_str.to_string());
+                            match fs::remove_file(path_str.to_string()) {
+                                Ok(_n) => {},
+                                Err(err) => panic!("Remove log file error. {}", err),
+                            };
+                            // USIで メッセージがでると反則負けになってしまう。
+                            // println!("Removed: {}", path_str.to_string());
                         }
                     }
                 },

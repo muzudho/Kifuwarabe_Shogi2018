@@ -73,7 +73,7 @@ const PLAYER_KIND_STR : [&str;CSA_PLAYER_KIND_LN] = [
   "LAN",
 ];
 
-var playerKind : [PlayerKind;2];
+var phaseKind : [PhaseKind;2];
 var teHistory : [Te;1000];
 
 const CSAKOMASTR : [&str;48] = [
@@ -130,7 +130,7 @@ pub fn csa_main(argc:int, argv:[2:char])
 
   let mut sikou_jikan_total : [i64;2] = [0, 0];
 
-  if !playerKindStr.Contains(argv[1]) or !playerKindStr.Contains(argv[2]) {
+  if !phaseKindStr.Contains(argv[1]) or !phaseKindStr.Contains(argv[2]) {
     // なければ説明出して終わり
     show_usage();
     std::process::exit(1);
@@ -140,13 +140,13 @@ pub fn csa_main(argc:int, argv:[2:char])
   let mut password = "KifuwarabePass";
   let mut server_domain = "usapyon.dip.jp";
   let mut port = 4081;
-  if (playerKindStr[0]==LAN && playerKindStr[1]==LAN) {
+  if (phaseKindStr[0]==LAN && phaseKindStr[1]==LAN) {
     g_writeln("Can't match LAN against LAN.");
     show_usage();
     std::process::exit(1);
   }
 
-  if (playerKindStr[0]==LAN || playerKindStr[1]==LAN) {
+  if (phaseKindStr[0]==LAN || phaseKindStr[1]==LAN) {
     // LAN同士
     if (user_name[0]=='\0') {
       show_usage();
@@ -205,12 +205,12 @@ pub fn csa_main(argc:int, argv:[2:char])
       var buf_login;
       CsaRecv(buf_login);
       if (buf_login=="Your_Turn:+\n") {
-        if (playerKind[0]==LAN) {
-          swap(playerKind[0], playerKind[1]);
+        if (phaseKind[0]==LAN) {
+          swap(phaseKind[0], phaseKind[1]);
         }
       } else if (buf_login=="Your_Turn:-\n") {
-        if (playerKind[1]==LAN) {
-          swap(playerKind[0], playerKind[1]);
+        if (phaseKind[1]==LAN) {
+          swap(phaseKind[0], phaseKind[1]);
         }
       } else if (buf_login=="END Game_Summary\n") {
         break;
